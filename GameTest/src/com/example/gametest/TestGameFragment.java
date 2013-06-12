@@ -4,16 +4,22 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class TestGameFragment extends GameFragment {
-	public TestGameFragment() {
-		setTargetFps(60);
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setTargetFps(60);
 		this.showStats = true;
-	}
+
+        this.run();
+    }
 
 	long totalTime;
 	boolean touching;
@@ -74,9 +80,31 @@ public class TestGameFragment extends GameFragment {
 	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
+		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
+			if (isRunning())
+				postHalt();
+			else
+				run();
+		}
 		touching = me.getActionMasked() != MotionEvent.ACTION_UP;
 		touchX = me.getX();
 		touchY = me.getY();
 		return true;
+	}
+	
+	/*
+	 * Called whenever the game thread is started.
+	 */
+	@Override
+	public void onRun() {
+		getActivity().setTitle("Super Duper Game-o-Loops");
+	}
+	
+	/*
+	 * Called when the game thread is stopped.
+	 */
+	@Override
+	public void onHalt() {
+		getActivity().setTitle("Resting for a moment...");
 	}
 }

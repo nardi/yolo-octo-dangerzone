@@ -44,7 +44,7 @@ public abstract class GameFragment extends Fragment
 	
 	private Paint statsPaint = new Paint();
 	private long beginTime, timeDiff, sleepTime, updateTime,
-		updateCount, drawCount, prevUpdate, gameStartTime;
+		updateCount, drawCount, gameStartTime;
 
 	{
 		setTargetFps(60);
@@ -63,6 +63,10 @@ public abstract class GameFragment extends Fragment
 		if (gameStartTime == 0)
 			return 0;
 		return SystemClock.uptimeMillis() - gameStartTime;
+	}
+	
+	public boolean isRunning() {
+		return running;
 	}
 
 	@Override
@@ -84,15 +88,15 @@ public abstract class GameFragment extends Fragment
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		surfaceHolder = holder;
+		
+		Canvas c = holder.lockCanvas();
+		thread.draw(c);
+		holder.unlockCanvasAndPost(c);
+		
 		surfaceCreated = true;
 		
 		if (thread.waiting())
 			thread.shouldWait(false);
-		
-		if (paused) {
-			paused = false;
-			this.run();
-		}
 	}
 	
 	protected void onRun() {}
@@ -101,18 +105,24 @@ public abstract class GameFragment extends Fragment
 		if (!running) {
 			onRun();
 			running = true;
-			if (thread.getState() != Thread.State.NEW)
+			if (thread.getState() != Thread.State.NEW) {
 				thread = new GameThread();
+				getView().setOnTouchListener(thread);
+			}
 			thread.start();
 		}
 	}
 	
 	protected void onHalt() {}
 	
+	public void postHalt() {
+		onHalt();
+		running = false;
+	}
+	
 	public synchronized void halt() {
 		if (running) {
-			onHalt();
-			running = false;
+			postHalt();
 			while (true) {
 				try {
 					thread.join();
@@ -135,15 +145,18 @@ public abstract class GameFragment extends Fragment
 	
 	private class GameThread extends Thread implements View.OnTouchListener {
 		private boolean m_waiting = false;
-		private boolean m_shouldWait = true;
+		private boolean m_shouldWait = false;
+		private Object waitLock = new Object();
 		
-		public synchronized boolean waiting() {
-			return m_waiting;
+		public boolean waiting() {
+			synchronized (waitLock) { return m_waiting; }
 		}
 		
-		public synchronized void shouldWait(boolean b) {
-			m_shouldWait = b;
+		public void shouldWait(boolean b) {
+			synchronized (waitLock) { m_shouldWait = b; }
 		}			
+		
+		long prevUpdate;
 		
 		private synchronized void update() {
 			if (prevUpdate == 0)
@@ -237,9 +250,9 @@ public abstract class GameFragment extends Fragment
 		 * or block it after completing the current update-draw cycle.
 		 * It seems to be about equal in performance.
 		 */
-		thread.shouldWait(true); 	// Block thread
-		while (!thread.waiting());
-		//this.halt(); 				// Shut down thread
+		/* thread.shouldWait(true); 	// Block thread
+		while (!thread.waiting()); */
+		this.halt(); 					// Shut down thread
 		surfaceHolder = null;
     }
 	
@@ -247,6 +260,19 @@ public abstract class GameFragment extends Fragment
 	public void onPause() {
 		super.onPause();
 
-		paused = true;
+		if (running) {
+			this.halt();
+			paused = true;
+		}
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+
+		if (paused) {
+			this.run();
+			paused = false;
+		}
 	}
 }
