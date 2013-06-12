@@ -58,6 +58,12 @@ public abstract class GameFragment extends Fragment
 		targetFps = fps;
 		updatePeriod = 1000f / targetFps;
 	}
+	
+	public long getTotalTime() {
+		if (gameStartTime == 0)
+			return 0;
+		return SystemClock.uptimeMillis() - gameStartTime;
+	}
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -208,7 +214,7 @@ public abstract class GameFragment extends Fragment
 				updateCount += framesSkipped + 1;
 				drawCount++;
 				
-				Log.d("GameFragment", "Game time = " + (SystemClock.uptimeMillis() - gameStartTime));
+				Log.d("GameFragment", "Game time = " + getTotalTime());
 			}
 		}
 
