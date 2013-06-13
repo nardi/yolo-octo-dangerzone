@@ -7,10 +7,12 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 public class PauseDialogFragment extends DialogFragment {
+	GameFragment game = null;
+	
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		final GameFragment game = (GameFragment)getActivity().getFragmentManager()
+		game = (GameFragment)getActivity().getFragmentManager()
 				.findFragmentById(getArguments().getInt("gameId"));
 		
 		builder.setMessage("Paused!");
@@ -20,9 +22,13 @@ public class PauseDialogFragment extends DialogFragment {
 				game.run();
 			}
 		});
-        
-        builder.setCancelable(false);
 
         return builder.create();
+	}
+	
+	@Override
+	public void onCancel(DialogInterface dialog) {
+		if (game != null)
+			game.run();
 	}
 }
