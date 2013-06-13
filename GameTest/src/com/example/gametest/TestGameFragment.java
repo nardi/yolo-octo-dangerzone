@@ -1,14 +1,24 @@
 package com.example.gametest;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.app.Fragment;
+import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.LinearLayout.LayoutParams;
 
 public class TestGameFragment extends GameFragment {
 	@Override
@@ -76,20 +86,27 @@ public class TestGameFragment extends GameFragment {
 			canvas.restore();
 	}
 
+	private void showPauseMenu() {
+		Fragment frag = new PauseDialogFragment();
+		Bundle args = new Bundle();
+		args.putInt("gameId", R.id.testGameFragment);
+		frag.setArguments(args);
+		getActivity().getFragmentManager().beginTransaction()
+			.add(frag, "pauseMenu").commit();
+	}
+	
 	/*
 	 * Called when you touch the game view.
 	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
-		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
-			if (isRunning())
-				postHalt();
-			else
-				run();
-		}
 		touching = me.getActionMasked() != MotionEvent.ACTION_UP;
 		touchX = me.getX();
 		touchY = me.getY();
+		if (touchX < 50 && touchY < 50 && isRunning()) {
+			postHalt();
+			showPauseMenu();
+		}
 		return true;
 	}
 	
