@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -52,7 +53,8 @@ public abstract class GameFragment extends Fragment
 		setTargetFps(60);
 		
 		statsPaint.setColor(Color.WHITE);
-		statsPaint.setShadowLayer(3, 1, 1, Color.BLACK);
+		statsPaint.setStyle(Style.FILL_AND_STROKE);
+		statsPaint.setStrokeWidth(0);
 		statsPaint.setTextSize(30);
 	}
 	
