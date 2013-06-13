@@ -1,0 +1,3 @@
+[submodule "Android-libmpg"]
+      path = Android-libmpg
+      url = git://github.com/Nobleworks/Android-libmpg.git
