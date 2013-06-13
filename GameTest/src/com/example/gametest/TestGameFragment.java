@@ -17,6 +17,7 @@ public class TestGameFragment extends GameFragment {
 
         setTargetFps(60);
 		this.showStats = true;
+		this.alwaysRecieveEvents = true;
 
         this.run();
     }
@@ -97,7 +98,7 @@ public class TestGameFragment extends GameFragment {
 	 */
 	@Override
 	public void onRun() {
-		getActivity().setTitle("Super Duper Game-o-Loops");
+		getActivity().setTitle("Super Duper Game-o-Looper");
 	}
 	
 	/*

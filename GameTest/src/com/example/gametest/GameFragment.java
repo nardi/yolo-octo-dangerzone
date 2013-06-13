@@ -1,5 +1,6 @@
 package com.example.gametest;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -41,6 +42,7 @@ public abstract class GameFragment extends Fragment
 	private int targetFps;
 	private float updatePeriod;
 	public boolean showStats = false;
+	public boolean alwaysRecieveEvents = false;
 	
 	private Paint statsPaint = new Paint();
 	private long beginTime, timeDiff, sleepTime, updateTime,
@@ -171,7 +173,8 @@ public abstract class GameFragment extends Fragment
 			canvas.drawText("Update count: " + updateCount, 5, canvas.getHeight() - 40, statsPaint);
 			canvas.drawText("Skipped frames: " + (updateCount - drawCount), 5, canvas.getHeight() - 5, statsPaint);
 		}
-		
+
+		@SuppressLint("WrongCall")
 		private synchronized void draw(Canvas canvas) {
 			onDraw(canvas);
 			if (showStats)
@@ -233,7 +236,9 @@ public abstract class GameFragment extends Fragment
 
 		@Override
 		public synchronized boolean onTouch(View v, MotionEvent me) {
-			return fragment.onTouch(v, me);
+			if (running || alwaysRecieveEvents)
+				return fragment.onTouch(v, me);
+			return false;
 		}
 	}
 	
