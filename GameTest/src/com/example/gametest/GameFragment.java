@@ -72,6 +72,10 @@ public abstract class GameFragment extends Fragment
 	public boolean isRunning() {
 		return running;
 	}
+	
+	public Paint getStatsPaint() {
+		return statsPaint;
+	}
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
