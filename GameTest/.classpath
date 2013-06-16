@@ -5,6 +5,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry kind="lib" path="G:/Dropbox/yolo-octo-dangerzone/GameTest/libs/android-libmpg.jar"/>
+	<classpathentry kind="lib" path="libs/android-libmpg.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
