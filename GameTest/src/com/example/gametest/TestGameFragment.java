@@ -220,6 +220,12 @@ public class TestGameFragment extends GameFragment {
 		    Intent chooser = Intent.createChooser(intent, "Select soundfile");
 		    startActivityForResult(chooser,1);
 		}
+		
+		else if(me.getActionMasked() == MotionEvent.ACTION_DOWN
+				&& touchX > this.getView().getWidth() - 150  && touchY < 150 && isRunning()) {
+
+			this.getActivity().setContentView(R.layout.level_layout);
+		}
 		return true;
 	}
 	
