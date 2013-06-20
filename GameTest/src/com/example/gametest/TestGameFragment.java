@@ -31,6 +31,11 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class TestGameFragment extends GameFragment {
+	private boolean jump;
+	private int jumpHeight;
+	private boolean direction;
+	private boolean cantTouchThis;
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +43,10 @@ public class TestGameFragment extends GameFragment {
         setTargetFps(60);
 		this.showStats = true;
 		this.alwaysRecieveEvents = true;
+		this.jump = false;
+		this.jumpHeight = 0;
+		this.direction = false;
+		this.cantTouchThis = false;
 
         this.run();
     }
@@ -226,7 +235,10 @@ public class TestGameFragment extends GameFragment {
 		Log.d("TestGameFragment", "onUpdate: dt = " + dt);
 		totalTime += dt;
 		Log.d("TestGameFragment", "onUpdate: totalTime = " + totalTime);
-		SystemClock.sleep(5);
+		
+		if (jump) {
+			updateY(dt);
+		}
 	}
 
 	/*
@@ -258,14 +270,44 @@ public class TestGameFragment extends GameFragment {
 			.add(frag, "pauseMenu").commit();
 	}
 	
+	public void updateY(long time) {
+		/* if direction == true, touchY goes up */
+		if (direction) {
+			if (jumpHeight >= 200) {
+				direction = false;
+			} else {
+				touchY -= time; 
+				jumpHeight += time;
+			}
+		}
+		if (!direction) {
+			touchY += time;
+			jumpHeight -= time;
+			if (jumpHeight <= 0) {
+				jump = false;
+				cantTouchThis = false;
+			}
+		}
+		
+	}
+	
 	/*
 	 * Called when you touch the game view.
 	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
-		touching = me.getActionMasked() != MotionEvent.ACTION_UP;
-		touchX = me.getX();
-		touchY = me.getY();
+
+		if (me.getActionMasked() == MotionEvent.ACTION_DOWN
+				&& me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
+			jump = true;
+			direction = true;
+			cantTouchThis = true;
+		}
+		if (!cantTouchThis && me.getY() < v.getHeight() - 150) {
+			touching = me.getActionMasked() != MotionEvent.ACTION_UP;
+			touchX = me.getX();
+			touchY = me.getY();
+		}
 		if (me.getActionMasked() == MotionEvent.ACTION_DOWN
 				&& touchX < 150 && touchY < 150 && isRunning()) {
 			//postHalt();
@@ -275,6 +317,12 @@ public class TestGameFragment extends GameFragment {
 		    intent.setType("audio/x-mp3");
 		    Intent chooser = Intent.createChooser(intent, "Select soundfile");
 		    startActivityForResult(chooser,1);
+		}
+		
+		else if(me.getActionMasked() == MotionEvent.ACTION_DOWN
+				&& touchX > this.getView().getWidth() - 150  && touchY < 150 && isRunning()) {
+
+			this.getActivity().setContentView(R.layout.level_layout);
 		}
 		return true;
 	}
