@@ -43,7 +43,7 @@ public class TestGameFragment extends GameFragment {
 		this.jump = false;
 		this.jumpHeight = 0;
 		this.direction = false;
-		this.cantTouchThis = true;
+		this.cantTouchThis = false;
 
         this.run();
     }

@@ -13,4 +13,9 @@ public class ForegroundObject {
 		this.y = y;
 	}
 	
+	ForegroundObject(int[] x, int[] y) {
+		for (int i = 0; i < x.length; i++) {
+			new ForegroundObject(x[i], y[i]);
+		}
+	}
 }
