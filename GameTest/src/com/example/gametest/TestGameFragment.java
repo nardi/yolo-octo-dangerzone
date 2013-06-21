@@ -296,6 +296,11 @@ public class TestGameFragment extends GameFragment {
 	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
+		Log.e("Coord", "X: " + me.getX() + " Y: " + me.getY());
+		Log.e("screenwidth", "Width: "+ (this.getView().getWidth() - 150));
+		Log.e("iSrunning", "IsRunning: " + isRunning());
+		Log.e("Dinges", "Dinges: " + (me.getActionMasked() == MotionEvent.ACTION_DOWN));
+		//Log.e("kanker", "kanker");
 		//FIXME Conflict#1
 		/*if (me.getActionMasked() == MotionEvent.ACTION_DOWN
 				&& me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
@@ -322,10 +327,18 @@ public class TestGameFragment extends GameFragment {
 		/*
 		 * Opens a new canvas to draw on when the user taps the upper right corner.
 		 */
-		else if(me.getActionMasked() == MotionEvent.ACTION_DOWN
-				&& touchX > this.getView().getWidth() - 150  && touchY < 150 && isRunning()) {
-
-			this.getActivity().setContentView(R.layout.level_layout);
+		
+		if(me.getX() > this.getView().getWidth() - 150  && me.getY() < 150 && isRunning()) {
+			
+			LevelFragment lvlFrag = new LevelFragment();
+			//Bundle args = new Bundle();
+			//args.putInt("levelId", R.id.LevelFragment);
+			//lvlFrag.setArguments(args);
+			Log.e("Switch content", "Switching content view");
+			
+			this.getActivity().getFragmentManager().beginTransaction().add(lvlFrag, "LevelFragment").commit();
+			
+			//this.getActivity().setContentView(R.layout.level_layout);
 		}
 		return true;
 	}

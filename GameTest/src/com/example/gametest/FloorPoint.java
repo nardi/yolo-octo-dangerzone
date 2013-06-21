@@ -1,5 +1,5 @@
-/* Floorpoints zijn te puntne waarmee het oopervlak van het level wordt gegenereerd.
- * Twee punten smaen vormen een lijn.
+/* Floorpoints zijn te punten waarmee het oppervlak van het level wordt gegenereerd.
+ * Twee punten samen vormen een lijn.
  * 
  * Voorstel:
  * Elk punt start op een standaard y-coordinaat. Bijhet constructen van een 
