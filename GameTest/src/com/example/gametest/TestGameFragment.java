@@ -165,39 +165,54 @@ public class TestGameFragment extends GameFragment {
 			public void run() {
 				try {
 					MP3Decoder md = new MP3Decoder(path);
-					int bufferSize = 512;
-					int bassArraySize = (int) (md.getLength() * 2 / bufferSize) + 1;
+					int bufferSize = 1024;
+					int bassArraySize = (int)(md.getLength() * 2 / bufferSize) + 1;
 					double[] calcDatBass = new double[bassArraySize];
 					DoubleFFT_1D fft = new DoubleFFT_1D(bufferSize);/*Nardi check dem sizes TODO*/
 					double[] fft_out = new double[bufferSize];
-					String fftPath = path + ".fft";
-					FileOutputStream out = new FileOutputStream(fftPath);
+					double[] futureBuffer = new double[bufferSize];
+					double[] currentBuffer = new double[bufferSize];
+					//String fftPath = path + ".fft";
+					//FileOutputStream out = new FileOutputStream(fftPath);
 					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize);
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
 					
-					int read = -1;
-					int i = 0;
+					int read = 0;
+					read = md.readSamples(shortBuffer);
+					for (int i = 0; i < read; i++) {
+						currentBuffer[i] = (double) shortBuffer.get()/Short.MAX_VALUE;
+						fft_out[i] = currentBuffer[i];
+					}
+	
 					int j = 0;
 					double temp = 0;
 					while (read != 0) {
-						i = 0;
 						read = md.readSamples(shortBuffer);
-						while (i < read) {
-							fft_out[i] = (double)shortBuffer.get()/Short.MAX_VALUE;
-							i++;
+						for (int i = 0; i < read; i++) {
+							futureBuffer[i] = (double)shortBuffer.get()/Short.MAX_VALUE;
 						}
+						/*spaghetti everywhere Kleine kans dat het array nog oude waarden heeft*/
+						if (read < futureBuffer.length) {
+							for (int i = read; i < futureBuffer.length; i++) {
+								futureBuffer[i] = 0;
+							}
+						}
+						/* functie om de ffts te doen*/
+						/*TODO old = future, future = read*/
 						shortBuffer.position(0);
-						fft.realForward(fft_out);
-						Log.v("FFT", "FFT op " + (44100/bufferSize) * 3+ "Hz: " + fft_out[3]);
-						temp = Math.abs(fft_out[3]);
+						//fft.realForward(fft_out);
+						//Log.v("FFT", "FFT op " + (44100/bufferSize) * 6+ "Hz: " + fft_out[6]);
+						//temp = Math.abs(fft_out[6]);
+						temp = moveWindow(currentBuffer, futureBuffer, fft_out, read, fft);
 						if (temp > 0.1) {
 							calcDatBass[j++] = 1;
 						}
 						else {
 							calcDatBass[j++] = 0;
 						}
+						System.arraycopy(futureBuffer, 0, currentBuffer, 0, futureBuffer.length);
 					}
 					DoubleFFT_1D bass = new DoubleFFT_1D(bassArraySize);			
 					bass.realForward(calcDatBass);
@@ -210,6 +225,21 @@ public class TestGameFragment extends GameFragment {
 				}
 			}
 		};
+	}
+	
+	/* Nu alleen voor #samples=1024*/
+	private double moveWindow (double[] original, double[] future, double[] output, int sizeOfFuture, DoubleFFT_1D fft) {
+		double intensitySum = 0;
+		
+		for (int i = 0; i < 4; i++) {
+			
+			System.arraycopy(future, 256 * i, original, original.length - (256 * 4 - i), 256);
+			fft.realForward(output);
+			intensitySum += Math.abs(output[6]);/*nogmaals, alles is hardcoded*/
+			System.arraycopy(original, 0, output, 0, original.length);
+		}
+		
+		return intensitySum / 4;
 	}
 	
 	/*
