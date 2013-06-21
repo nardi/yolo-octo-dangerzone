@@ -32,6 +32,6 @@ public class LevelFragment extends GameFragment {
 	}
 	
 	public boolean onTouch(){
-		
+		return true;
 	}
 }
