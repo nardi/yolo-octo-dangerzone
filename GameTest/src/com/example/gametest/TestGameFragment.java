@@ -32,6 +32,7 @@ public class TestGameFragment extends GameFragment {
 	private int jumpHeight;
 	private boolean direction;
 	private boolean cantTouchThis;
+	Coin coin = new Coin(400, 300);
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -197,6 +198,8 @@ public class TestGameFragment extends GameFragment {
 		canvas.drawCircle(touchX, touchY, 70, touchCircle);
 		if (!touching)
 			canvas.restore();
+		
+		coin.drawCoin(canvas);
 		
 		if (at != null) {
 			double seconds = (double)at.getPlaybackHeadPosition() / at.getPlaybackRate();
