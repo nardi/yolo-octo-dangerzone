@@ -18,7 +18,6 @@ public class FloorBuffer {
 		index = 0;
 		bufferSize = 400;
 		buffer = new double[bufferSize];
-		
 	}
 	
 	
