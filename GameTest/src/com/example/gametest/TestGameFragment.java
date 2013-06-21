@@ -7,6 +7,9 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.text.DecimalFormat;
 
+import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
+import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
+
 import nobleworks.libmpg.MP3Decoder;
 import android.content.Intent;
 import android.database.Cursor;
@@ -28,6 +31,11 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class TestGameFragment extends GameFragment {
+	private boolean jump;
+	private int jumpHeight;
+	private boolean direction;
+	private boolean cantTouchThis;
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +43,10 @@ public class TestGameFragment extends GameFragment {
         setTargetFps(60);
 		this.showStats = true;
 		this.alwaysRecieveEvents = true;
+		this.jump = false;
+		this.jumpHeight = 0;
+		this.direction = false;
+		this.cantTouchThis = false;
 
         this.run();
     }
@@ -69,7 +81,7 @@ public class TestGameFragment extends GameFragment {
 				return;
 			}
 			
-			new Thread(playMp3(path)).start();
+			new Thread(fourierTransform(path)).start();
 		}
 	}
 	
@@ -83,6 +95,7 @@ public class TestGameFragment extends GameFragment {
 			public void run() {
 				try {
 					MP3Decoder md = new MP3Decoder(path);
+					
 					int channels = AudioFormat.CHANNEL_OUT_DEFAULT;
 					switch (md.getNumChannels()) {
 						case 1: channels = AudioFormat.CHANNEL_OUT_MONO; break;
@@ -147,6 +160,58 @@ public class TestGameFragment extends GameFragment {
 	}
 	DecimalFormat threeDecimals = new DecimalFormat("0.000");
 	
+	public Runnable fourierTransform (final String path) {
+		return new Runnable() {
+			public void run() {
+				try {
+					MP3Decoder md = new MP3Decoder(path);
+					int bufferSize = 512;
+					int bassArraySize = (int) (md.getLength() * 2 / bufferSize) + 1;
+					double[] calcDatBass = new double[bassArraySize];
+					DoubleFFT_1D fft = new DoubleFFT_1D(bufferSize);/*Nardi check dem sizes TODO*/
+					double[] fft_out = new double[bufferSize];
+					String fftPath = path + ".fft";
+					FileOutputStream out = new FileOutputStream(fftPath);
+					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize);
+					// Audio data is little endian, so for correct bytes -> short conversion:
+					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+					
+					int read = -1;
+					int i = 0;
+					int j = 0;
+					double temp = 0;
+					while (read != 0) {
+						i = 0;
+						read = md.readSamples(shortBuffer);
+						while (i < read) {
+							fft_out[i] = (double)shortBuffer.get()/Short.MAX_VALUE;
+							i++;
+						}
+						shortBuffer.position(0);
+						fft.realForward(fft_out);
+						Log.v("FFT", "FFT op " + (44100/bufferSize) * 3+ "Hz: " + fft_out[3]);
+						temp = Math.abs(fft_out[3]);
+						if (temp > 0.1) {
+							calcDatBass[j++] = 1;
+						}
+						else {
+							calcDatBass[j++] = 0;
+						}
+					}
+					DoubleFFT_1D bass = new DoubleFFT_1D(bassArraySize);			
+					bass.realForward(calcDatBass);
+					for (int k = 0; k < bassArraySize; k++) {/*TODO for loops etc*/
+						Log.v("FFT", "FFT op " + ((44100.0/bufferSize)/bassArraySize) * k + "Hz: " + calcDatBass[k]);
+					}
+				}
+				catch (Exception e){
+					Log.e("Fourier Transform", "Borked!", e);
+				}
+			}
+		};
+	}
+	
 	/*
 	 * Is called every time the draw surface gets a new size (i.e. when it is first
 	 * initialized and when the screen is rotated).
@@ -170,7 +235,10 @@ public class TestGameFragment extends GameFragment {
 		Log.d("TestGameFragment", "onUpdate: dt = " + dt);
 		totalTime += dt;
 		Log.d("TestGameFragment", "onUpdate: totalTime = " + totalTime);
-		SystemClock.sleep(5);
+		
+		if (jump) {
+			updateY(dt);
+		}
 	}
 
 	/*
@@ -202,14 +270,44 @@ public class TestGameFragment extends GameFragment {
 			.add(frag, "pauseMenu").commit();
 	}
 	
+	public void updateY(long time) {
+		/* if direction == true, touchY goes up */
+		if (direction) {
+			if (jumpHeight >= 200) {
+				direction = false;
+			} else {
+				touchY -= time; 
+				jumpHeight += time;
+			}
+		}
+		if (!direction) {
+			touchY += time;
+			jumpHeight -= time;
+			if (jumpHeight <= 0) {
+				jump = false;
+				cantTouchThis = false;
+			}
+		}
+		
+	}
+	
 	/*
 	 * Called when you touch the game view.
 	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
-		touching = me.getActionMasked() != MotionEvent.ACTION_UP;
-		touchX = me.getX();
-		touchY = me.getY();
+		//FIXME Conflict#1
+		/*if (me.getActionMasked() == MotionEvent.ACTION_DOWN
+				&& me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
+			jump = true;
+			direction = true;
+			cantTouchThis = true;
+		}*/
+		if (!cantTouchThis && me.getY() < v.getHeight() - 150) {
+			touching = me.getActionMasked() != MotionEvent.ACTION_UP;
+			touchX = me.getX();
+			touchY = me.getY();
+		}
 		if (me.getActionMasked() == MotionEvent.ACTION_DOWN
 				&& touchX < 150 && touchY < 150 && isRunning()) {
 			//postHalt();
@@ -219,6 +317,15 @@ public class TestGameFragment extends GameFragment {
 		    intent.setType("audio/x-mp3");
 		    Intent chooser = Intent.createChooser(intent, "Select soundfile");
 		    startActivityForResult(chooser,1);
+		}
+		//XXX Conflict#1
+		/*
+		 * Opens a new canvas to draw on when the user taps the upper right corner.
+		 */
+		else if(me.getActionMasked() == MotionEvent.ACTION_DOWN
+				&& touchX > this.getView().getWidth() - 150  && touchY < 150 && isRunning()) {
+
+			this.getActivity().setContentView(R.layout.level_layout);
 		}
 		return true;
 	}
