@@ -43,7 +43,7 @@ public class TestGameFragment extends GameFragment {
 		this.jump = false;
 		this.jumpHeight = 0;
 		this.direction = false;
-		this.cantTouchThis = true;
+		this.cantTouchThis = false;
 
         this.run();
     }
@@ -240,13 +240,13 @@ public class TestGameFragment extends GameFragment {
 	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
-
-		if (me.getActionMasked() == MotionEvent.ACTION_DOWN
+		//FIXME Conflict#1
+		/*if (me.getActionMasked() == MotionEvent.ACTION_DOWN
 				&& me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
 			jump = true;
 			direction = true;
 			cantTouchThis = true;
-		}
+		}*/
 		if (!cantTouchThis && me.getY() < v.getHeight() - 150) {
 			touching = me.getActionMasked() != MotionEvent.ACTION_UP;
 			touchX = me.getX();
@@ -262,7 +262,10 @@ public class TestGameFragment extends GameFragment {
 		    Intent chooser = Intent.createChooser(intent, "Select soundfile");
 		    startActivityForResult(chooser,1);
 		}
-		
+		//XXX Conflict#1
+		/*
+		 * Opens a new canvas to draw on when the user taps the upper right corner.
+		 */
 		else if(me.getActionMasked() == MotionEvent.ACTION_DOWN
 				&& touchX > this.getView().getWidth() - 150  && touchY < 150 && isRunning()) {
 
