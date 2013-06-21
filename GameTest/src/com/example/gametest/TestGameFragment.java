@@ -318,8 +318,19 @@ public class TestGameFragment extends GameFragment {
 	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
+
 		//FIXME Conflict#1
 		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
+			/*IK CLAIM RECHTSONDER VERDORIE!!!! ~Jordy
+			 * Ringbuffer test
+			 */
+			if (me.getX() > (v.getWidth() - 150) && me.getY() > (v.getHeight() - 150) && isRunning()) {
+				
+				Log.e("JordyWasHere","Rechtsonder is van mij, bitsjes!");
+				
+			}
+			
+			
 			if (me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
 				jump = true;
 				direction = true;
@@ -345,12 +356,26 @@ public class TestGameFragment extends GameFragment {
 				this.getActivity().setContentView(R.layout.level_layout);
 			}
 			*/
+
 		}
 		if (!cantTouchThis && me.getY() < v.getHeight() - 150) {
 			touching = me.getActionMasked() != MotionEvent.ACTION_UP;
 			touchX = me.getX();
 			touchY = me.getY();
 		}
+		
+		
+		else if(me.getActionMasked() == MotionEvent.ACTION_DOWN
+				&& touchX > this.getView().getWidth() - 150  && touchY < 150 && isRunning()) {
+
+			this.getActivity().setContentView(R.layout.level_layout);
+		}
+		
+		
+		
+		
+
+
 		return true;
 	}
 	
