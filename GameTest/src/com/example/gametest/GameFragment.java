@@ -24,9 +24,9 @@ import android.view.ViewGroup;
  */
 
 public abstract class GameFragment extends Fragment
-	implements SurfaceHolder.Callback, View.OnTouchListener {
+	implements SurfaceHolder.Callback, View.OnTouchListener, BaseGameObject {
 	private final static int MAX_FRAME_SKIPS = 5;
-	
+
 	private final GameFragment fragment = this;
 	
 	private GameThread thread = new GameThread();
@@ -48,7 +48,7 @@ public abstract class GameFragment extends Fragment
 	public boolean showStats = false;
 	public boolean alwaysRecieveEvents = false;
 	
-	private List<GameObject> autoObjects = new ArrayList<GameObject>();
+	private List<BaseGameObject> autoObjects = new ArrayList<BaseGameObject>();
 	
 	private Paint statsPaint = new Paint();
 	private long beginTime, timeDiff, sleepTime, updateTime,
@@ -149,9 +149,13 @@ public abstract class GameFragment extends Fragment
 		}
 	}
 	
-	public abstract void onUpdate(long dt);
+	public void preUpdate(long dt) {}
+	public void onUpdate(long dt) {}
+	public void postUpdate(long dt) {}
 
-	public abstract void onDraw(Canvas canvas);
+	public void preDraw(Canvas canvas) {}
+	public void onDraw(Canvas canvas) {}
+	public void postDraw(Canvas canvas) {}
 	
 	public void onResize(int width, int height) {}
 	
@@ -179,9 +183,11 @@ public abstract class GameFragment extends Fragment
 			if (prevUpdate == 0)
 				prevUpdate = SystemClock.uptimeMillis();
 			long dt = SystemClock.uptimeMillis() - prevUpdate;
+			preUpdate(dt);
 			onUpdate(dt);
-			for (GameObject go : autoObjects)
+			for (BaseGameObject go : autoObjects)
 				go.onUpdate(dt);
+			postUpdate(dt);
 			prevUpdate += dt;
 		}
 		
@@ -193,9 +199,11 @@ public abstract class GameFragment extends Fragment
 
 		@SuppressLint("WrongCall")
 		private synchronized void draw(Canvas canvas) {
+			preDraw(canvas);
 			onDraw(canvas);
-			for (GameObject go : autoObjects)
+			for (BaseGameObject go : autoObjects)
 				go.onDraw(canvas);
+			postDraw(canvas);
 			if (showStats)
 				drawStats(canvas);
 		}
