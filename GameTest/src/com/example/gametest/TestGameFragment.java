@@ -82,7 +82,7 @@ public class TestGameFragment extends GameFragment {
 				return;
 			}
 			
-			new Thread(fourierTransform(path)).start();
+			new Thread(fourierTransformNub(path)).start();
 		}
 	}
 	
@@ -161,30 +161,33 @@ public class TestGameFragment extends GameFragment {
 	}
 	DecimalFormat threeDecimals = new DecimalFormat("0.000");
 	
-	public Runnable fourierTransform (final String path) {
+	/*
+	 * XXX We kunnen in ieder geval fijn fft's doen maar
+	 * het algoritme werkt verder voor geen meter ^_^
+	 */
+	public Runnable fourierTransformNub (final String nubPath) {
 		return new Runnable() {
 			public void run() {
 				try {
-					MP3Decoder md = new MP3Decoder(path);
+					MP3Decoder md = new MP3Decoder(nubPath);
 					int bufferSize = 1024;
-					int bassArraySize = (int)(md.getLength() * 2 / bufferSize) + 1;
-					double[] calcDatBass = new double[bassArraySize];
-					DoubleFFT_1D fft = new DoubleFFT_1D(bufferSize);/*Nardi check dem sizes TODO*/
-					double[] fft_out = new double[bufferSize];
-					double[] futureBuffer = new double[bufferSize];
-					double[] currentBuffer = new double[bufferSize];
-					//String fftPath = path + ".fft";
-					//FileOutputStream out = new FileOutputStream(fftPath);
+					int nubArraySize = 4 * (int)(md.getLength() * 2 / bufferSize) + 1;
+
 					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize);
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+					double[] audioData = new double[bufferSize],
+							 prevAudioData = new double[bufferSize],
+							 fftStore = new double[bufferSize],
+							 nubData = new double[nubArraySize];
+					
+					DoubleFFT_1D fft = new DoubleFFT_1D(bufferSize);
 					
 					int read = 0;
 					read = md.readSamples(shortBuffer);
 					for (int i = 0; i < read; i++) {
-						currentBuffer[i] = (double) shortBuffer.get()/Short.MAX_VALUE;
-						fft_out[i] = currentBuffer[i];
+						prevAudioData[i] = (double)shortBuffer.get() / Short.MAX_VALUE;
 					}
 	
 					int j = 0;
@@ -192,53 +195,78 @@ public class TestGameFragment extends GameFragment {
 					while (read != 0) {
 						read = md.readSamples(shortBuffer);
 						for (int i = 0; i < read; i++) {
-							futureBuffer[i] = (double)shortBuffer.get()/Short.MAX_VALUE;
+							audioData[i] = (double)shortBuffer.get() / Short.MAX_VALUE;
 						}
-						/*spaghetti everywhere Kleine kans dat het array nog oude waarden heeft*/
-						if (read < futureBuffer.length) {
-							for (int i = read; i < futureBuffer.length; i++) {
-								futureBuffer[i] = 0;
+						shortBuffer.position(0);
+						/* spaghetti everywhere Kleine kans dat het array nog oude waarden heeft nub */
+						if (read < audioData.length) {
+							for (int i = read; i < audioData.length; i++) {
+								audioData[i] = 0;
 							}
 						}
-						/* functie om de ffts te doen*/
-						/*TODO old = future, future = read*/
-						shortBuffer.position(0);
-						//fft.realForward(fft_out);
-						//Log.v("FFT", "FFT op " + (44100/bufferSize) * 6+ "Hz: " + fft_out[6]);
-						//temp = Math.abs(fft_out[6]);
-						temp = moveWindow(currentBuffer, futureBuffer, fft_out, read, fft);
-						if (temp > 0.1) {
-							calcDatBass[j++] = 1;
+						/* functie om de ffts te doen nub*/
+						/*TODO old = future, future = read nub*/
+						//fft.realForward(fftStore);
+						//Log.v("FFT", "FFT op " + (6 * md.getRate()/bufferSize) + "Hz: " + fftStore[6]);
+
+						for (int i = 0; i < 4; i++) {
+							int offset = 256 * i;
+							System.arraycopy(prevAudioData, offset, fftStore, 0, bufferSize - offset);
+							System.arraycopy(audioData, 0, fftStore, bufferSize - offset, offset);
+							fft.realForward(fftStore);
+							// 172 hz want nub logic
+							nubData[j] = fftStore[4] * fftStore[4]; /*nogmaals, alles is hardcoded nub*/
+							//Log.v("FFT", "FFT op " + (4 * md.getRate()/bufferSize) + "Hz: " + nubData[j]);
+							j++;
+							/* fok dit
+							if (temp > 0.1) {
+								calcDatNub[j++] = 1;
+							}
+							else {
+								calcDatNub[j++] = 0;
+							} */
 						}
-						else {
-							calcDatBass[j++] = 0;
+
+						double[] tmp = prevAudioData;
+						prevAudioData = audioData;
+						audioData = tmp;
+					}
+					
+					Log.e("FFT", "Samples for 2nd fft:" + j + ", array size: " + nubData.length);
+					
+					DoubleFFT_1D nubFFT = new DoubleFFT_1D(nubArraySize);			
+					nubFFT.realForward(nubData);
+					double freqRes = ((44100.0/bufferSize)/nubArraySize);
+					int lower = (int)(1 / freqRes), upper = (int)(4 / freqRes);
+					int mi1 = -1, mi2 = -1, mi3 = -1;
+					for (int k = lower; k < upper; k++) {
+						if (mi1 < 0 || Math.abs(nubData[k]) > Math.abs(nubData[mi1])) {
+							mi3 = mi2;
+							mi2 = mi1;
+							mi1 = k;
+						} else if (mi2 < 0 || Math.abs(nubData[k]) > Math.abs(nubData[mi2])) {
+							mi3 = mi2;
+							mi2 = k;
+						} else if (mi3 < 0 || Math.abs(nubData[k]) > Math.abs(nubData[mi3])) {
+							mi3 = k;
 						}
-						System.arraycopy(futureBuffer, 0, currentBuffer, 0, futureBuffer.length);
 					}
-					DoubleFFT_1D bass = new DoubleFFT_1D(bassArraySize);			
-					bass.realForward(calcDatBass);
-					for (int k = 0; k < bassArraySize; k++) {/*TODO for loops etc*/
-						Log.v("FFT", "FFT op " + ((44100.0/bufferSize)/bassArraySize) * k + "Hz: " + calcDatBass[k]);
-					}
+					Log.i("FFT", "FFT op " + ((44100.0/bufferSize)/nubArraySize) * mi1 + "Hz: " + nubData[mi1]);
+					Log.i("FFT", "FFT op " + ((44100.0/bufferSize)/nubArraySize) * mi2 + "Hz: " + nubData[mi2]);
+					Log.i("FFT", "FFT op " + ((44100.0/bufferSize)/nubArraySize) * mi3 + "Hz: " + nubData[mi3]);
 				}
 				catch (Exception e){
-					Log.e("Fourier Transform", "Borked!", e);
+					Log.e("FFT", "Dimi is een nub", e);
 				}
 			}
 		};
 	}
 	
-	/* Nu alleen voor #samples=1024*/
-	private double moveWindow (double[] original, double[] future, double[] output, int sizeOfFuture, DoubleFFT_1D fft) {
+	/* Nu alleen voor #samples=1024 nub*/
+	private double moveWindowNub (double[] original, double[] future, double[] output, int sizeOfFuture, DoubleFFT_1D fft) {
 		double intensitySum = 0;
 		
-		for (int i = 0; i < 4; i++) {
-			
-			System.arraycopy(future, 256 * i, original, original.length - (256 * 4 - i), 256);
-			fft.realForward(output);
-			intensitySum += Math.abs(output[6]);/*nogmaals, alles is hardcoded*/
-			System.arraycopy(original, 0, output, 0, original.length);
-		}
+		
 		
 		return intensitySum / 4;
 	}
@@ -263,9 +291,9 @@ public class TestGameFragment extends GameFragment {
 	 */
 	@Override
 	public void onUpdate(long dt) {
-		Log.d("TestGameFragment", "onUpdate: dt = " + dt);
+		//Log.d("TestGameFragment", "onUpdate: dt = " + dt);
 		totalTime += dt;
-		Log.d("TestGameFragment", "onUpdate: totalTime = " + totalTime);
+		//Log.d("TestGameFragment", "onUpdate: totalTime = " + totalTime);
 		
 		if (jump) {
 			updateY(dt);

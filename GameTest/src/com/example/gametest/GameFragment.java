@@ -177,7 +177,7 @@ public abstract class GameFragment extends Fragment
 			synchronized (waitLock) { m_shouldWait = b; }
 		}			
 		
-		long prevUpdate;
+		private long prevUpdate;
 		
 		private synchronized void update() {
 			if (prevUpdate == 0)
@@ -257,7 +257,7 @@ public abstract class GameFragment extends Fragment
 				updateCount += framesSkipped + 1;
 				drawCount++;
 				
-				Log.d("GameFragment", "Game time = " + getTotalTime());
+				//Log.d("GameFragment", "Game time = " + getTotalTime());
 			}
 		}
 
