@@ -1,5 +1,8 @@
 package com.example.gametest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.graphics.Canvas;
@@ -45,6 +48,8 @@ public abstract class GameFragment extends Fragment
 	public boolean showStats = false;
 	public boolean alwaysRecieveEvents = false;
 	
+	private List<GameObject> autoObjects = new ArrayList<GameObject>();
+	
 	private Paint statsPaint = new Paint();
 	private long beginTime, timeDiff, sleepTime, updateTime,
 		updateCount, drawCount, gameStartTime;
@@ -75,6 +80,10 @@ public abstract class GameFragment extends Fragment
 	
 	public Paint getStatsPaint() {
 		return statsPaint;
+	}
+	
+	public void addObject(GameObject go) {
+		autoObjects.add(go);
 	}
 
 	@Override
@@ -171,6 +180,8 @@ public abstract class GameFragment extends Fragment
 				prevUpdate = SystemClock.uptimeMillis();
 			long dt = SystemClock.uptimeMillis() - prevUpdate;
 			onUpdate(dt);
+			for (GameObject go : autoObjects)
+				go.onUpdate(dt);
 			prevUpdate += dt;
 		}
 		
@@ -183,6 +194,8 @@ public abstract class GameFragment extends Fragment
 		@SuppressLint("WrongCall")
 		private synchronized void draw(Canvas canvas) {
 			onDraw(canvas);
+			for (GameObject go : autoObjects)
+				go.onDraw(canvas);
 			if (showStats)
 				drawStats(canvas);
 		}
