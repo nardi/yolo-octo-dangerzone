@@ -6,6 +6,7 @@ import android.graphics.Paint;
 
 public class Coin {
 	int x, y;
+	float radius = 40;
 	
 	Paint coinPaint = new Paint(); {
 		coinPaint.setColor(Color.rgb(212,175,55));
@@ -20,7 +21,7 @@ public class Coin {
 	}
 	
 	public void drawCoin(Canvas canvas) {
-		canvas.drawCircle(x, y, 40, coinPaint);
+		canvas.drawCircle(x, y, radius, coinPaint);
 	}
 
 }

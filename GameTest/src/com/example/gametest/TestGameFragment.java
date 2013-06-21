@@ -255,13 +255,31 @@ public class TestGameFragment extends GameFragment {
 		if (!touching)
 			canvas.restore();
 		
-		coin.drawCoin(canvas);
+		if (coin != null) {
+			if (checkCollisionCoin(touchX, touchY, coin)) {
+				coin = null;
+			} else
+				coin.drawCoin(canvas);
+		}
 		
 		if (at != null) {
 			double seconds = (double)at.getPlaybackHeadPosition() / at.getPlaybackRate();
 			canvas.drawText("Music position: " + threeDecimals.format(seconds) + "s",
 					5, 30, getStatsPaint());
 		}
+	}
+	
+	private boolean checkCollisionCoin(float x, float y, Coin coin) {
+		boolean collision;
+		float xDif = x - coin.x;
+		float yDif = y - coin.y;
+		double distance = Math.pow(xDif, 2) + Math.pow(yDif, 2);
+		if (distance < (70 + coin.radius) * (70 + coin.radius)) {
+			collision = true;
+		} else {
+			collision = false;
+		}
+		return collision;
 	}
 
 	private void showPauseMenu() {
@@ -300,35 +318,37 @@ public class TestGameFragment extends GameFragment {
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
 		//FIXME Conflict#1
-		/*if (me.getActionMasked() == MotionEvent.ACTION_DOWN
-				&& me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
-			jump = true;
-			direction = true;
-			cantTouchThis = true;
-		}*/
+		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
+			if (me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
+				jump = true;
+				direction = true;
+				cantTouchThis = true;
+			}
+			if (touchX < 150 && touchY < 150 && isRunning()) {
+				//postHalt();
+				//showPauseMenu();
+				
+				Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+			    intent.setType("audio/x-mp3");
+			    Intent chooser = Intent.createChooser(intent, "Select soundfile");
+			    startActivityForResult(chooser,1);
+			}
+			
+			//XXX Conflict#1
+			/*
+			 * Opens a new canvas to draw on when the user taps the upper right corner.
+			 */
+			/*
+			if(me.getX() > this.getView().getWidth() - 150  && me.getY() < 150) {
+	
+				this.getActivity().setContentView(R.layout.level_layout);
+			}
+			*/
+		}
 		if (!cantTouchThis && me.getY() < v.getHeight() - 150) {
 			touching = me.getActionMasked() != MotionEvent.ACTION_UP;
 			touchX = me.getX();
 			touchY = me.getY();
-		}
-		if (me.getActionMasked() == MotionEvent.ACTION_DOWN
-				&& touchX < 150 && touchY < 150 && isRunning()) {
-			//postHalt();
-			//showPauseMenu();
-			
-			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		    intent.setType("audio/x-mp3");
-		    Intent chooser = Intent.createChooser(intent, "Select soundfile");
-		    startActivityForResult(chooser,1);
-		}
-		//XXX Conflict#1
-		/*
-		 * Opens a new canvas to draw on when the user taps the upper right corner.
-		 */
-		else if(me.getActionMasked() == MotionEvent.ACTION_DOWN
-				&& touchX > this.getView().getWidth() - 150  && touchY < 150 && isRunning()) {
-
-			this.getActivity().setContentView(R.layout.level_layout);
 		}
 		return true;
 	}
