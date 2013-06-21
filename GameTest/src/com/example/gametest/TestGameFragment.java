@@ -296,7 +296,17 @@ public class TestGameFragment extends GameFragment {
 	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
-
+		
+		/*IK CLAIM RECHTSONDER VERDORIE!!!! ~Jordy
+		 * Ringbuffer test
+		 */
+		if (me.getActionMasked() == MotionEvent.ACTION_DOWN &&
+				me.getX() > (v.getWidth() - 150) && me.getY() > (v.getHeight() - 150) && isRunning()) {
+			
+			Log.e("JordyWasHere","Rechtsonder is van mij, bitsjes!");
+			
+		}
+		
 		if (me.getActionMasked() == MotionEvent.ACTION_DOWN
 				&& me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
 			jump = true;
@@ -324,6 +334,10 @@ public class TestGameFragment extends GameFragment {
 
 			this.getActivity().setContentView(R.layout.level_layout);
 		}
+		
+		
+		
+		
 		return true;
 	}
 	
