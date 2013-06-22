@@ -1,5 +1,6 @@
 package com.example.gametest;
 
+
 public class Beat {
 	public double time;
 	// intensity kan gebaseerd worden op amplitude, of later ook
