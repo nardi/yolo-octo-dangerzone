@@ -50,6 +50,16 @@ public class GameObject implements Drawable, Updateable, Touchable {
 		}
 	}
 	
+	public void swapFor(GameObject go) {
+		if (parent != null) {
+			parent.removeObject(this);
+			parent.addObject(go);
+		} else if (parentFragment != null) {
+			parentFragment.removeObject(this);
+			parentFragment.addObject(go);
+		}
+	}
+	
 	protected void preUpdate(long dt) {}
 	protected void onUpdate(long dt) {}
 	protected void postUpdate(long dt) {}
