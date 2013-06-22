@@ -31,27 +31,23 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class TestGameFragment extends GameFragment {
-	private boolean jump;
-	private int jumpHeight;
-	private boolean direction;
-	private boolean cantTouchThis;
+	private boolean jump = false;
+	private int jumpHeight = 0;
+	private boolean direction = false;
+	private boolean cantTouchThis = false;
 	Coin coin = new Coin(400, 300);
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTargetFps(60);
-		this.showStats = true;
-		this.alwaysRecieveEvents = true;
-		this.jump = false;
-		this.jumpHeight = 0;
-		this.direction = false;
-		this.cantTouchThis = false;
+        setTargetFps(42);
+		showStats = true;
+		alwaysRecieveEvents = true;
 
-		this.addObject(coin);
+		addObject(coin);
 		
-        this.run();
+        run();
     }
 	/*
 	 * Genakt van MultimediaAudio :)
