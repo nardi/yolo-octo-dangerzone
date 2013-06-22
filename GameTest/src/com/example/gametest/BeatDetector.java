@@ -20,7 +20,30 @@ public class BeatDetector {
 		...
 		return isBeat;
 	}
-
+	
+	public double setEnergy (double[] samples) {
+		double localEnergy = 0;
+		for (int i = 0; i < samples.length; i++) {
+			localEnergy += (samples[i] * samples[i]);
+		}
+		return (localEnergy / samples.length);
+	}
+	
+	// Berekent de afwijking van de locale energy met zijn history
+	private double calcVariance (double[] energyHistory, double localEnergy) {
+		double variance = 0;
+		for (int i = 0; i < energyHistory.length; i++) {
+			variance += ((energyHistory[i] - localEnergy) * (energyHistory[i] - localEnergy));
+		}
+		return (variance/energyHistory.length);
+	}
+	
+	// Berekent de constante C
+	private double calcC (double v) {
+		double c = (-0.0025714 * v) + 1.5142857;
+		return c;
+	}
+	
 	public double estimateTempo() {
 		
 	}
