@@ -80,16 +80,23 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 	public Paint getStatsPaint() {
 		return statsPaint;
 	}
-
+	
 	public void addObject(GameObject go) {
 		childObjects.add(go);
 		go.setParentFragment(this);
 	}
+	
+	public void addObject(GameObject go, int index) {
+		childObjects.add(index, go);
+		go.setParentFragment(this);
+	}
 
-	public void removeObject(GameObject go) {
+	public int removeObject(GameObject go) {
+		int index = childObjects.indexOf(go);
 		childObjects.remove(go);
 		if (go.getParentFragment() == this)
 			go.setParentFragment(null);
+		return index;
 	}
 
 	@Override

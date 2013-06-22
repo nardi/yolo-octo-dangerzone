@@ -34,11 +34,18 @@ public class GameObject implements Drawable, Updateable, Touchable {
 		childObjects.add(go);
 		go.setParent(this);
 	}
+	
+	public void addObject(GameObject go, int index) {
+		childObjects.add(index, go);
+		go.setParent(this);
+	}
 
-	public void removeObject(GameObject go) {
+	public int removeObject(GameObject go) {
+		int index = childObjects.indexOf(go);
 		childObjects.remove(go);
 		if (go.getParent() == this)
 			go.setParent(null);
+		return index;
 	}
 	
 	public void detatch() {
@@ -52,11 +59,11 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	
 	public void swapFor(GameObject go) {
 		if (parent != null) {
-			parent.removeObject(this);
-			parent.addObject(go);
+			int index = parent.removeObject(this);
+			parent.addObject(go, index);
 		} else if (parentFragment != null) {
-			parentFragment.removeObject(this);
-			parentFragment.addObject(go);
+			int index = parentFragment.removeObject(this);
+			parentFragment.addObject(go, index);
 		}
 	}
 	
