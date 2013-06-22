@@ -19,7 +19,7 @@ public class CircularDoubleBuffer {
 		return (position + length) % buffer.length;
 	}
 
-	public int placeFrom(int position, short[] data, int offset, int length) {
+	public int placeFrom(int position, double[] data, int offset, int length) {
 		int bufferLeft = buffer.length - position;
 		if (bufferLeft >= length) {
 			System.arraycopy(data, offset, buffer, position, length);
@@ -29,6 +29,12 @@ public class CircularDoubleBuffer {
 		}
 
 		return (position + length) % buffer.length;
+	}
+	
+	public int setSingle (int position, double data) {
+		buffer[position] = data;
+		
+		return (position + 1) % buffer.length;
 	}
 	
 	public int getLength() {
