@@ -18,7 +18,7 @@ public interface BeatDetector {
 
 }
 
-public class BeatDetector implements BeatDetector{
+public class Detector implements BeatDetector{
 	
 	private CircularDoubleBuffer historyBuffer;
 	private double[] tempBuffer;
@@ -44,7 +44,7 @@ public class BeatDetector implements BeatDetector{
 		return isBeat;
 	}
 	
-	public void setEnergy (double[] samples) {
+	public boolean newSamples (double[] samples) {
 		double instantEnergy = 0;
 		for (int i = 0; i < samples.length; i++) {
 			instantEnergy += (samples[i] * samples[i]);
@@ -90,8 +90,8 @@ public class BeatDetector implements BeatDetector{
 		
 	}
 	
-	public Section[] getSections {
-		
+	public Section[] getSections () {
+
 	}
 }
 
