@@ -3,7 +3,6 @@ package com.example.gametest;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -23,7 +21,8 @@ import android.view.ViewGroup;
  * Based on code from http://www.mysecretroom.com/www/programming-and-software/android-game-loops
  */
 
-public class GameFragment extends Fragment implements SurfaceHolder.Callback {
+public class GameFragment extends Fragment
+	implements SurfaceHolder.Callback, Drawable, Updateable, Touchable {
 	private final static int MAX_FRAME_SKIPS = 5;
 
 	private final GameFragment fragment = this;
@@ -48,6 +47,7 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 	public boolean alwaysRecieveEvents = false;
 	
 	private List<GameObject> childObjects = new ArrayList<GameObject>();
+	private boolean iterating = false;
 	private List<GameObject> objectsToRemove = new ArrayList<GameObject>();
 	
 	private Paint statsPaint = new Paint();
@@ -94,10 +94,21 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 
 	public int removeObject(GameObject go) {
 		int index = childObjects.indexOf(go);
-		objectsToRemove.add(go);
+		if (iterating)
+			objectsToRemove.add(go);
+		else
+			childObjects.remove(go);
 		if (go.getParentFragment() == this)
 			go.setParentFragment(null);
 		return index;
+	}
+	
+	private void checkAndRemove() {
+		if (!objectsToRemove.isEmpty()) {
+			for (GameObject go : objectsToRemove)
+				childObjects.remove(go);
+			objectsToRemove.clear();
+		}
 	}
 
 	@Override
@@ -163,6 +174,8 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 		}
 	}
 	
+	protected void onResize(int width, int height) {}
+
 	protected void preUpdate(long dt) {}
 	protected void onUpdate(long dt) {}
 	protected void postUpdate(long dt) {}
@@ -170,11 +183,11 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 	public final void update(long dt) {
 		preUpdate(dt);
 		onUpdate(dt);
+		iterating = true;
 		for (GameObject go : childObjects)
 			go.update(dt);
-		for (GameObject go : objectsToRemove)
-			childObjects.remove(go);
-		objectsToRemove.clear();
+		iterating = false;
+		checkAndRemove();
 		postUpdate(dt);
 	}
 
@@ -185,16 +198,14 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 	public final void draw(Canvas canvas) {
 		preDraw(canvas);
 		onDraw(canvas);
+		iterating = true;
 		for (GameObject go : childObjects)
 			go.draw(canvas);
-		for (GameObject go : objectsToRemove)
-			childObjects.remove(go);
-		objectsToRemove.clear();
+		iterating = false;
+		checkAndRemove();
 		postDraw(canvas);
 	}
 	
-	protected void onResize(int width, int height) {}
-
 	protected boolean onTouch(View v, MotionEvent me) {
 		return false;
 	}
@@ -202,11 +213,11 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 	public final boolean touch(View v, MotionEvent me) {
 		boolean eventUsed = false;
 		eventUsed |= onTouch(v, me);
+		iterating = true;
 		for (GameObject go : childObjects)
 			eventUsed |= go.touch(v, me);
-		for (GameObject go : objectsToRemove)
-			childObjects.remove(go);
-		objectsToRemove.clear();
+		iterating = false;
+		checkAndRemove();
 		return eventUsed;
 	}
 	
