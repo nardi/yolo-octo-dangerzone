@@ -11,6 +11,11 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	private GameFragment parentFragment = null;
 	private GameObject parent = null;
 	private List<GameObject> childObjects = new ArrayList<GameObject>();
+	/*
+	 * You can't remove an object from a List while iterating over it,
+	 * so a record is kept instead and we remove these objects later,
+	 * so GameObjects can remove themselves and each other.
+	 */
 	private List<GameObject> objectsToRemove = new ArrayList<GameObject>();
 	
 	void setParent(GameObject parent) {
