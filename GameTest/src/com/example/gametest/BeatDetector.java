@@ -1,5 +1,7 @@
 package com.example.gametest;
 
+import com.example.gametest.Section.BeatDetector;
+
 /*
  * Deze onthoudt "energies" en kan zo van nieuwe energies bepalen of deze
  * een beat zijn of niet.
@@ -7,7 +9,16 @@ package com.example.gametest;
  * Dit kan trouwens ook een interface worden, maken we een SimpleBeatDetector en
  * later een FFTBeatDetector
  */
-public class BeatDetector {
+
+public interface BeatDetector {
+	public boolean newSamples(double[] samples);
+	public double estimateTempo();
+	public Beat[] getBeats();
+	public Section[] getSections();
+
+}
+
+public class BeatDetector implements BeatDetector{
 	
 	private CircularDoubleBuffer historyBuffer;
 	private double[] tempBuffer;
