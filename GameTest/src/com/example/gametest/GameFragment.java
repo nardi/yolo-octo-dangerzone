@@ -48,6 +48,7 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 	public boolean alwaysRecieveEvents = false;
 	
 	private List<GameObject> childObjects = new ArrayList<GameObject>();
+	private List<GameObject> objectsToRemove = new ArrayList<GameObject>();
 	
 	private Paint statsPaint = new Paint();
 	private long beginTime, timeDiff, sleepTime, updateTime,
@@ -93,7 +94,7 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 
 	public int removeObject(GameObject go) {
 		int index = childObjects.indexOf(go);
-		childObjects.remove(go);
+		objectsToRemove.add(go);
 		if (go.getParentFragment() == this)
 			go.setParentFragment(null);
 		return index;
@@ -171,6 +172,9 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 		onUpdate(dt);
 		for (GameObject go : childObjects)
 			go.update(dt);
+		for (GameObject go : objectsToRemove)
+			childObjects.remove(go);
+		objectsToRemove.clear();
 		postUpdate(dt);
 	}
 
@@ -183,6 +187,9 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 		onDraw(canvas);
 		for (GameObject go : childObjects)
 			go.draw(canvas);
+		for (GameObject go : objectsToRemove)
+			childObjects.remove(go);
+		objectsToRemove.clear();
 		postDraw(canvas);
 	}
 	
@@ -197,6 +204,9 @@ public class GameFragment extends Fragment implements SurfaceHolder.Callback {
 		eventUsed |= onTouch(v, me);
 		for (GameObject go : childObjects)
 			eventUsed |= go.touch(v, me);
+		for (GameObject go : objectsToRemove)
+			childObjects.remove(go);
+		objectsToRemove.clear();
 		return eventUsed;
 	}
 	

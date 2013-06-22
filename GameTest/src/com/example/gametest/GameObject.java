@@ -11,6 +11,7 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	private GameFragment parentFragment = null;
 	private GameObject parent = null;
 	private List<GameObject> childObjects = new ArrayList<GameObject>();
+	private List<GameObject> objectsToRemove = new ArrayList<GameObject>();
 	
 	void setParent(GameObject parent) {
 		setParentFragment(parent.getParentFragment());
@@ -42,7 +43,7 @@ public class GameObject implements Drawable, Updateable, Touchable {
 
 	public int removeObject(GameObject go) {
 		int index = childObjects.indexOf(go);
-		childObjects.remove(go);
+		objectsToRemove.add(go);
 		if (go.getParent() == this)
 			go.setParent(null);
 		return index;
@@ -76,6 +77,9 @@ public class GameObject implements Drawable, Updateable, Touchable {
 		onUpdate(dt);
 		for (GameObject go : childObjects)
 			go.update(dt);
+		for (GameObject go : objectsToRemove)
+			childObjects.remove(go);
+		objectsToRemove.clear();
 		postUpdate(dt);
 	}
 
@@ -88,6 +92,9 @@ public class GameObject implements Drawable, Updateable, Touchable {
 		onDraw(canvas);
 		for (GameObject go : childObjects)
 			go.draw(canvas);
+		for (GameObject go : objectsToRemove)
+			childObjects.remove(go);
+		objectsToRemove.clear();
 		postDraw(canvas);
 	}
 	
@@ -100,6 +107,9 @@ public class GameObject implements Drawable, Updateable, Touchable {
 		eventUsed |= onTouch(v, me);
 		for (GameObject go : childObjects)
 			eventUsed |= go.touch(v, me);
+		for (GameObject go : objectsToRemove)
+			childObjects.remove(go);
+		objectsToRemove.clear();
 		return eventUsed;
 	}
 }
