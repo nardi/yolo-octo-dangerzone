@@ -35,6 +35,7 @@ public class TestGameFragment extends GameFragment {
 	private int jumpHeight;
 	private boolean direction;
 	private boolean cantTouchThis;
+	Coin coin = new Coin(400, 300);
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -254,11 +255,31 @@ public class TestGameFragment extends GameFragment {
 		if (!touching)
 			canvas.restore();
 		
+		if (coin != null) {
+			if (checkCollisionCoin(touchX, touchY, coin)) {
+				coin = null;
+			} else
+				coin.drawCoin(canvas);
+		}
+		
 		if (at != null) {
 			double seconds = (double)at.getPlaybackHeadPosition() / at.getPlaybackRate();
 			canvas.drawText("Music position: " + threeDecimals.format(seconds) + "s",
 					5, 30, getStatsPaint());
 		}
+	}
+	
+	private boolean checkCollisionCoin(float x, float y, Coin coin) {
+		boolean collision;
+		float xDif = x - coin.x;
+		float yDif = y - coin.y;
+		double distance = Math.pow(xDif, 2) + Math.pow(yDif, 2);
+		if (distance < (70 + coin.radius) * (70 + coin.radius)) {
+			collision = true;
+		} else {
+			collision = false;
+		}
+		return collision;
 	}
 
 	private void showPauseMenu() {
@@ -296,49 +317,50 @@ public class TestGameFragment extends GameFragment {
 	 */
 	@Override
 	public boolean onTouch(View v, MotionEvent me) {
-		Log.e("Coord", "X: " + me.getX() + " Y: " + me.getY());
-		Log.e("screenwidth", "Width: "+ (this.getView().getWidth() - 150));
-		Log.e("iSrunning", "IsRunning: " + isRunning());
-		Log.e("Dinges", "Dinges: " + (me.getActionMasked() == MotionEvent.ACTION_DOWN));
-		//Log.e("kanker", "kanker");
+
 		//FIXME Conflict#1
-		/*if (me.getActionMasked() == MotionEvent.ACTION_DOWN
-				&& me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
-			jump = true;
-			direction = true;
-			cantTouchThis = true;
-		}*/
+		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
+			/*IK CLAIM RECHTSONDER VERDORIE!!!! ~Jordy
+			 * Ringbuffer test
+			 */
+			if (me.getX() > (v.getWidth() - 150) && me.getY() > (v.getHeight() - 150) && isRunning()) {
+				
+				Log.e("JordyWasHere","Rechtsonder is van mij, bitsjes!");
+				
+			}
+			
+			
+			if (me.getX() < 150 && me.getY() > v.getHeight() - 150 && jump == false) {
+				jump = true;
+				direction = true;
+				cantTouchThis = true;
+			}
+			if (touchX < 150 && touchY < 150 && isRunning()) {
+				//postHalt();
+				//showPauseMenu();
+				
+				Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+			    intent.setType("audio/x-mp3");
+			    Intent chooser = Intent.createChooser(intent, "Select soundfile");
+			    startActivityForResult(chooser,1);
+			}
+			
+			//XXX Conflict#1
+			/*
+			 * Opens a new canvas to draw on when the user taps the upper right corner.
+			 */
+			/*
+			if(me.getX() > this.getView().getWidth() - 150  && me.getY() < 150) {
+	
+				this.getActivity().setContentView(R.layout.level_layout);
+			}
+			*/
+
+		}
 		if (!cantTouchThis && me.getY() < v.getHeight() - 150) {
 			touching = me.getActionMasked() != MotionEvent.ACTION_UP;
 			touchX = me.getX();
 			touchY = me.getY();
-		}
-		if (me.getActionMasked() == MotionEvent.ACTION_DOWN
-				&& touchX < 150 && touchY < 150 && isRunning()) {
-			//postHalt();
-			//showPauseMenu();
-			
-			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		    intent.setType("audio/x-mp3");
-		    Intent chooser = Intent.createChooser(intent, "Select soundfile");
-		    startActivityForResult(chooser,1);
-		}
-		//XXX Conflict#1
-		/*
-		 * Opens a new canvas to draw on when the user taps the upper right corner.
-		 */
-		
-		if(me.getX() > this.getView().getWidth() - 150  && me.getY() < 150 && isRunning()) {
-			
-			LevelFragment lvlFrag = new LevelFragment();
-			//Bundle args = new Bundle();
-			//args.putInt("levelId", R.id.LevelFragment);
-			//lvlFrag.setArguments(args);
-			Log.e("Switch content", "Switching content view");
-			
-			this.getActivity().getFragmentManager().beginTransaction().add(lvlFrag, "LevelFragment").commit();
-			
-			//this.getActivity().setContentView(R.layout.level_layout);
 		}
 		return true;
 	}

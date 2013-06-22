@@ -13,7 +13,7 @@ public class FloorPoint {
 	private double deviation;
 	
 	/* Maak een punt aan met een bepaalde afwijking tussen -1 en 1. */
-	FloorPoint(int deviation) {
+	FloorPoint(double deviation) {
 		this.deviation = deviation;
 	}
 	

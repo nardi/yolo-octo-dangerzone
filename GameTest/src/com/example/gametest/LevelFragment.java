@@ -33,11 +33,7 @@ public class LevelFragment extends GameFragment {
 		canvas.drawText("Hello Wordl", 100, 100, paint);
 	}
 	
-	/*public boolean onTouch(View v, MotionEvent me){
-		if (me.getActionMasked() == MotionEvent.ACTION_DOWN
-				&& me.getX() < 150 && me.getY() < 150 && isRunning()) {
-			this.getActivity().setContentView(R.layout.activity_main);
-		}
+	public boolean onTouch(){
 		return true;
-	}*/
+	}
 }

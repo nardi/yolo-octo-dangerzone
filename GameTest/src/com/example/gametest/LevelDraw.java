@@ -10,15 +10,16 @@ public class LevelDraw {
 	public GameCanvas gameCanvas;
 	public Canvas canvas;
 	private Paint paint;
-	Point x;
+	Point old;
+	int y = 50;
 	
 	public LevelDraw(GameCanvas gameCanvas) {
 		this.gameCanvas = gameCanvas;
 		this.canvas = gameCanvas.getCanvas();
 		paint = new Paint();
 		paint.setColor(Color.BLACK);
-		x.x = 0;
-		x.y = 0;
+		old.x = 0;
+		old.y = 0;
 	}
 	
 	public void drawText(String toWrite, Point loc){
@@ -29,17 +30,19 @@ public class LevelDraw {
 		canvas.drawText(toWrite, loc.x, loc.y, brush);
 	}
 	
-	public void drawFloor(Point y){
+	public void drawFloor(Point newp){
 		paint.setStrokeWidth(25);
-		canvas.drawLine(x.x, x.y, y.x, y.y, paint);
-		x.x = y.x;
-		x.y = y.y;
+		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
+		old.x = newp.x;
+		old.y = newp.y;
 	}
 	
-	public void drawFloor(Point y, Paint brush){
-		canvas.drawLine(x.x, x.y, y.x, y.y, brush);
-		x.x = y.x;
-		x.y = y.y;
+	public void drawFloor(Point newp, Paint brush){
+		canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
+		old.x = newp.x;
+		old.y = newp.y;
 	}
+	
+	
 
 }
