@@ -49,6 +49,8 @@ public class TestGameFragment extends GameFragment {
 		this.direction = false;
 		this.cantTouchThis = false;
 
+		this.addObject(coin);
+		
         this.run();
     }
 	/*
@@ -73,7 +75,6 @@ public class TestGameFragment extends GameFragment {
 				int column_index = cursor
 						.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 				cursor.moveToFirst();
-
 				path = cursor.getString(column_index);
 			} else if ("file".equalsIgnoreCase(uri.getScheme())) {
 				path = uri.getPath();
@@ -276,7 +277,7 @@ public class TestGameFragment extends GameFragment {
 	 * initialized and when the screen is rotated).
 	 */
 	@Override
-	public void onResize(int width, int height) {
+	protected void onResize(int width, int height) {
 		fullScreen = new RectF(0, 0, width, height);
 		if (touchX == 0 && touchY == 0) {
 			touchX = width / 2f;
@@ -290,7 +291,7 @@ public class TestGameFragment extends GameFragment {
 	 * the (start of the) last update.
 	 */
 	@Override
-	public void onUpdate(long dt) {
+	protected void onUpdate(long dt) {
 		//Log.d("TestGameFragment", "onUpdate: dt = " + dt);
 		totalTime += dt;
 		//Log.d("TestGameFragment", "onUpdate: totalTime = " + totalTime);
@@ -298,13 +299,17 @@ public class TestGameFragment extends GameFragment {
 		if (jump) {
 			updateY(dt);
 		}
+		
+		// De collision check kan ook nog naar Coin.onUpdate verplaatst worden
+		if (checkCollisionCoin(touchX, touchY, coin))
+			coin.detatch();
 	}
 
 	/*
 	 * Draw the game: only use this canvas! (threads and stuff)
 	 */
 	@Override
-	public void onDraw(Canvas canvas) {
+	protected void onDraw(Canvas canvas) {
 		canvas.drawRGB(100, 149, 237);
 		
 		if (!touching)
@@ -312,13 +317,6 @@ public class TestGameFragment extends GameFragment {
 		canvas.drawCircle(touchX, touchY, 70, touchCircle);
 		if (!touching)
 			canvas.restore();
-		
-		if (coin != null) {
-			if (checkCollisionCoin(touchX, touchY, coin)) {
-				coin = null;
-			} else
-				coin.drawCoin(canvas);
-		}
 		
 		if (at != null) {
 			double seconds = (double)at.getPlaybackHeadPosition() / at.getPlaybackRate();
@@ -374,7 +372,7 @@ public class TestGameFragment extends GameFragment {
 	 * Called when you touch the game view.
 	 */
 	@Override
-	public boolean onTouch(View v, MotionEvent me) {
+	protected boolean onTouch(View v, MotionEvent me) {
 
 		//FIXME Conflict#1
 		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
@@ -427,11 +425,6 @@ public class TestGameFragment extends GameFragment {
 
 			this.getActivity().setContentView(R.layout.level_layout);
 		}
-		
-		
-		
-		
-
 
 		return true;
 	}
