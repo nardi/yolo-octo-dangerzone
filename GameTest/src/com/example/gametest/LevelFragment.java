@@ -34,7 +34,8 @@ public class LevelFragment extends GameFragment {
 		canvas.drawText("Hello Wordl", 100, 100, paint);
 	}
 	
-	public boolean onTouch(){
+	@Override
+	protected boolean onTouch(View v, MotionEvent me) {
 		Log.e("Action","Pressed");
 		return true;
 	}
