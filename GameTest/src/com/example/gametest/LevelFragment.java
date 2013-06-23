@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -34,6 +35,7 @@ public class LevelFragment extends GameFragment {
 	}
 	
 	public boolean onTouch(){
+		Log.e("Action","Pressed");
 		return true;
 	}
 }
