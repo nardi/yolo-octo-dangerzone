@@ -10,37 +10,41 @@ package com.example.gametest;
 public class SimpleBeatDetector implements BeatDetector {
 	private CircularDoubleBuffer historyBuffer;
 	private double[] tempBuffer;
-	int writeEnd = 0;
-	double instantEnergy = 0;
-	double localEnergy = 0;
+	private int historyPosition = 0;
+	private double localEnergy = 0;
+	private boolean wasBeat = false;
 	
-	// reference is om voor de eerste energies te kunnen bepalen of het beats
-	// zijn, i.e. reference is historySize groot
+	/*
+	 * reference is om voor de eerste energies te kunnen bepalen of het beats
+	 * zijn, i.e. reference is historySize groot
+	 */
 	public SimpleBeatDetector (int historySize, int beatFactor, double[] reference) {
-		tempBuffer = new double[historySize];//Gebruikt voor berekeningen op history
+		tempBuffer = new double[historySize]; //Gebruikt voor berekeningen op history
 		historyBuffer = new CircularDoubleBuffer(historySize);
-		writeEnd = historyBuffer.placeFrom(0, reference, 0, historySize);
+		historyPosition = historyBuffer.placeFrom(0, reference, 0, historySize);
 	}
 	
 	public boolean newSamples (double[] samples) {
 		double instantEnergy = 0;
-		boolean isBeat = false;
 		for (int i = 0; i < samples.length; i++) {
 			instantEnergy += (samples[i] * samples[i]);
 		}
-		this.instantEnergy = (instantEnergy * 1024) /samples.length;
+		instantEnergy = (instantEnergy * 1024) / samples.length;
 		
 		historyBuffer.getFrom(0, tempBuffer, 0, tempBuffer.length);
+		historyPosition = historyBuffer.placeFrom(historyPosition, instantEnergy);
+
 		double c = calcC(calcVariance(tempBuffer));
-		if (instantEnergy > (c * localEnergy)) {
-			isBeat = true;
-		}
-		updateHistory();
+		
+		boolean isBeat = instantEnergy > (c * localEnergy);
+
+		/*
+		 * Het is alleen een beat als ervoor een niet-beat geweest is
+		 */
+		boolean temp = isBeat;
+		isBeat = isBeat && wasBeat;
+		wasBeat = temp;
 		return isBeat;
-	}
-	
-	private void updateHistory () {
-		writeEnd = historyBuffer.setSingle(writeEnd, instantEnergy);
 	}
 	
 	// Berekent de afwijking van de locale energy met zijn history
@@ -54,19 +58,18 @@ public class SimpleBeatDetector implements BeatDetector {
 		}
 		
 		localEnergy /= energyHistory.length;
-		this.localEnergy = localEnergy;
+
 		// Krijg variantie total
 		for (int i = 0; i < energyHistory.length; i++) {
 			variance += ((energyHistory[i] - localEnergy) * (energyHistory[i] - localEnergy));
 		}
 		
-		return (variance /energyHistory.length);
+		return variance / energyHistory.length;
 	}
 	
-	// Berekent de constante C
+	// Berekent de intensiteitsfactor C die bepaalt of een bepaald energieniveau een beat is of niet
 	private double calcC (double v) {
-		double c = (-0.0025714 * v) + 1.5142857;
-		return c;
+		return (-0.0025714 * v) + 1.5142857;
 	}
 	
 	public double estimateTempo() {

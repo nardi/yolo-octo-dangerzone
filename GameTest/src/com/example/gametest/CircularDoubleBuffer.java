@@ -31,7 +31,7 @@ public class CircularDoubleBuffer {
 		return (position + length) % buffer.length;
 	}
 	
-	public int setSingle (int position, double data) {
+	public int placeFrom(int position, double data) {
 		buffer[position] = data;
 		
 		return (position + 1) % buffer.length;
