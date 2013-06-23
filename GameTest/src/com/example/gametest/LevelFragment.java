@@ -24,7 +24,7 @@ public class LevelFragment extends GameFragment {
 		paint = new Paint();
 		paint.setColor(Color.RED);
 		paint.setTextSize(12);
-		lvlGen = new LevelDraw(this.getView());
+		lvlGen = new LevelDraw();
 		buffer = new FloorBuffer(generateDevs());
 		buffer.FillBuffer();
 	}
@@ -38,6 +38,7 @@ public class LevelFragment extends GameFragment {
 	public void onDraw(Canvas canvas){
 		canvas.drawColor(Color.BLACK);
 		canvas.drawText("Hello Wordl", 100, 100, paint);
+		lvlGen.view = this.getView();
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
 	}
 	

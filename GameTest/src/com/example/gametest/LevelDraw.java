@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.util.Log;
 import android.view.View;
 
 public class LevelDraw {
@@ -16,10 +17,10 @@ public class LevelDraw {
 	PointF old;
 	int y = 50;
 	
-	public LevelDraw(View view) {
+	public LevelDraw() {
 		//this.gameCanvas = gameCanvas;
 		//this.canvas = gameCanvas.getCanvas();
-		this.view = view;
+		//this.view = view;
 		paint = new Paint();
 		paint.setColor(Color.BLUE);
 		old = new PointF(0 , 0);
@@ -58,6 +59,7 @@ public class LevelDraw {
 			dev.y = ((view.getHeight() * 2/3) - (dev.y * 1/5));
 			return dev;
 		}
+		Log.e("View", "View == null");
 		return dev;
 	}
 	
