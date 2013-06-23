@@ -22,22 +22,21 @@ public class SimpleBeatDetector implements BeatDetector {
 		writeEnd = historyBuffer.placeFrom(0, reference, 0, historySize);
 	}
 	
-	public boolean newEnergy(double energy) {
+	public boolean newSamples (double[] samples) {
+		double instantEnergy = 0;
 		boolean isBeat = false;
+		for (int i = 0; i < samples.length; i++) {
+			instantEnergy += (samples[i] * samples[i]);
+		}
+		this.instantEnergy = (instantEnergy * 1024) /samples.length;
+		
 		historyBuffer.getFrom(0, tempBuffer, 0, tempBuffer.length);
 		double c = calcC(calcVariance(tempBuffer));
 		if (instantEnergy > (c * localEnergy)) {
 			isBeat = true;
 		}
+		updateHistory();
 		return isBeat;
-	}
-	
-	public boolean newSamples (double[] samples) {
-		double instantEnergy = 0;
-		for (int i = 0; i < samples.length; i++) {
-			instantEnergy += (samples[i] * samples[i]);
-		}
-		this.instantEnergy = (instantEnergy * 1024) /samples.length;
 	}
 	
 	private void updateHistory () {
