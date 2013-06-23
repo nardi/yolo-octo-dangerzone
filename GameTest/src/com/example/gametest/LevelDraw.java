@@ -10,7 +10,7 @@ import android.view.View;
 public class LevelDraw {
 	
 	public GameCanvas gameCanvas;
-	public Canvas canvas;
+	//public Canvas canvas;
 	public View view;
 	private Paint paint;
 	PointF old;
@@ -30,22 +30,22 @@ public class LevelDraw {
 	 * either use the standard paint or the given paint. The drawFloor functions
 	 * save the point so each subsequent point will be drawn from the previous.
 	 */
-	public void drawText(String toWrite, PointF loc){
+	public void drawText(String toWrite, PointF loc, Canvas canvas){
 		canvas.drawText(toWrite, loc.x, loc.y, paint);
 	}
 	
-	public void drawText(String toWrite, PointF loc, Paint brush){
+	public void drawText(String toWrite, PointF loc, Paint brush, Canvas canvas){
 		canvas.drawText(toWrite, loc.x, loc.y, brush);
 	}
 	
-	public void drawFloor(PointF newp){
+	public void drawFloor(PointF newp, Canvas canvas){
 		paint.setStrokeWidth(25);
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
 		old.x = newp.x;
 		old.y = newp.y;
 	}
 	
-	public void drawFloor(PointF newp, Paint brush){
+	public void drawFloor(PointF newp, Paint brush, Canvas canvas){
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
 		old.x = newp.x;
 		old.y = newp.y;
@@ -58,12 +58,12 @@ public class LevelDraw {
 	}
 	
 	/*
-	 * THis is a raw version. I am trying to find a good translation method in order to evenly distribute the 400 x points over
+	 * This is a raw version. I am trying to find a good translation method in order to evenly distribute the 400 x points over
 	 * the screen and to translate the deviation.
 	 */
-	public void drawFromBuffer(PointF[] buffer){
+	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
 		for(int i = 0; i < buffer.length; i++){
-			drawFloor(translate(buffer[i]));
+			drawFloor(translate(buffer[i]), canvas);
 		}
 	}
 	

@@ -36,7 +36,8 @@ public class FloorBuffer {
 	/* Initialiseer de buffer met de eerste >bufferSize< aantal waardes.
 	 * Als er minder waardes dan dit zijn, wordt er een plat vlak gegenereerd.
 	 */
-	private void FillBuffer() {
+	//XXX Deze was private, (?) maar heb ff public gemaakt voor testen
+	public void FillBuffer() {
 		for (int i = 0; i < bufferSize; i++) {
 			if (i < points.length) {
 				buffer[i] = points[i].getDev();
