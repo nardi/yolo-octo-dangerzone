@@ -386,13 +386,6 @@ public class TestGameFragment extends GameFragment {
 			touchX = me.getX();
 			touchY = me.getY();
 		}
-		
-		
-		else if(me.getActionMasked() == MotionEvent.ACTION_DOWN
-				&& touchX > this.getView().getWidth() - 150  && touchY < 150 && isRunning()) {
-
-			this.getActivity().setContentView(R.layout.level_layout);
-		}
 
 		return true;
 	}

@@ -9,8 +9,8 @@ import android.view.View;
 
 public class GameCanvas extends View {
 	
-	public Paint paint;
-	public Canvas canvas;
+	private Paint paint;
+	private Canvas canvas;
 	
 	public GameCanvas(Context context) {
 		super(context);
@@ -34,6 +34,10 @@ public class GameCanvas extends View {
 		
 		canvas.drawText("Hello Wordl", 0, 0, paint);
 		canvas.restore();
+	}
+	
+	public Canvas getCanvas(){
+		return this.canvas;
 	}
 
 }
