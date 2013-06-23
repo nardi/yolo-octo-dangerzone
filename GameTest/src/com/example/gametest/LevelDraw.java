@@ -53,8 +53,11 @@ public class LevelDraw {
 	}
 	
 	public PointF translate(PointF dev){
-		dev.x = (view.getWidth()/399 * dev.x);
-		dev.y = ((view.getHeight() * 2/3) - (dev.y * 1/5));
+		if(view != null){
+			dev.x = (view.getWidth()/399 * dev.x);
+			dev.y = ((view.getHeight() * 2/3) - (dev.y * 1/5));
+			return dev;
+		}
 		return dev;
 	}
 	

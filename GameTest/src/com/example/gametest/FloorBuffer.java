@@ -70,6 +70,7 @@ public class FloorBuffer {
 	public PointF[] getBuffer() {
 		for (int i = index, j = 0; j < bufferSize; i++, j++) {
 			i %= bufferSize;
+			tempBuffer[j] = new PointF();
 			tempBuffer[j].y = buffer[i];	
 			tempBuffer[j].x = j;
 		}
