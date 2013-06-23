@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface BeatDetector {
 	public boolean newSamples(double[] samples);
+	public void finishSong();
 	public double estimateTempo();
 	public List<Beat> getBeats();
 	public List<Section> getSections();

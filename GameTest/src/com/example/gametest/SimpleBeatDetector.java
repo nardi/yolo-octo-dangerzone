@@ -61,13 +61,22 @@ public class SimpleBeatDetector implements BeatDetector {
 
 		if (currentBeat != null) {
 			if (isBeat) {
-				currentBeat.endTime = time;
-				currentBeatLength++;
-				currentBeat.intensity = ((currentBeat.intensity * currentBeatLength - 1) + instantEnergy) / currentBeatLength; 
+				currentBeat.add(time, instantEnergy);
 			} else {
-				currentBeat.endTime = time;
+				currentBeat.finish(time);
+				beats.add(currentBeat);
+				if (currentSection == null
+				 || avgEnergy / currentSection.intensity > c
+				 || currentSection.intensity / avgEnergy > c) {
+					if (currentSection != null) {
+						currentSection.finish(currentBeat);
+						sections.add(currentSection);
+					}
+					currentSection = new Section(currentBeat, avgEnergy);
+				} else {
+					currentSection.add(currentBeat, avgEnergy);
+				}
 				currentBeat = null;
-				currentBeatLength = 0;
 			}
 		}
 		
@@ -78,23 +87,30 @@ public class SimpleBeatDetector implements BeatDetector {
 		isBeat = isBeat && !wasBeat;
 		wasBeat = temp;
 		
-		if (isBeat) {
-			if (!beats.isEmpty()) {
-				Beat lastBeat = beats.get(beats.size() - 1);
-				long beatTime = time - lastBeat.startTime;
-				isBeat = 60000 / beatTime <= HIGHEST_BPM;
-			}
-			if (isBeat) {
-				currentBeat = new Beat();
-				currentBeat.startTime = currentBeat.endTime = time;
-				currentBeat.intensity = instantEnergy;
-				currentBeatLength = 1;
-				beats.add(currentBeat);
-			}
+		if (!beats.isEmpty() && isBeat) {
+			Beat lastBeat = beats.get(beats.size() - 1);
+			long beatTime = time - lastBeat.startTime;
+			isBeat = 60000 / beatTime <= HIGHEST_BPM;
 		}
+		
+		if (isBeat)
+			currentBeat = new Beat(time, instantEnergy);
 		
 		sampleCounter += fromSamples;
 		return isBeat;
+	}
+	
+	public void finishSong() {
+		if (currentBeat != null) {
+			beats.add(currentBeat);
+			if (currentSection != null)
+				currentSection.finish(currentBeat);
+			currentBeat = null;
+		}
+		if (currentSection != null) {
+			sections.add(currentSection);
+			currentSection = null;
+		}
 	}
 	
 	// Berekent de afwijking van de locale energy met zijn history
@@ -156,6 +172,6 @@ public class SimpleBeatDetector implements BeatDetector {
 	}
 	
 	public List<Section> getSections () {
-		return null;
+		return sections;
 	}
 }

@@ -10,4 +10,22 @@ public class Beat {
 	public long time() {
 		return (startTime + endTime) / 2;
 	}
+	
+	private int length;
+	
+	public Beat(long startTime, double startIntensity) {
+		this.startTime = endTime = startTime;
+		intensity = startIntensity;
+		length = 1;
+	}
+	
+	public void add(long time, double newIntensity) {
+		endTime = time;
+		length++;
+		intensity = (intensity * (length - 1) + newIntensity) / length;
+	}
+	
+	public void finish(long time) {
+		endTime = time;
+	}
 }

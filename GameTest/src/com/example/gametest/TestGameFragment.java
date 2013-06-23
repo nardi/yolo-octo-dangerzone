@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.text.DecimalFormat;
+import java.util.List;
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
@@ -189,8 +190,13 @@ public class TestGameFragment extends GameFragment {
 							Log.i("detectTempo", "Beat at " + (1000 * sampleCounter / 2) / 44100 + " ms");
 						sampleCounter += read;
 					}
+					bd.finishSong();
 					
 					Log.i("detectTempo", "Estimated tempo: " + bd.estimateTempo() + " BPM");
+					for (Section s : bd.getSections()) {
+						Log.i("detectTempo", "Section from " + s.startTime + " ms to "
+								+ s.endTime + " ms, intensity: " + s.intensity);
+					}
 				} catch (Exception e) {
 					Log.e("detectTempo", "Oeps!", e);
 				}
