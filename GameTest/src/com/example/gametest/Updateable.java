@@ -1,5 +1,5 @@
 package com.example.gametest;
 
 public interface Updateable {
-	public void onUpdate(long dt);
+	public void update(long dt);
 }

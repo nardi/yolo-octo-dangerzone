@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-public class Coin {
+public class Coin extends GameObject {
 	int x, y;
 	float radius = 40;
 	
@@ -20,7 +20,7 @@ public class Coin {
 		this.y = y;
 	}
 	
-	public void drawCoin(Canvas canvas) {
+	public void onDraw(Canvas canvas) {
 		canvas.drawCircle(x, y, radius, coinPaint);
 	}
 

@@ -21,7 +21,11 @@ public class LevelDraw {
 		old.x = 0;
 		old.y = 0;
 	}
-	
+	/*
+	 * Following are the drawing functions for the level. Each function can 
+	 * either use the standard paint or the given paint. The drawFloor functions
+	 * save the point so each subsequent point will be drawn from the previous.
+	 */
 	public void drawText(String toWrite, Point loc){
 		canvas.drawText(toWrite, loc.x, loc.y, paint);
 	}
@@ -41,6 +45,21 @@ public class LevelDraw {
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
 		old.x = newp.x;
 		old.y = newp.y;
+	}
+	
+	public Point translateDeviation(Point dev){
+		dev.y = 0; //TODO Translation formula here
+		return dev;
+	}
+	
+	/*
+	 * THis is a raw version. I am trying to find a good translation method in order to evenly distribute the 400 x points over
+	 * the screen and to translate the deviation.
+	 */
+	public void drawFromBuffer(Point[] buffer){
+		for(int i = 0; i < buffer.length; i++){
+			drawFloor(translateDeviation(buffer[i]));
+		}
 	}
 	
 	
