@@ -1,8 +1,11 @@
 package com.example.gametest;
 
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.MotionEvent;
+import android.view.View;
 
 public class LevelFragment extends GameFragment {
 
@@ -16,6 +19,7 @@ public class LevelFragment extends GameFragment {
 	{
 		paint = new Paint();
 		paint.setColor(Color.RED);
+		paint.setTextSize(12);
 	}
 
 	@Override
@@ -25,10 +29,8 @@ public class LevelFragment extends GameFragment {
 	
 	@Override
 	public void onDraw(Canvas canvas){
-		this.canvas = canvas;
-		
-		canvas.drawText("Hello Wordl", 0, 0, paint);
-		canvas.restore();
+		canvas.drawColor(Color.BLACK);
+		canvas.drawText("Hello Wordl", 100, 100, paint);
 	}
 	
 	public boolean onTouch(){

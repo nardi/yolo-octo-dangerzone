@@ -31,25 +31,23 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class TestGameFragment extends GameFragment {
-	private boolean jump;
-	private int jumpHeight;
-	private boolean direction;
-	private boolean cantTouchThis;
+	private boolean jump = false;
+	private int jumpHeight = 0;
+	private boolean direction = false;
+	private boolean cantTouchThis = false;
 	Coin coin = new Coin(400, 300);
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTargetFps(60);
-		this.showStats = true;
-		this.alwaysRecieveEvents = true;
-		this.jump = false;
-		this.jumpHeight = 0;
-		this.direction = false;
-		this.cantTouchThis = false;
+        setTargetFps(42);
+		showStats = true;
+		alwaysRecieveEvents = true;
 
-        this.run();
+		addObject(coin);
+		
+        run();
     }
 	/*
 	 * Genakt van MultimediaAudio :)
@@ -73,7 +71,6 @@ public class TestGameFragment extends GameFragment {
 				int column_index = cursor
 						.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 				cursor.moveToFirst();
-
 				path = cursor.getString(column_index);
 			} else if ("file".equalsIgnoreCase(uri.getScheme())) {
 				path = uri.getPath();
@@ -82,7 +79,7 @@ public class TestGameFragment extends GameFragment {
 				return;
 			}
 			
-			new Thread(fourierTransform(path)).start();
+			new Thread(fourierTransformNub(path)).start();
 		}
 	}
 	
@@ -161,56 +158,86 @@ public class TestGameFragment extends GameFragment {
 	}
 	DecimalFormat threeDecimals = new DecimalFormat("0.000");
 	
-	public Runnable fourierTransform (final String path) {
+	/*
+	 * XXX We kunnen in ieder geval fijn fft's doen maar
+	 * het algoritme werkt verder voor geen meter ^_^
+	 */
+	public Runnable fourierTransformNub (final String nubPath) {
 		return new Runnable() {
 			public void run() {
 				try {
-					MP3Decoder md = new MP3Decoder(path);
-					int bufferSize = 512;
-					int bassArraySize = (int) (md.getLength() * 2 / bufferSize) + 1;
-					double[] calcDatBass = new double[bassArraySize];
-					DoubleFFT_1D fft = new DoubleFFT_1D(bufferSize);/*Nardi check dem sizes TODO*/
-					double[] fft_out = new double[bufferSize];
-					String fftPath = path + ".fft";
-					FileOutputStream out = new FileOutputStream(fftPath);
+					MP3Decoder md = new MP3Decoder(nubPath);
+					int bufferSize = 1024;
+					int nubArraySize = 4 * (int)(md.getLength() * 2 / bufferSize) + 1;
+					long subBandOldest = 0;
+					long historyWriteIndex = 0;
 					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize);
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+					double[] audioData = new double[bufferSize],
+							 subBands = new double[32];
+					double[][] subBandHistory = new double[32][43];
+							 
+					DoubleFFT_1D fft = new DoubleFFT_1D(bufferSize);
 					
 					int read = -1;
-					int i = 0;
 					int j = 0;
 					double temp = 0;
 					while (read != 0) {
-						i = 0;
 						read = md.readSamples(shortBuffer);
-						while (i < read) {
-							fft_out[i] = (double)shortBuffer.get()/Short.MAX_VALUE;
-							i++;
+						for (int i = 0; i < read; i++) {
+							audioData[i] = (double)shortBuffer.get() / Short.MAX_VALUE;
 						}
 						shortBuffer.position(0);
-						fft.realForward(fft_out);
-						Log.v("FFT", "FFT op " + (44100/bufferSize) * 3+ "Hz: " + fft_out[3]);
-						temp = Math.abs(fft_out[3]);
-						if (temp > 0.1) {
-							calcDatBass[j++] = 1;
+						/* spaghetti everywhere Kleine kans dat het array nog oude waarden heeft nub */
+						if (read < audioData.length) {
+							for (int i = read; i < audioData.length; i++) {
+								audioData[i] = 0;
+							}
 						}
-						else {
-							calcDatBass[j++] = 0;
-						}
-					}
-					DoubleFFT_1D bass = new DoubleFFT_1D(bassArraySize);			
-					bass.realForward(calcDatBass);
-					for (int k = 0; k < bassArraySize; k++) {/*TODO for loops etc*/
-						Log.v("FFT", "FFT op " + ((44100.0/bufferSize)/bassArraySize) * k + "Hz: " + calcDatBass[k]);
+						fft.realForward(audioData);
+						splitIntoSubBands(audioData, subBands);
+						subBandOldest = fillSubBandHistory(subBands, subBandHistory, subBandOldest);
 					}
 				}
 				catch (Exception e){
-					Log.e("Fourier Transform", "Borked!", e);
+					Log.e("FFT", "Dimi is een nub", e);
 				}
 			}
 		};
+	}
+	
+	/*XXX Breekt de fft data op in subbands, kan zijn dat ik hier dus ook de imaginary getallen pak*/
+	private void splitIntoSubBands (double[] fftData, double[] subBands) {
+		double subBandEng = 0;
+		for (int i = 0; i < subBands.length; i++) {
+			subBandEng = 0;
+			for (int j = i * subBands.length; j < (i + 1) * subBands.length; j++) {
+				subBandEng += fftData[j];
+			}
+			subBandEng *= (32/1024.0);
+			subBands[i] = subBandEng;
+		}
+		//Log.i("SubBand", "Made it");
+	}
+	
+	/* SubBandsHistory is circulair XXX moet misschien wat beter geschreven worden*/
+	private long fillSubBandHistory (double[] subBands, double[][] subBandHistory, long oldest) {
+		for (int i = 0; i < subBands.length; i++) {
+			subBandHistory[i][(int) (oldest % 43)] = subBands[i];
+		}
+		Log.i("SubBand", "oldest val: " + oldest);
+		return oldest + 1;
+	}
+	
+	/* Nu alleen voor #samples=1024 nub*/
+	private double moveWindowNub (double[] original, double[] future, double[] output, int sizeOfFuture, DoubleFFT_1D fft) {
+		double intensitySum = 0;
+		
+		
+		
+		return intensitySum / 4;
 	}
 	
 	/*
@@ -218,7 +245,7 @@ public class TestGameFragment extends GameFragment {
 	 * initialized and when the screen is rotated).
 	 */
 	@Override
-	public void onResize(int width, int height) {
+	protected void onResize(int width, int height) {
 		fullScreen = new RectF(0, 0, width, height);
 		if (touchX == 0 && touchY == 0) {
 			touchX = width / 2f;
@@ -232,21 +259,25 @@ public class TestGameFragment extends GameFragment {
 	 * the (start of the) last update.
 	 */
 	@Override
-	public void onUpdate(long dt) {
-		Log.d("TestGameFragment", "onUpdate: dt = " + dt);
+	protected void onUpdate(long dt) {
+		//Log.d("TestGameFragment", "onUpdate: dt = " + dt);
 		totalTime += dt;
-		Log.d("TestGameFragment", "onUpdate: totalTime = " + totalTime);
+		//Log.d("TestGameFragment", "onUpdate: totalTime = " + totalTime);
 		
 		if (jump) {
 			updateY(dt);
 		}
+		
+		// De collision check kan ook nog naar Coin.onUpdate verplaatst worden
+		if (checkCollisionCoin(touchX, touchY, coin))
+			coin.detatch();
 	}
 
 	/*
 	 * Draw the game: only use this canvas! (threads and stuff)
 	 */
 	@Override
-	public void onDraw(Canvas canvas) {
+	protected void onDraw(Canvas canvas) {
 		canvas.drawRGB(100, 149, 237);
 		
 		if (!touching)
@@ -254,13 +285,6 @@ public class TestGameFragment extends GameFragment {
 		canvas.drawCircle(touchX, touchY, 70, touchCircle);
 		if (!touching)
 			canvas.restore();
-		
-		if (coin != null) {
-			if (checkCollisionCoin(touchX, touchY, coin)) {
-				coin = null;
-			} else
-				coin.drawCoin(canvas);
-		}
 		
 		if (at != null) {
 			double seconds = (double)at.getPlaybackHeadPosition() / at.getPlaybackRate();
@@ -317,7 +341,7 @@ public class TestGameFragment extends GameFragment {
 	 * Called when you touch the game view.
 	 */
 	@Override
-	public boolean onTouch(View v, MotionEvent me) {
+	protected boolean onTouch(View v, MotionEvent me) {
 
 		//FIXME Conflict#1
 		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
@@ -363,18 +387,6 @@ public class TestGameFragment extends GameFragment {
 			touchX = me.getX();
 			touchY = me.getY();
 		}
-		
-		
-		else if(me.getActionMasked() == MotionEvent.ACTION_DOWN
-				&& touchX > this.getView().getWidth() - 150  && touchY < 150 && isRunning()) {
-
-			this.getActivity().setContentView(R.layout.level_layout);
-		}
-		
-		
-		
-		
-
 
 		return true;
 	}

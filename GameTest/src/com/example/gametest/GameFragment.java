@@ -3,7 +3,6 @@ package com.example.gametest;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -23,10 +21,10 @@ import android.view.ViewGroup;
  * Based on code from http://www.mysecretroom.com/www/programming-and-software/android-game-loops
  */
 
-public abstract class GameFragment extends Fragment
-	implements SurfaceHolder.Callback, View.OnTouchListener {
+public class GameFragment extends Fragment
+	implements SurfaceHolder.Callback, Drawable, Updateable, Touchable {
 	private final static int MAX_FRAME_SKIPS = 5;
-	
+
 	private final GameFragment fragment = this;
 	
 	private GameThread thread = new GameThread();
@@ -48,7 +46,9 @@ public abstract class GameFragment extends Fragment
 	public boolean showStats = false;
 	public boolean alwaysRecieveEvents = false;
 	
-	private List<GameObject> autoObjects = new ArrayList<GameObject>();
+	private List<GameObject> childObjects = new ArrayList<GameObject>();
+	private boolean iterating = false;
+	private List<GameObject> objectsToRemove = new ArrayList<GameObject>();
 	
 	private Paint statsPaint = new Paint();
 	private long beginTime, timeDiff, sleepTime, updateTime,
@@ -83,7 +83,32 @@ public abstract class GameFragment extends Fragment
 	}
 	
 	public void addObject(GameObject go) {
-		autoObjects.add(go);
+		childObjects.add(go);
+		go.setParentFragment(this);
+	}
+	
+	public void addObject(GameObject go, int index) {
+		childObjects.add(index, go);
+		go.setParentFragment(this);
+	}
+
+	public int removeObject(GameObject go) {
+		int index = childObjects.indexOf(go);
+		if (iterating)
+			objectsToRemove.add(go);
+		else
+			childObjects.remove(go);
+		if (go.getParentFragment() == this)
+			go.setParentFragment(null);
+		return index;
+	}
+	
+	private void checkAndRemove() {
+		if (!objectsToRemove.isEmpty()) {
+			for (GameObject go : objectsToRemove)
+				childObjects.remove(go);
+			objectsToRemove.clear();
+		}
 	}
 
 	@Override
@@ -149,15 +174,51 @@ public abstract class GameFragment extends Fragment
 		}
 	}
 	
-	public abstract void onUpdate(long dt);
+	protected void onResize(int width, int height) {}
 
-	public abstract void onDraw(Canvas canvas);
+	protected void preUpdate(long dt) {}
+	protected void onUpdate(long dt) {}
+	protected void postUpdate(long dt) {}
 	
-	public void onResize(int width, int height) {}
+	public final void update(long dt) {
+		preUpdate(dt);
+		onUpdate(dt);
+		iterating = true;
+		for (GameObject go : childObjects)
+			go.update(dt);
+		iterating = false;
+		checkAndRemove();
+		postUpdate(dt);
+	}
+
+	protected void preDraw(Canvas canvas) {}
+	protected void onDraw(Canvas canvas) {}
+	protected void postDraw(Canvas canvas) {}
 	
-	@Override
-	public boolean onTouch(View v, MotionEvent me) {
+	public final void draw(Canvas canvas) {
+		preDraw(canvas);
+		onDraw(canvas);
+		iterating = true;
+		for (GameObject go : childObjects)
+			go.draw(canvas);
+		iterating = false;
+		checkAndRemove();
+		postDraw(canvas);
+	}
+	
+	protected boolean onTouch(View v, MotionEvent me) {
 		return false;
+	}
+	
+	public final boolean touch(View v, MotionEvent me) {
+		boolean eventUsed = false;
+		eventUsed |= onTouch(v, me);
+		iterating = true;
+		for (GameObject go : childObjects)
+			eventUsed |= go.touch(v, me);
+		iterating = false;
+		checkAndRemove();
+		return eventUsed;
 	}
 	
 	private class GameThread extends Thread implements View.OnTouchListener {
@@ -173,15 +234,13 @@ public abstract class GameFragment extends Fragment
 			synchronized (waitLock) { m_shouldWait = b; }
 		}			
 		
-		long prevUpdate;
+		private long prevUpdate;
 		
 		private synchronized void update() {
 			if (prevUpdate == 0)
 				prevUpdate = SystemClock.uptimeMillis();
 			long dt = SystemClock.uptimeMillis() - prevUpdate;
-			onUpdate(dt);
-			for (GameObject go : autoObjects)
-				go.onUpdate(dt);
+			fragment.update(dt);
 			prevUpdate += dt;
 		}
 		
@@ -191,11 +250,8 @@ public abstract class GameFragment extends Fragment
 			canvas.drawText("Skipped frames: " + (updateCount - drawCount), 5, canvas.getHeight() - 5, statsPaint);
 		}
 
-		@SuppressLint("WrongCall")
 		private synchronized void draw(Canvas canvas) {
-			onDraw(canvas);
-			for (GameObject go : autoObjects)
-				go.onDraw(canvas);
+			fragment.draw(canvas);
 			if (showStats)
 				drawStats(canvas);
 		}
@@ -249,14 +305,14 @@ public abstract class GameFragment extends Fragment
 				updateCount += framesSkipped + 1;
 				drawCount++;
 				
-				Log.d("GameFragment", "Game time = " + getTotalTime());
+				//Log.d("GameFragment", "Game time = " + getTotalTime());
 			}
 		}
 
 		@Override
 		public synchronized boolean onTouch(View v, MotionEvent me) {
 			if (running || alwaysRecieveEvents)
-				return fragment.onTouch(v, me);
+				return fragment.touch(v, me);
 			return false;
 		}
 	}

@@ -9,12 +9,14 @@
 
 package com.example.gametest;
 
+import android.graphics.Point;
+
 public class FloorBuffer {
 	private int index;
 	private int bufferSize;
 	private int pointCounter;
 	private double[] buffer;
-	private double[] tempBuffer;
+	private Point[] tempBuffer;
 	private FloorPoint[] points;
 	
 	/* Initialiseer de waardes voor de buffer */
@@ -23,7 +25,7 @@ public class FloorBuffer {
 		index = 0;
 		bufferSize = 400;
 		buffer = new double[bufferSize];
-		tempBuffer = new double[bufferSize];
+		tempBuffer = new Point[bufferSize];
 		pointCounter = bufferSize;
 		
 		FillBuffer();
@@ -63,10 +65,11 @@ public class FloorBuffer {
 	/* Geeft de buffer terug voor de teken klasse, in de volgorde van aller linker 
 	 * punt op scherm naar aller rechter punt. 
 	 */
-	public double[] getBuffer() {
+	public Point[] getBuffer() {
 		for (int i = index, j = 0; j < bufferSize; i++, j++) {
 			i %= bufferSize;
-			tempBuffer[j] = buffer[i];		
+			tempBuffer[j].y = (int) Math.round(buffer[i]);	
+			tempBuffer[j].x = j;
 		}
 		
 		return tempBuffer;
