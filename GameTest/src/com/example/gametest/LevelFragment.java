@@ -1,5 +1,7 @@
 package com.example.gametest;
 
+import java.util.Random;
+
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -23,7 +25,8 @@ public class LevelFragment extends GameFragment {
 		paint.setColor(Color.RED);
 		paint.setTextSize(12);
 		lvlGen = new LevelDraw(this.getView());
-		//buffer.FillBuffer();
+		buffer = new FloorBuffer(generateDevs());
+		buffer.FillBuffer();
 	}
 
 	@Override
@@ -42,5 +45,15 @@ public class LevelFragment extends GameFragment {
 	protected boolean onTouch(View v, MotionEvent me) {
 		Log.e("Action","Pressed");
 		return true;
+	}
+	
+	public FloorPoint[] generateDevs(){
+		FloorPoint[] array = new FloorPoint[400];
+		Random random = new Random();
+		random.setSeed(42);
+		for(int i = 0; i < 400; i++){
+			array[i] = new FloorPoint(random.nextFloat());
+		}
+		return array;
 	}
 }

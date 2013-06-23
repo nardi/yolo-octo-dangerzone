@@ -22,8 +22,9 @@ public class LevelDraw {
 		this.view = view;
 		paint = new Paint();
 		paint.setColor(Color.BLUE);
-		old.x = 0;
-		old.y = 0;
+		old = new PointF(0 , 0);
+		//old.x = 0;
+		//old.y = 0;
 	}
 	/*
 	 * Following are the drawing functions for the level. Each function can 
