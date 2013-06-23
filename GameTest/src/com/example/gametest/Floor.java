@@ -10,7 +10,7 @@ public class Floor {
 	 * meer?
 	 */
 	FloorBuffer buffer;
-	double[] points;
+	float[] points;
 	
 	
 	Floor(FloorBuffer buffer) {

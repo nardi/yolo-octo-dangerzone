@@ -4,20 +4,24 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PointF;
+import android.view.View;
 
 public class LevelDraw {
 	
 	public GameCanvas gameCanvas;
 	public Canvas canvas;
+	public View view;
 	private Paint paint;
-	Point old;
+	PointF old;
 	int y = 50;
 	
-	public LevelDraw(GameCanvas gameCanvas) {
-		this.gameCanvas = gameCanvas;
-		this.canvas = gameCanvas.getCanvas();
+	public LevelDraw(View view) {
+		//this.gameCanvas = gameCanvas;
+		//this.canvas = gameCanvas.getCanvas();
+		this.view = view;
 		paint = new Paint();
-		paint.setColor(Color.BLACK);
+		paint.setColor(Color.BLUE);
 		old.x = 0;
 		old.y = 0;
 	}
@@ -26,29 +30,30 @@ public class LevelDraw {
 	 * either use the standard paint or the given paint. The drawFloor functions
 	 * save the point so each subsequent point will be drawn from the previous.
 	 */
-	public void drawText(String toWrite, Point loc){
+	public void drawText(String toWrite, PointF loc){
 		canvas.drawText(toWrite, loc.x, loc.y, paint);
 	}
 	
-	public void drawText(String toWrite, Point loc, Paint brush){
+	public void drawText(String toWrite, PointF loc, Paint brush){
 		canvas.drawText(toWrite, loc.x, loc.y, brush);
 	}
 	
-	public void drawFloor(Point newp){
+	public void drawFloor(PointF newp){
 		paint.setStrokeWidth(25);
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
 		old.x = newp.x;
 		old.y = newp.y;
 	}
 	
-	public void drawFloor(Point newp, Paint brush){
+	public void drawFloor(PointF newp, Paint brush){
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
 		old.x = newp.x;
 		old.y = newp.y;
 	}
 	
-	public Point translateDeviation(Point dev){
-		dev.y = 0; //TODO Translation formula here
+	public PointF translate(PointF dev){
+		dev.x = (view.getWidth()/399 * dev.x);
+		dev.y = ((view.getHeight() * 2/3) - (dev.y * 1/5));
 		return dev;
 	}
 	
@@ -56,9 +61,9 @@ public class LevelDraw {
 	 * THis is a raw version. I am trying to find a good translation method in order to evenly distribute the 400 x points over
 	 * the screen and to translate the deviation.
 	 */
-	public void drawFromBuffer(Point[] buffer){
+	public void drawFromBuffer(PointF[] buffer){
 		for(int i = 0; i < buffer.length; i++){
-			drawFloor(translateDeviation(buffer[i]));
+			drawFloor(translate(buffer[i]));
 		}
 	}
 	
