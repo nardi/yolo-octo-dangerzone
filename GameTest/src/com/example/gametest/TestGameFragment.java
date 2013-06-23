@@ -31,27 +31,23 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class TestGameFragment extends GameFragment {
-	private boolean jump;
-	private int jumpHeight;
-	private boolean direction;
-	private boolean cantTouchThis;
+	private boolean jump = false;
+	private int jumpHeight = 0;
+	private boolean direction = false;
+	private boolean cantTouchThis = false;
 	Coin coin = new Coin(400, 300);
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTargetFps(60);
-		this.showStats = true;
-		this.alwaysRecieveEvents = true;
-		this.jump = false;
-		this.jumpHeight = 0;
-		this.direction = false;
-		this.cantTouchThis = false;
+        setTargetFps(42);
+		showStats = true;
+		alwaysRecieveEvents = true;
 
-		this.addObject(coin);
+		addObject(coin);
 		
-        this.run();
+        run();
     }
 	/*
 	 * Genakt van MultimediaAudio :)
@@ -173,24 +169,19 @@ public class TestGameFragment extends GameFragment {
 					MP3Decoder md = new MP3Decoder(nubPath);
 					int bufferSize = 1024;
 					int nubArraySize = 4 * (int)(md.getLength() * 2 / bufferSize) + 1;
-
+					long subBandOldest = 0;
+					long historyWriteIndex = 0;
 					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize);
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
 					double[] audioData = new double[bufferSize],
-							 prevAudioData = new double[bufferSize],
-							 fftStore = new double[bufferSize],
-							 nubData = new double[nubArraySize];
-					
+							 subBands = new double[32];
+					double[][] subBandHistory = new double[32][43];
+							 
 					DoubleFFT_1D fft = new DoubleFFT_1D(bufferSize);
 					
-					int read = 0;
-					read = md.readSamples(shortBuffer);
-					for (int i = 0; i < read; i++) {
-						prevAudioData[i] = (double)shortBuffer.get() / Short.MAX_VALUE;
-					}
-	
+					int read = -1;
 					int j = 0;
 					double temp = 0;
 					while (read != 0) {
@@ -205,62 +196,39 @@ public class TestGameFragment extends GameFragment {
 								audioData[i] = 0;
 							}
 						}
-						/* functie om de ffts te doen nub*/
-						/*TODO old = future, future = read nub*/
-						//fft.realForward(fftStore);
-						//Log.v("FFT", "FFT op " + (6 * md.getRate()/bufferSize) + "Hz: " + fftStore[6]);
-
-						for (int i = 0; i < 4; i++) {
-							int offset = 256 * i;
-							System.arraycopy(prevAudioData, offset, fftStore, 0, bufferSize - offset);
-							System.arraycopy(audioData, 0, fftStore, bufferSize - offset, offset);
-							fft.realForward(fftStore);
-							// 172 hz want nub logic
-							nubData[j] = fftStore[4] * fftStore[4]; /*nogmaals, alles is hardcoded nub*/
-							//Log.v("FFT", "FFT op " + (4 * md.getRate()/bufferSize) + "Hz: " + nubData[j]);
-							j++;
-							/* fok dit
-							if (temp > 0.1) {
-								calcDatNub[j++] = 1;
-							}
-							else {
-								calcDatNub[j++] = 0;
-							} */
-						}
-
-						double[] tmp = prevAudioData;
-						prevAudioData = audioData;
-						audioData = tmp;
+						fft.realForward(audioData);
+						splitIntoSubBands(audioData, subBands);
+						subBandOldest = fillSubBandHistory(subBands, subBandHistory, subBandOldest);
 					}
-					
-					Log.e("FFT", "Samples for 2nd fft:" + j + ", array size: " + nubData.length);
-					
-					DoubleFFT_1D nubFFT = new DoubleFFT_1D(nubArraySize);			
-					nubFFT.realForward(nubData);
-					double freqRes = ((44100.0/bufferSize)/nubArraySize);
-					int lower = (int)(1 / freqRes), upper = (int)(4 / freqRes);
-					int mi1 = -1, mi2 = -1, mi3 = -1;
-					for (int k = lower; k < upper; k++) {
-						if (mi1 < 0 || Math.abs(nubData[k]) > Math.abs(nubData[mi1])) {
-							mi3 = mi2;
-							mi2 = mi1;
-							mi1 = k;
-						} else if (mi2 < 0 || Math.abs(nubData[k]) > Math.abs(nubData[mi2])) {
-							mi3 = mi2;
-							mi2 = k;
-						} else if (mi3 < 0 || Math.abs(nubData[k]) > Math.abs(nubData[mi3])) {
-							mi3 = k;
-						}
-					}
-					Log.i("FFT", "FFT op " + ((44100.0/bufferSize)/nubArraySize) * mi1 + "Hz: " + nubData[mi1]);
-					Log.i("FFT", "FFT op " + ((44100.0/bufferSize)/nubArraySize) * mi2 + "Hz: " + nubData[mi2]);
-					Log.i("FFT", "FFT op " + ((44100.0/bufferSize)/nubArraySize) * mi3 + "Hz: " + nubData[mi3]);
 				}
 				catch (Exception e){
 					Log.e("FFT", "Dimi is een nub", e);
 				}
 			}
 		};
+	}
+	
+	/*XXX Breekt de fft data op in subbands, kan zijn dat ik hier dus ook de imaginary getallen pak*/
+	private void splitIntoSubBands (double[] fftData, double[] subBands) {
+		double subBandEng = 0;
+		for (int i = 0; i < subBands.length; i++) {
+			subBandEng = 0;
+			for (int j = i * subBands.length; j < (i + 1) * subBands.length; j++) {
+				subBandEng += fftData[j];
+			}
+			subBandEng *= (32/1024.0);
+			subBands[i] = subBandEng;
+		}
+		//Log.i("SubBand", "Made it");
+	}
+	
+	/* SubBandsHistory is circulair XXX moet misschien wat beter geschreven worden*/
+	private long fillSubBandHistory (double[] subBands, double[][] subBandHistory, long oldest) {
+		for (int i = 0; i < subBands.length; i++) {
+			subBandHistory[i][(int) (oldest % 43)] = subBands[i];
+		}
+		Log.i("SubBand", "oldest val: " + oldest);
+		return oldest + 1;
 	}
 	
 	/* Nu alleen voor #samples=1024 nub*/
