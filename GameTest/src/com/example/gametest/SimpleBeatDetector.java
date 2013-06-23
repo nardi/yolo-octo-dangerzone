@@ -1,5 +1,9 @@
 package com.example.gametest;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /*
  * Deze onthoudt "energies" en kan zo van nieuwe energies bepalen of deze
  * een beat zijn of niet.
@@ -13,6 +17,7 @@ public class SimpleBeatDetector implements BeatDetector {
 	private int historyPosition = 0;
 	private double localEnergy = 0;
 	private boolean wasBeat = false;
+	private List<Beat> beats = new ArrayList<Beat>();
 	
 	/*
 	 * reference is om voor de eerste energies te kunnen bepalen of het beats
@@ -73,14 +78,18 @@ public class SimpleBeatDetector implements BeatDetector {
 	}
 	
 	public double estimateTempo() {
-		
+		long beatTime = 0;
+		for (int i = 0; i < beats.size() - 1; i++) {
+			beatTime += beats.get(i + 1).time - beats.get(i).time;
+		}
+		return beatTime / beats.size();
 	}
 	
-	public Beat[] getBeats() {
-		
+	public List<Beat> getBeats() {
+		return beats;
 	}
 	
-	public Section[] getSections () {
-
+	public List<Section> getSections () {
+		return null;
 	}
 }

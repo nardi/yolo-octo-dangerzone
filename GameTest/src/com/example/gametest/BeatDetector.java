@@ -1,4 +1,6 @@
 package com.example.gametest;
+
+import java.util.List;
 /*
  * Deze onthoudt "energies" en kan zo van nieuwe energies bepalen of deze
  * een beat zijn of niet.
@@ -10,7 +12,7 @@ package com.example.gametest;
 public interface BeatDetector {
 	public boolean newSamples(double[] samples);
 	public double estimateTempo();
-	public Beat[] getBeats();
-	public Section[] getSections();
+	public List<Beat> getBeats();
+	public List<Section> getSections();
 }
 
