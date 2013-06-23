@@ -8,7 +8,6 @@ package com.example.gametest;
  * later een FFTBeatDetector
  */
 public class SimpleBeatDetector implements BeatDetector {
-	
 	private CircularDoubleBuffer historyBuffer;
 	private double[] tempBuffer;
 	int writeEnd = 0;

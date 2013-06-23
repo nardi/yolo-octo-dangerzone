@@ -12,6 +12,5 @@ public interface BeatDetector {
 	public double estimateTempo();
 	public Beat[] getBeats();
 	public Section[] getSections();
-
 }
 
