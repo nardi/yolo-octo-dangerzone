@@ -79,7 +79,7 @@ public class TestGameFragment extends GameFragment {
 				return;
 			}
 			
-			new Thread(fourierTransformNub(path)).start();
+			new Thread(detectTempo(path)).start();
 		}
 	}
 	
@@ -157,6 +157,49 @@ public class TestGameFragment extends GameFragment {
 		text.setTextSize(30);
 	}
 	DecimalFormat threeDecimals = new DecimalFormat("0.000");
+	
+	
+	
+	
+	public Runnable detectTempo (final String path) {
+		return new Runnable() {
+			public void run() {
+				try {
+					MP3Decoder md = new MP3Decoder(path);
+					int bufferSize = 1024;
+					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize);
+					// Audio data is little endian, so for correct bytes -> short conversion:
+					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+					double[] audioData = new double[bufferSize];
+					long sampleCounter = 0;
+					
+					BeatDetector bd = new SimpleBeatDetector(md.getRate(), md.getNumChannels(), audioData);
+					
+					int read = -1;
+					while (read != 0) {
+						read = md.readSamples(shortBuffer);
+						for (int i = 0; i < read; i++) {
+							audioData[i] = (double)shortBuffer.get() / Short.MAX_VALUE;
+						}
+						shortBuffer.position(0);
+						
+						boolean isBeat = bd.newSamples(audioData);
+						if (isBeat)
+							Log.i("detectTempo", "Beat at " + (1000 * sampleCounter / 2) / 44100 + " ms");
+						sampleCounter += read;
+					}
+					
+					Log.i("detectTempo", "Estimated tempo: " + bd.estimateTempo() + " BPM");
+				} catch (Exception e) {
+					Log.e("detectTempo", "Oeps!", e);
+				}
+			}
+		};
+	}
+	
+	
+	
 	
 	/*
 	 * XXX We kunnen in ieder geval fijn fft's doen maar
