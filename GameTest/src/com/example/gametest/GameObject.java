@@ -11,6 +11,7 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	private GameFragment parentFragment = null;
 	private GameObject parent = null;
 	private List<GameObject> childObjects = new ArrayList<GameObject>();
+	private boolean iterating = false;
 	/*
 	 * You can't remove an object from a List while iterating over it,
 	 * so a record is kept instead and we remove these objects later,
@@ -48,7 +49,10 @@ public class GameObject implements Drawable, Updateable, Touchable {
 
 	public int removeObject(GameObject go) {
 		int index = childObjects.indexOf(go);
-		objectsToRemove.add(go);
+		if (iterating)
+			objectsToRemove.add(go);
+		else
+			childObjects.remove(go);
 		if (go.getParent() == this)
 			go.setParent(null);
 		return index;
@@ -73,6 +77,14 @@ public class GameObject implements Drawable, Updateable, Touchable {
 		}
 	}
 	
+	private void checkAndRemove() {
+		if (!objectsToRemove.isEmpty()) {
+			for (GameObject go : objectsToRemove)
+				childObjects.remove(go);
+			objectsToRemove.clear();
+		}
+	}
+	
 	protected void preUpdate(long dt) {}
 	protected void onUpdate(long dt) {}
 	protected void postUpdate(long dt) {}
@@ -80,11 +92,11 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	public final void update(long dt) {
 		preUpdate(dt);
 		onUpdate(dt);
+		iterating = true;
 		for (GameObject go : childObjects)
 			go.update(dt);
-		for (GameObject go : objectsToRemove)
-			childObjects.remove(go);
-		objectsToRemove.clear();
+		iterating = false;
+		checkAndRemove();
 		postUpdate(dt);
 	}
 
@@ -95,11 +107,11 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	public final void draw(Canvas canvas) {
 		preDraw(canvas);
 		onDraw(canvas);
+		iterating = true;
 		for (GameObject go : childObjects)
 			go.draw(canvas);
-		for (GameObject go : objectsToRemove)
-			childObjects.remove(go);
-		objectsToRemove.clear();
+		iterating = false;
+		checkAndRemove();
 		postDraw(canvas);
 	}
 	
@@ -110,11 +122,11 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	public final boolean touch(View v, MotionEvent me) {
 		boolean eventUsed = false;
 		eventUsed |= onTouch(v, me);
+		iterating = true;
 		for (GameObject go : childObjects)
 			eventUsed |= go.touch(v, me);
-		for (GameObject go : objectsToRemove)
-			childObjects.remove(go);
-		objectsToRemove.clear();
+		iterating = false;
+		checkAndRemove();
 		return eventUsed;
 	}
 }
