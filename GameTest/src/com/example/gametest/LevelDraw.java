@@ -20,8 +20,7 @@ public class LevelDraw {
 	private boolean init = true;
 	private int playerX;
 	private float playerY;
-	Character character = new Character (70, 50);
-	Coin coin = new Coin(200, 200);
+	Coin[] coin = new Coin[120];
 	
 	public LevelDraw() {
 		paint = new Paint();

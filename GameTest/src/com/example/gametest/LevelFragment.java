@@ -2,7 +2,7 @@ package com.example.gametest;
 
 import java.util.Random;
 
-import android.content.Intent;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,7 +20,8 @@ public class LevelFragment extends GameFragment {
 	Character character = new Character(0,0);
 	Button button = new Button(0,0);
 	boolean update = false;
-	int speed = 3;
+	int speed = 3, bpm = 120;
+	//Coin[] coin = new Coin[bpm];
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +34,13 @@ public class LevelFragment extends GameFragment {
 		buffer.fillBuffer();
 		addObject(character);
 		addObject(button);
+		
+		/*
+		for (int i = 0; i < bpm; i++) {
+			coin[i] = new Coin(i*400, 200);
+			coin[i].speed = speed + (speed/3);
+			addObject(coin[i]);
+		} */
 
 		run();
 	}
