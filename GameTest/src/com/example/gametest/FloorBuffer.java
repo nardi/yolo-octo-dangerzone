@@ -11,6 +11,7 @@ package com.example.gametest;
 
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.util.Log;
 import android.view.View;
 
 public class FloorBuffer {

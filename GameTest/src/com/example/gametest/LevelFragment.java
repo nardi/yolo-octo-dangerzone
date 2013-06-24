@@ -42,6 +42,7 @@ public class LevelFragment extends GameFragment {
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
 		Log.e("Height", "" + buffer.getHeight(this.getView()));
 		buffer.update();
+		buffer.update();
 	}
 	
 	@Override
