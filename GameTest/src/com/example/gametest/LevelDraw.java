@@ -89,5 +89,10 @@ public class LevelDraw {
 	}
 	
 	
-
+	/* gets the height on the player's position
+	 */
+	public float getHeight() {
+		int width = view.getWidth();
+		return (float)((width/4.0 * 399.0) / width);
+	}
 }
