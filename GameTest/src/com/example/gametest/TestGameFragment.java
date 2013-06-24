@@ -8,6 +8,8 @@ import java.nio.ShortBuffer;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import ddf.minim.analysis.FFT;
+
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 
@@ -80,7 +82,7 @@ public class TestGameFragment extends GameFragment {
 				return;
 			}
 			
-			new Thread(detectTempo(path)).start();
+			new Thread(doeEensFFT(path)).start();
 		}
 	}
 	
@@ -159,7 +161,42 @@ public class TestGameFragment extends GameFragment {
 	}
 	DecimalFormat threeDecimals = new DecimalFormat("0.000");
 	
-	
+	public Runnable doeEensFFT (final String path) {
+		return new Runnable() {
+			public void run() {
+				try {
+					MP3Decoder md = new MP3Decoder(path);
+					int bufferSize = 2048;
+					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize);
+					// Audio data is little endian, so for correct bytes -> short conversion:
+					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+					float[] mix = new float[bufferSize / 2];
+					long sampleCounter = 0;
+					
+					FFT fft = new FFT(bufferSize, 44100);
+					double freqRes = 44100.0 / 1024;
+					int freqBand = (int)(270 / freqRes);
+					
+					int read = -1;
+					while (read != 0) {
+						read = md.readSamples(shortBuffer);
+						for (int i = 0, j = 0; i < read - 1; i += 2, j++) {
+							mix[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) * Short.MAX_VALUE;
+						}
+						shortBuffer.position(0);
+						
+						fft.forward(mix);
+						//double amplitude = Math.sqrt(l[freqBand] * l[freqBand] + r[freqBand] * r[freqBand]);
+						Log.i("FFT", Float.toString(fft.getFreq(262)));
+						sampleCounter += read;
+					}
+				} catch (Exception e) {
+					Log.e("detectTempo", "Oeps!", e);
+				}
+			}
+		};
+	}
 	
 	
 	public Runnable detectTempo (final String path) {
