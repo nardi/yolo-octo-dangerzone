@@ -51,7 +51,7 @@ public class LevelFragment extends GameFragment {
 	
 	public FloorPoint[] generateDevs(){
 		boolean dinges  = true;
-		FloorPoint[] array = new FloorPoint[400];
+		FloorPoint[] array = new FloorPoint[760];
 		
 		if(dinges){	
 			for (int i = 0; i < 40; i++) {
@@ -59,6 +59,9 @@ public class LevelFragment extends GameFragment {
 			}
 			for (int i = 0; i < 360; i++) {
 				array[i+40] = new FloorPoint(Math.sin(Math.toRadians(i)));
+			}
+			for (int i = 0; i < 360; i++) {
+				array[i+400] = new FloorPoint(Math.sin(Math.toRadians(i)));
 			}
 		}
 		else{

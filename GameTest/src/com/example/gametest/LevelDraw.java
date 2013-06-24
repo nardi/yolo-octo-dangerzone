@@ -48,12 +48,13 @@ public class LevelDraw {
 		if (init) {
 			init = false;
 			old.y = view.getHeight() * 2/3;
+			old.x = 150;
 		}
 		
 		paint.setStrokeWidth(10);
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
-		Log.e("Draw", "From X: " + old.x + " to " + newp.x);
-		Log.e("Draw", "From Y: " + old.y + " to " + newp.y);
+		//Log.e("Draw", "From X: " + old.x + " to " + newp.x);
+		//Log.e("Draw", "From Y: " + old.y + " to " + newp.y);
 		old.x = newp.x;
 		old.y = newp.y;
 	}
@@ -85,9 +86,13 @@ public class LevelDraw {
 	 * the screen and to translate the deviation.
 	 */
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
+		old.x = 0;
+		old.y = translate(buffer[0]).y;
+		Log.e("Hpi",""+ old.y);
 		for(int i = 0; i < buffer.length; i++){
 			drawFloor(translate(buffer[i]), canvas);
 		}
+
 	}
 	
 	
