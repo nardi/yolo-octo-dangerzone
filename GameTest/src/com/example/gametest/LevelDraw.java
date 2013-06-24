@@ -71,6 +71,31 @@ public class LevelDraw {
 		
 	}
 	
+	
+	
+	/* XXX: DRAW TEST
+	 */
+	public void drawFloorTest(PointF newp, Canvas canvas, int index){
+		if (init) {
+			init = false;
+			old.y = view.getHeight() * 2/3;
+		}
+		
+		if (old.x == 0) {
+			Log.e("XNull", "Old x was 0 at: " + index);
+		}
+		if (newp.x == 0) {
+			Log.e("XNull", "New x was 0 at: " + index);
+		}
+		paint.setStrokeWidth(10);
+		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
+		old.x = newp.x;
+		old.y = newp.y;
+		
+		
+	}
+	
+	
 	public PointF translate(PointF dev){
 		if(view != null){
 			dev.x = (float)((view.getWidth() /399.0) * dev.x);
@@ -88,7 +113,7 @@ public class LevelDraw {
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
 		Log.e("Draw start", ">>>>>>>><<<<<<<<");
 		for(int i = 0; i < buffer.length; i++){
-			drawFloor(translate(buffer[i]), canvas);
+			drawFloorTest(translate(buffer[i]), canvas, i);
 		}
 		Log.e("Draw stop", "---------------------");
 	}
