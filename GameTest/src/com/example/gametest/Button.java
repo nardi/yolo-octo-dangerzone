@@ -33,10 +33,11 @@ public class Button extends GameObject {
 	}
 	
 	public void onDraw(Canvas canvas) {
-		if(!pressed) 
-			canvas.drawBitmap(button1, 200, 200, null);
-		else
-			canvas.drawBitmap(button2, 200, 200, null);
+		if(!pressed) { 
+			canvas.drawBitmap(button1, x, y, null);
+		} else {
+			canvas.drawBitmap(button2, x, y, null);
+		}
 	}
 
 }

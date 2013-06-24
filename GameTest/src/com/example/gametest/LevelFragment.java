@@ -32,6 +32,7 @@ public class LevelFragment extends GameFragment {
 		buffer = new FloorBuffer(generateDevs());
 		buffer.fillBuffer();
 		addObject(character);
+		addObject(button);
 
 		run();
 	}
@@ -52,7 +53,6 @@ public class LevelFragment extends GameFragment {
 	@Override
 	public void onDraw(Canvas canvas){
 		canvas.drawColor(Color.rgb(124,139,198));
-		//canvas.drawText("Hello Wordl", 100, 100, paint);
 		lvlGen.view = this.getView();
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
 		int width = this.getView().getWidth();
@@ -76,8 +76,11 @@ public class LevelFragment extends GameFragment {
 			if (me.getX() < 150 && me.getY() > v.getHeight() - 150 && character.jumping == false) {
 				character.jumping = true;
 				character.direction = true;
-				//cantTouchThis = true;
+				button.pressed = true;
 			}
+		}
+		if (me.getActionMasked()==MotionEvent.ACTION_UP) {
+			button.pressed = false;
 		}
 		return true;
 	}
