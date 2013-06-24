@@ -40,6 +40,7 @@ public class LevelFragment extends GameFragment {
 		canvas.drawText("Hello Wordl", 100, 100, paint);
 		lvlGen.view = this.getView();
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
+		Log.e("Height", "" + buffer.getHeight(this.getView()));
 		buffer.update();
 	}
 	
@@ -73,4 +74,5 @@ public class LevelFragment extends GameFragment {
 		}
 		return array;
 	}
+		
 }
