@@ -37,7 +37,7 @@ public class SimpleBeatDetector implements BeatDetector {
 	 * 
 	 * XXX reference wordt op dit moment niet gebruikt, is een beetje lastig goed te doen
 	 */
-	public SimpleBeatDetector (int sampleRate, int channels, double[] reference) {
+	public SimpleBeatDetector (int sampleRate, int channels) {
 		this.sampleRate = sampleRate;
 		this.channels = channels;
 		historyBuffer = new CircularDoubleBuffer(sampleRate / 1024);
