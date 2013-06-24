@@ -19,6 +19,7 @@ public class LevelFragment extends GameFragment {
 	FloorBuffer buffer;
 	Character character = new Character(0,0);
 	boolean update = false;
+	int speed = 1;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,9 +38,9 @@ public class LevelFragment extends GameFragment {
 	@Override
 	public void onUpdate(long dt) {
 		if (update) {
-			float height = (this.getView().getHeight() * 2/3) - 45;
-			character.y = -1*(buffer.getHeight(this.getView())) + height;
-
+			character.y = lvlGen.getHeight() - 45;
+			//float height = (this.getView().getHeight() * 2/3) - 45;
+			//character.y = -1*(buffer.getHeight(this.getView())) + height;
 		}
 
 	}
@@ -54,8 +55,10 @@ public class LevelFragment extends GameFragment {
 		character.x = (int)(width/4.0);
 		character.addSprite(this.getView());
 
-
-		buffer.update();
+		for (int i = 0; i < speed; i++) {
+			buffer.update();
+		}
+		
 		update = true;
 	}
 	
