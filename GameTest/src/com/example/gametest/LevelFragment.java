@@ -17,7 +17,8 @@ public class LevelFragment extends GameFragment {
 	public Canvas canvas;
 	LevelDraw lvlGen;
 	FloorBuffer buffer;
-	Character character = new Character(70, 500);
+	Character character = new Character(0,0);
+	boolean update = false;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,7 +36,11 @@ public class LevelFragment extends GameFragment {
 
 	@Override
 	public void onUpdate(long dt) {
-		character.y = buffer.getHeight(this.getView());
+		if (update) {
+			float height = (this.getView().getHeight() * 2/3) - 45;
+			character.y = -1*(buffer.getHeight(this.getView())) + height;
+		}
+
 	}
 	
 	@Override
@@ -44,8 +49,12 @@ public class LevelFragment extends GameFragment {
 		//canvas.drawText("Hello Wordl", 100, 100, paint);
 		lvlGen.view = this.getView();
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
+		int width = this.getView().getWidth();
+		character.x = (int)(width/4.0);
+
 
 		buffer.update();
+		update = true;
 	}
 	
 	@Override
