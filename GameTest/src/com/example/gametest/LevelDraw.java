@@ -10,12 +10,14 @@ import android.view.View;
 
 public class LevelDraw {
 	
+	
 	public GameCanvas gameCanvas;
 	//public Canvas canvas;
 	public View view;
 	private Paint paint;
 	PointF old;
 	int y = 50;
+	private boolean init = true;
 	
 	public LevelDraw() {
 		//this.gameCanvas = gameCanvas;
@@ -24,8 +26,10 @@ public class LevelDraw {
 		paint = new Paint();
 		paint.setColor(Color.BLUE);
 		old = new PointF(0 , 0);
+		//standardHeight = view.getHeight() * 2/3;
+		//old.y = standardHeight;
 		//old.x = 0;
-		//old.y = 0;
+		//old.y = 300;
 	}
 	/*
 	 * Following are the drawing functions for the level. Each function can 
@@ -41,13 +45,23 @@ public class LevelDraw {
 	}
 	
 	public void drawFloor(PointF newp, Canvas canvas){
-		paint.setStrokeWidth(25);
+		if (init) {
+			init = false;
+			old.y = view.getHeight() * 2/3;
+		}
+		
+		paint.setStrokeWidth(10);
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
 		old.x = newp.x;
 		old.y = newp.y;
 	}
 	
 	public void drawFloor(PointF newp, Paint brush, Canvas canvas){
+		if (init) {
+			init = false;
+			old.y = view.getHeight() * 2/3;
+		}
+		
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
 		old.x = newp.x;
 		old.y = newp.y;
@@ -55,8 +69,9 @@ public class LevelDraw {
 	
 	public PointF translate(PointF dev){
 		if(view != null){
-			dev.x = (view.getWidth()/399 * dev.x);
-			dev.y = ((view.getHeight() * 2/3) - (dev.y * 1/5));
+			dev.x = (float)((view.getWidth() /399.0) * dev.x);
+			
+			dev.y = (float)((view.getHeight() * (2.0/3.0)) - (dev.y * (1.0/5.0) * view.getHeight()));
 			return dev;
 		}
 		Log.e("View", "View == null");

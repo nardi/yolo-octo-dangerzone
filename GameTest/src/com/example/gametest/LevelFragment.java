@@ -26,7 +26,7 @@ public class LevelFragment extends GameFragment {
 		paint.setTextSize(12);
 		lvlGen = new LevelDraw();
 		buffer = new FloorBuffer(generateDevs());
-		buffer.FillBuffer();
+		run();
 	}
 
 	@Override
@@ -50,11 +50,20 @@ public class LevelFragment extends GameFragment {
 	
 	public FloorPoint[] generateDevs(){
 		FloorPoint[] array = new FloorPoint[400];
+		for (int i = 0; i < 40; i++) {
+			array[i] = new FloorPoint(0.0);
+		}
+		for (int i = 0; i < 360; i++) {
+			array[i+40] = new FloorPoint(Math.sin(Math.toRadians(i)));
+		}
+		
+		/*
+		FloorPoint[] array = new FloorPoint[400];
 		Random random = new Random();
 		random.setSeed(42);
 		for(int i = 0; i < 400; i++){
 			array[i] = new FloorPoint(random.nextFloat());
-		}
+		} */
 		return array;
 	}
 }

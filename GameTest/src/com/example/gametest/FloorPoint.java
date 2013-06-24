@@ -17,6 +17,9 @@ public class FloorPoint {
 		this.deviation = deviation;
 	}
 	
+	FloorPoint(double deviation) {
+		this((float)deviation);
+	}
 	
 	/* Geeft de afwijking van het punt terug aan de ringbuffer. */
 	public float getDev() {
