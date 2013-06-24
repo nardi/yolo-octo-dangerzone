@@ -367,7 +367,7 @@ public class TestGameFragment extends GameFragment {
 	public void updateY(long time) {
 		/* if direction == true, touchY goes up */
 		if (direction) {
-			if (jumpHeight >= 200) {
+			if (jumpHeight >= 300) {
 				direction = false;
 			} else {
 				touchY -= time; 
@@ -384,6 +384,7 @@ public class TestGameFragment extends GameFragment {
 		}
 		
 	}
+	
 	
 	/*
 	 * Called when you touch the game view.

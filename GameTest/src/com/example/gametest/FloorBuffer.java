@@ -39,7 +39,7 @@ public class FloorBuffer {
 	 * Als er minder waardes dan dit zijn, wordt er een plat vlak gegenereerd.
 	 */
 	//XXX Deze was private, (?) maar heb ff public gemaakt voor testen
-	private void fillBuffer() {
+	public void fillBuffer() {
 		for (int i = 0; i < bufferSize; i++) {
 			if (i < points.length) {
 				buffer[i] = points[i].getDev();
@@ -86,6 +86,7 @@ public class FloorBuffer {
 	public float getHeight(View v) {
 		int width = v.getWidth();
 		int location =(int) ((width/4.0 * 399.0) / width);
-		return buffer[(index + location) % 400];
+		float yValue = (float) (buffer[(index + location) % 400] * 100);
+		return yValue;
 	}
 }

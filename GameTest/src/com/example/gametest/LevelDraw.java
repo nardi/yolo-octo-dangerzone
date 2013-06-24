@@ -18,6 +18,8 @@ public class LevelDraw {
 	PointF old;
 	int y = 50;
 	private boolean init = true;
+	Character character = new Character (70, 50);
+	Coin coin = new Coin(200, 200);
 	
 	public LevelDraw() {
 		//this.gameCanvas = gameCanvas;
@@ -48,6 +50,7 @@ public class LevelDraw {
 		if (init) {
 			init = false;
 			old.y = view.getHeight() * 2/3;
+			old.x = 150;
 		}
 		
 		paint.setStrokeWidth(10);

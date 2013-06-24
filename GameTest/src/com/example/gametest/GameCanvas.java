@@ -32,7 +32,7 @@ public class GameCanvas extends View {
 		this.canvas = canvas;
 		super.onDraw(canvas);
 		
-		canvas.drawText("Hello Wordl", 0, 0, paint);
+		//canvas.drawText("Hello Wordl", 0, 0, paint);
 		canvas.restore();
 	}
 	

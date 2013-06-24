@@ -17,6 +17,8 @@ public class LevelFragment extends GameFragment {
 	public Canvas canvas;
 	LevelDraw lvlGen;
 	FloorBuffer buffer;
+	Character character = new Character(0,0);
+	boolean update = false;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,23 +28,34 @@ public class LevelFragment extends GameFragment {
 		paint.setTextSize(12);
 		lvlGen = new LevelDraw();
 		buffer = new FloorBuffer(generateDevs());
+		buffer.fillBuffer();
+		addObject(character);
+
 		run();
 	}
 
 	@Override
 	public void onUpdate(long dt) {
-		;
+		if (update) {
+			float height = (this.getView().getHeight() * 2/3) - 45;
+			character.y = -1*(buffer.getHeight(this.getView())) + height;
+		}
+
 	}
 	
 	@Override
 	public void onDraw(Canvas canvas){
 		canvas.drawColor(Color.BLACK);
-		canvas.drawText("Hello Wordl", 100, 100, paint);
+		//canvas.drawText("Hello Wordl", 100, 100, paint);
 		lvlGen.view = this.getView();
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
-		Log.e("Height", "" + buffer.getHeight(this.getView()));
+		int width = this.getView().getWidth();
+		character.x = (int)(width/4.0);
+
+
 		buffer.update();
-		buffer.update();
+
+		update = true;
 	}
 	
 	@Override
@@ -53,7 +66,7 @@ public class LevelFragment extends GameFragment {
 	
 	public FloorPoint[] generateDevs(){
 		boolean dinges  = true;
-		FloorPoint[] array = new FloorPoint[400];
+		FloorPoint[] array = new FloorPoint[760];
 		
 		if(dinges){	
 			for (int i = 0; i < 40; i++) {
@@ -61,6 +74,9 @@ public class LevelFragment extends GameFragment {
 			}
 			for (int i = 0; i < 360; i++) {
 				array[i+40] = new FloorPoint(Math.sin(Math.toRadians(i)));
+			}
+			for (int i = 0; i < 360; i++) {
+				array[i+400] = new FloorPoint(Math.sin(Math.toRadians(i)));
 			}
 		}
 		else{
