@@ -39,6 +39,7 @@ public class LevelFragment extends GameFragment {
 		if (update) {
 			float height = (this.getView().getHeight() * 2/3) - 45;
 			character.y = -1*(buffer.getHeight(this.getView())) + height;
+
 		}
 
 	}
@@ -51,6 +52,7 @@ public class LevelFragment extends GameFragment {
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
 		int width = this.getView().getWidth();
 		character.x = (int)(width/4.0);
+		character.addSprite(this.getView());
 
 
 		buffer.update();
