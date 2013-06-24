@@ -29,15 +29,12 @@ public class LevelFragment extends GameFragment {
 		buffer = new FloorBuffer(generateDevs());
 		buffer.FillBuffer();
 		addObject(character);
-		
+
 		run();
 	}
 
 	@Override
 	public void onUpdate(long dt) {
-		if () {
-			
-		}
 		;
 	}
 	
