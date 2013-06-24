@@ -175,7 +175,7 @@ public class TestGameFragment extends GameFragment {
 					double[] audioData = new double[bufferSize];
 					long sampleCounter = 0;
 					
-					BeatDetector bd = new SimpleBeatDetector(md.getRate(), md.getNumChannels());
+					BeatDetector bd = new FFTBeatDetector(md.getRate(), md.getNumChannels());
 					
 					int read = -1;
 					while (read != 0) {
