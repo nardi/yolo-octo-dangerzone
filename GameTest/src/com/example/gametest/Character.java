@@ -36,7 +36,7 @@ public class Character extends GameObject {
 		Context context = v.getContext();
 	    Resources res = context.getResources();
 	    try {
-			Bitmap spriteBig = BitmapFactory.decodeResource(res, R.drawable.yolo);
+			Bitmap spriteBig = BitmapFactory.decodeResource(res, R.drawable.hashtag);
 			this.sprite = getResizedBitmap(spriteBig, 100, 100);
 	    } catch (Exception e) {
 	        Log.d("kak","Error is " + e);
@@ -61,7 +61,7 @@ public class Character extends GameObject {
 	
 	public void onDraw(Canvas canvas) {
 	//	canvas.drawCircle(x, y, radius, character);
-		canvas.drawBitmap(sprite, x, y, null);
+		canvas.drawBitmap(sprite, x-50, y, null);
 	}
 
 }

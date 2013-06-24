@@ -38,7 +38,7 @@ public class LevelFragment extends GameFragment {
 	@Override
 	public void onUpdate(long dt) {
 		if (update) {
-			character.y = lvlGen.getHeight() - 45;
+			character.y = lvlGen.getHeight() - 100;
 			//float height = (this.getView().getHeight() * 2/3) - 45;
 			//character.y = -1*(buffer.getHeight(this.getView())) + height;
 		}
