@@ -89,6 +89,4 @@ public class FloorBuffer {
 		float yValue = (float) (buffer[(index + location) % 400] * 100);
 		return yValue;
 	}
-	
-	
 }
