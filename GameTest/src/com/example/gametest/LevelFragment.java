@@ -17,6 +17,7 @@ public class LevelFragment extends GameFragment {
 	public Canvas canvas;
 	LevelDraw lvlGen;
 	FloorBuffer buffer;
+	Character character = new Character(70, 200);
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,17 +28,23 @@ public class LevelFragment extends GameFragment {
 		lvlGen = new LevelDraw();
 		buffer = new FloorBuffer(generateDevs());
 		buffer.FillBuffer();
+		addObject(character);
+		
+		run();
 	}
 
 	@Override
 	public void onUpdate(long dt) {
+		if () {
+			
+		}
 		;
 	}
 	
 	@Override
 	public void onDraw(Canvas canvas){
 		canvas.drawColor(Color.BLACK);
-		canvas.drawText("Hello Wordl", 100, 100, paint);
+		//canvas.drawText("Hello Wordl", 100, 100, paint);
 		lvlGen.view = this.getView();
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
 	}

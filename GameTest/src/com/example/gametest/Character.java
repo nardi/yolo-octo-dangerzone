@@ -1,19 +1,37 @@
 package com.example.gametest;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.util.Log;
 
 public class Character extends GameObject {
-
-	@Override
-	public void onDraw(Canvas canvas) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onUpdate(long dt) {
-		// TODO Auto-generated method stub
-		
+	int x, y;
+	int floorY;
+	float radius = 40;
+	boolean inAir = true; 
+	
+	Paint character = new Paint(); {
+		character.setColor(Color.rgb(33,201,50));
+		character.setAntiAlias(true);
+		character.setDither(true);
+		character.setShadowLayer(2, 0, 0, Color.argb(0x42, 0, 0, 0));
 	}
 	
+	public Character(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	protected void onUpdate(long dt){
+
+		if (inAir) {
+			y += dt;
+		}
+	}
+	
+	public void onDraw(Canvas canvas) {
+		canvas.drawCircle(x, y, radius, character);
+	}
+
 }

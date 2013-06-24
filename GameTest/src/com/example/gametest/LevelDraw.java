@@ -18,6 +18,8 @@ public class LevelDraw {
 	PointF old;
 	int y = 50;
 	private boolean init = true;
+	Character character = new Character (70, 50);
+	Coin coin = new Coin(200, 200);
 	
 	public LevelDraw() {
 		//this.gameCanvas = gameCanvas;
@@ -61,7 +63,7 @@ public class LevelDraw {
 			init = false;
 			old.y = view.getHeight() * 2/3;
 		}
-		
+
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
 		old.x = newp.x;
 		old.y = newp.y;
