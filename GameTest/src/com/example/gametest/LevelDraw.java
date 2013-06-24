@@ -88,11 +88,11 @@ public class LevelDraw {
 	 * This is a raw version. I am trying to find a good translation method in order to evenly distribute the 400 x points over
 	 * the screen and to translate the deviation.	 */
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
-		Log.e("Draw start", ">>>>>>>><<<<<<<<");
+		//Log.e("Draw start", ">>>>>>>><<<<<<<<");
 		for(int i = 0; i < buffer.length; i++){
 			drawFloor(translate(buffer[i]), canvas);
 		}
-		Log.e("Draw stop", "---------------------");
+		//Log.e("Draw stop", "---------------------");
 	}
 	
 	

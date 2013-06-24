@@ -6,10 +6,8 @@ import android.graphics.Paint;
 import android.util.Log;
 
 public class Character extends GameObject {
-	int x, y;
-	int floorY;
+	float x, y;
 	float radius = 40;
-	boolean inAir = true; 
 	
 	Paint character = new Paint(); {
 		character.setColor(Color.rgb(33,201,50));
@@ -18,16 +16,12 @@ public class Character extends GameObject {
 		character.setShadowLayer(2, 0, 0, Color.argb(0x42, 0, 0, 0));
 	}
 	
-	public Character(int x, int y) {
+	public Character(float x, float y) {
 		this.x = x;
 		this.y = y;
 	}
 	
 	protected void onUpdate(long dt){
-
-		if (inAir) {
-			y += dt;
-		}
 	}
 	
 	public void onDraw(Canvas canvas) {
