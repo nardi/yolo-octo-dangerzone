@@ -51,9 +51,10 @@ public class LevelDraw {
 		}
 		
 		paint.setStrokeWidth(10);
-		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
-		//Log.e("Draw", "From X: " + old.x + " to " + newp.x);
-		//Log.e("Draw", "From Y: " + old.y + " to " + newp.y);
+		
+		if(old.x >= 0 && old.y > 0){
+			canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
+		}
 		old.x = newp.x;
 		old.y = newp.y;
 	}
@@ -64,37 +65,14 @@ public class LevelDraw {
 			old.y = view.getHeight() * 2/3;
 		}
 		
-		canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
+		if(old.x >= 0 && old.y > 0){
+			canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
+		}
 		old.x = newp.x;
 		old.y = newp.y;
 		
 		
 	}
-	
-	
-	
-	/* XXX: DRAW TEST
-	 */
-	public void drawFloorTest(PointF newp, Canvas canvas, int index){
-		if (init) {
-			init = false;
-			old.y = view.getHeight() * 2/3;
-		}
-		
-		if (old.x == 0) {
-			Log.e("XNull", "Old x was 0 at: " + index);
-		}
-		if (newp.x == 0) {
-			Log.e("XNull", "New x was 0 at: " + index);
-		}
-		paint.setStrokeWidth(10);
-		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
-		old.x = newp.x;
-		old.y = newp.y;
-		
-		
-	}
-	
 	
 	public PointF translate(PointF dev){
 		if(view != null){
@@ -113,8 +91,10 @@ public class LevelDraw {
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
 		Log.e("Draw start", ">>>>>>>><<<<<<<<");
 		for(int i = 0; i < buffer.length; i++){
-			drawFloorTest(translate(buffer[i]), canvas, i);
+			drawFloor(translate(buffer[i]), canvas);
 		}
+		old.x = -1;
+		old.y = -1;
 		Log.e("Draw stop", "---------------------");
 	}
 	
