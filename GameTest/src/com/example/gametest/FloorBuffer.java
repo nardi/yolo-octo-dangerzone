@@ -11,6 +11,7 @@ package com.example.gametest;
 
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.view.View;
 
 public class FloorBuffer {
 	private int index;
@@ -76,5 +77,14 @@ public class FloorBuffer {
 		}
 		
 		return tempBuffer;
+	}
+	
+	
+	/* gets the height on the player's position
+	 */
+	public float getHeight(View v) {
+		int width = v.getWidth();
+		int location =(int) ((width/4.0 * 399.0) / width);
+		return buffer[(index + location) % 400];
 	}
 }
