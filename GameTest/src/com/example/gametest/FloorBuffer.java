@@ -29,7 +29,7 @@ public class FloorBuffer {
 		tempBuffer = new PointF[bufferSize];
 		pointCounter = bufferSize;
 		
-		FillBuffer();
+		fillBuffer();
 	}
 	
 	
@@ -37,7 +37,7 @@ public class FloorBuffer {
 	 * Als er minder waardes dan dit zijn, wordt er een plat vlak gegenereerd.
 	 */
 	//XXX Deze was private, (?) maar heb ff public gemaakt voor testen
-	private void FillBuffer() {
+	private void fillBuffer() {
 		for (int i = 0; i < bufferSize; i++) {
 			if (i < points.length) {
 				buffer[i] = points[i].getDev();
@@ -51,7 +51,7 @@ public class FloorBuffer {
 	
 	
 	/* Vervangt het meest linker punt met het nieuwe, meest rechter punt. */
-	public void Update() {
+	public void update() {
 		if (pointCounter < points.length) {
 			buffer[index] = points[pointCounter].getDev();
 		}
