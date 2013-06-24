@@ -64,27 +64,6 @@ public class Character extends GameObject {
 		    jumping = false;
 		}      
 	}
-		    
-		
-		
-		/* if direction == true, touchY goes up /
-		if (direction) {
-			if (jumpHeight >= 200) {
-				direction = false;
-			} else {
-				this.y -= dt; 
-				jumpHeight += dt;
-			}
-		}
-		if (!direction) {
-			if ((groundY - this.y) > dt) {
-				this.y = groundY;
-				jumping = false;
-				jumpHeight = 0;
-			} else {
-				this.y += dt;
-			}
-		}*/
 	
 	public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
 		int width = bm.getWidth();

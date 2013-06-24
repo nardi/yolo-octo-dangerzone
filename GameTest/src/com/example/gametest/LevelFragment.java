@@ -18,6 +18,7 @@ public class LevelFragment extends GameFragment {
 	LevelDraw lvlGen;
 	FloorBuffer buffer;
 	Character character = new Character(0,0);
+	Button button = new Button(0,0);
 	boolean update = false;
 	int speed = 3;
 	
@@ -25,7 +26,7 @@ public class LevelFragment extends GameFragment {
         super.onCreate(savedInstanceState);
         setTargetFps(42);
 		paint = new Paint();
-		paint.setColor(Color.RED);
+		paint.setColor(Color.rgb(143,205,158));
 		paint.setTextSize(12);
 		lvlGen = new LevelDraw();
 		buffer = new FloorBuffer(generateDevs());
@@ -50,13 +51,17 @@ public class LevelFragment extends GameFragment {
 	
 	@Override
 	public void onDraw(Canvas canvas){
-		canvas.drawColor(Color.BLACK);
+		canvas.drawColor(Color.rgb(124,139,198));
 		//canvas.drawText("Hello Wordl", 100, 100, paint);
 		lvlGen.view = this.getView();
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
 		int width = this.getView().getWidth();
 		character.x = (int)(width/4.0);
 		character.addSprite(this.getView());
+		
+		int height = this.getView().getHeight();
+		button.y = height - 150;
+		button.addSprite(this.getView());
 
 		for (int i = 0; i < speed; i++) {
 			buffer.update();
