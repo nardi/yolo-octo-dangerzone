@@ -79,14 +79,4 @@ public class FloorBuffer {
 		
 		return tempBuffer;
 	}
-	
-	
-	/* gets the height on the player's position
-	 */
-	public float getHeight(View v) {
-		int width = v.getWidth();
-		int location =(int) ((width/4.0 * 399.0) / width);
-		float yValue = (float) (buffer[(index + location) % 400] * 100);
-		return yValue;
-	}
 }
