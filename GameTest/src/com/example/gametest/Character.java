@@ -2,7 +2,7 @@ package com.example.gametest;
 
 import android.graphics.Canvas;
 
-public class Character implements GameObject {
+public class Character extends GameObject {
 
 	@Override
 	public void onDraw(Canvas canvas) {

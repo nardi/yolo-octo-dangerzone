@@ -18,7 +18,7 @@ public class Floor {
 	}
 	
 	public void DrawFloor() {
-		points = buffer.getBuffer();
+		//points = buffer.getBuffer();
 		
 		/* Voor elk punt, teken een lijn tussen dit punt en het volgende punt. */
 		for (int i = 0; i + 1 < points.length; i++) {
