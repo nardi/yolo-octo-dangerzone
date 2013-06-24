@@ -26,7 +26,7 @@ public class LevelFragment extends GameFragment {
 		paint.setTextSize(12);
 		lvlGen = new LevelDraw();
 		buffer = new FloorBuffer(generateDevs());
-		buffer.FillBuffer();
+		run();
 	}
 
 	@Override
