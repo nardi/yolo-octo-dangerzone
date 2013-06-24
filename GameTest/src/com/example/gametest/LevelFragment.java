@@ -19,7 +19,7 @@ public class LevelFragment extends GameFragment {
 	FloorBuffer buffer;
 	Character character = new Character(0,0);
 	boolean update = false;
-	int speed = 1;
+	int speed = 3;
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,11 +37,14 @@ public class LevelFragment extends GameFragment {
 
 	@Override
 	public void onUpdate(long dt) {
-		if (update) {
+		if (update && !character.jumping) {
 			character.y = lvlGen.getHeight() - 100;
 			//float height = (this.getView().getHeight() * 2/3) - 45;
 			//character.y = -1*(buffer.getHeight(this.getView())) + height;
+		} else if (update) {
+			character.groundY = lvlGen.getHeight() - 100;
 		}
+		
 
 	}
 	
@@ -64,7 +67,13 @@ public class LevelFragment extends GameFragment {
 	
 	@Override
 	protected boolean onTouch(View v, MotionEvent me) {
-		Log.e("Action","Pressed");
+		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
+			if (me.getX() < 150 && me.getY() > v.getHeight() - 150 && character.jumping == false) {
+				character.jumping = true;
+				character.direction = true;
+				//cantTouchThis = true;
+			}
+		}
 		return true;
 	}
 	

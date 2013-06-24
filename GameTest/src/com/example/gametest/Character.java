@@ -16,9 +16,14 @@ import android.util.Log;
 import android.view.View;
 
 public class Character extends GameObject {
-	float x, y;
-	float radius = 40;
+	private double height=0, speed=5.0;
+	float x, y, groundY, radius = 40;
 	Bitmap sprite;
+	boolean jumping = false;
+	boolean direction = false;
+	long previous = 0, start = 0;
+	
+	public static final double gravity = 0.3;
 	
 	Paint character = new Paint(); {
 		character.setColor(Color.rgb(33,201,50));
@@ -29,6 +34,7 @@ public class Character extends GameObject {
 	
 	public Character(float x, float y) {
 		this.x = x;
+		this.groundY = y;
 		this.y = y;
 	}
 	
@@ -44,7 +50,41 @@ public class Character extends GameObject {
 	}
 	
 	protected void onUpdate(long dt){
+		if (jumping) {
+			updateY(dt);
+		}
 	}
+	
+	private void updateY(long dt) {		   
+		y -= (dt/2) *speed;       
+		speed -= (dt/10) * gravity;   
+		if(y > groundY){
+		    y=groundY;
+		    speed=5.0; 
+		    jumping = false;
+		}      
+	}
+		    
+		
+		
+		/* if direction == true, touchY goes up /
+		if (direction) {
+			if (jumpHeight >= 200) {
+				direction = false;
+			} else {
+				this.y -= dt; 
+				jumpHeight += dt;
+			}
+		}
+		if (!direction) {
+			if ((groundY - this.y) > dt) {
+				this.y = groundY;
+				jumping = false;
+				jumpHeight = 0;
+			} else {
+				this.y += dt;
+			}
+		}*/
 	
 	public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
 		int width = bm.getWidth();
