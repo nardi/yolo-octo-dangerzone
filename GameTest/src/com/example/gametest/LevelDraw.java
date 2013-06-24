@@ -52,16 +52,11 @@ public class LevelDraw {
 		}
 		
 		paint.setStrokeWidth(10);
-<<<<<<< HEAD
-		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
-		//Log.e("Draw", "From X: " + old.x + " to " + newp.x);
-		//Log.e("Draw", "From Y: " + old.y + " to " + newp.y);
-=======
 		
 		if(old.x >= 0 && old.y > 0){
 			canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
 		}
->>>>>>> lvlgen
+
 		old.x = newp.x;
 		old.y = newp.y;
 	}
