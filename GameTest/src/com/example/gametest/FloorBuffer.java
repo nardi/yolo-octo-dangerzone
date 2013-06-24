@@ -86,6 +86,7 @@ public class FloorBuffer {
 	public float getHeight(View v) {
 		int width = v.getWidth();
 		int location =(int) ((width/4.0 * 399.0) / width);
-		return buffer[(index + location) % 400] * 100;
+		float yValue = (float) (buffer[(index + location) % 400] * 100);
+		return yValue;
 	}
 }
