@@ -10,16 +10,19 @@
 package com.example.gametest;
 
 public class FloorPoint {
-	private double deviation;
+	private float deviation;
 	
 	/* Maak een punt aan met een bepaalde afwijking tussen -1 en 1. */
-	FloorPoint(double deviation) {
+	FloorPoint(float deviation) {
 		this.deviation = deviation;
 	}
 	
+	FloorPoint(double deviation) {
+		this((float)deviation);
+	}
 	
 	/* Geeft de afwijking van het punt terug aan de ringbuffer. */
-	public double getDev() {
+	public float getDev() {
 		return this.deviation;
 	}
 }

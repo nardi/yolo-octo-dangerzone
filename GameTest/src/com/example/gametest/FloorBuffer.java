@@ -10,13 +10,14 @@
 package com.example.gametest;
 
 import android.graphics.Point;
+import android.graphics.PointF;
 
 public class FloorBuffer {
 	private int index;
 	private int bufferSize;
 	private int pointCounter;
-	private double[] buffer;
-	private Point[] tempBuffer;
+	private float[] buffer;
+	private PointF[] tempBuffer;
 	private FloorPoint[] points;
 	
 	/* Initialiseer de waardes voor de buffer */
@@ -24,8 +25,8 @@ public class FloorBuffer {
 		this.points = points;
 		index = 0;
 		bufferSize = 400;
-		buffer = new double[bufferSize];
-		tempBuffer = new Point[bufferSize];
+		buffer = new float[bufferSize];
+		tempBuffer = new PointF[bufferSize];
 		pointCounter = bufferSize;
 		
 		FillBuffer();
@@ -35,14 +36,15 @@ public class FloorBuffer {
 	/* Initialiseer de buffer met de eerste >bufferSize< aantal waardes.
 	 * Als er minder waardes dan dit zijn, wordt er een plat vlak gegenereerd.
 	 */
-	private void FillBuffer() {
+	//XXX Deze was private, (?) maar heb ff public gemaakt voor testen
+	public void FillBuffer() {
 		for (int i = 0; i < bufferSize; i++) {
 			if (i < points.length) {
 				buffer[i] = points[i].getDev();
 			}
 			
 			else {
-				buffer[i] = 0.0;
+				buffer[i] = 0;
 			}
 		}
 	}
@@ -54,7 +56,7 @@ public class FloorBuffer {
 			buffer[index] = points[pointCounter].getDev();
 		}
 		else {
-			buffer[index] = 0.0;
+			buffer[index] = 0;
 		}
 		
 		index = (index + 1) % bufferSize;
@@ -65,10 +67,11 @@ public class FloorBuffer {
 	/* Geeft de buffer terug voor de teken klasse, in de volgorde van aller linker 
 	 * punt op scherm naar aller rechter punt. 
 	 */
-	public Point[] getBuffer() {
+	public PointF[] getBuffer() {
 		for (int i = index, j = 0; j < bufferSize; i++, j++) {
 			i %= bufferSize;
-			tempBuffer[j].y = (int) Math.round(buffer[i]);	
+			tempBuffer[j] = new PointF();
+			tempBuffer[j].y = buffer[i];	
 			tempBuffer[j].x = j;
 		}
 		
