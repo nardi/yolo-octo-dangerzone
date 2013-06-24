@@ -11,6 +11,7 @@ package com.example.gametest;
 
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.view.View;
 
 public class FloorBuffer {
 	private int index;
@@ -29,7 +30,7 @@ public class FloorBuffer {
 		tempBuffer = new PointF[bufferSize];
 		pointCounter = bufferSize;
 		
-		FillBuffer();
+		fillBuffer();
 	}
 	
 	
@@ -37,7 +38,7 @@ public class FloorBuffer {
 	 * Als er minder waardes dan dit zijn, wordt er een plat vlak gegenereerd.
 	 */
 	//XXX Deze was private, (?) maar heb ff public gemaakt voor testen
-	public void FillBuffer() {
+	private void fillBuffer() {
 		for (int i = 0; i < bufferSize; i++) {
 			if (i < points.length) {
 				buffer[i] = points[i].getDev();
@@ -51,7 +52,7 @@ public class FloorBuffer {
 	
 	
 	/* Vervangt het meest linker punt met het nieuwe, meest rechter punt. */
-	public void Update() {
+	public void update() {
 		if (pointCounter < points.length) {
 			buffer[index] = points[pointCounter].getDev();
 		}
@@ -76,5 +77,14 @@ public class FloorBuffer {
 		}
 		
 		return tempBuffer;
+	}
+	
+	
+	/* gets the height on the player's position
+	 */
+	public float getHeight(View v) {
+		int width = v.getWidth();
+		int location =(int) ((width/4.0 * 399.0) / width);
+		return buffer[(index + location) % 400];
 	}
 }

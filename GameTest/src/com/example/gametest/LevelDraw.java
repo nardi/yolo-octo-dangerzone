@@ -52,6 +52,8 @@ public class LevelDraw {
 		
 		paint.setStrokeWidth(10);
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
+		//Log.e("Draw", "From X: " + old.x + " to " + newp.x);
+		//Log.e("Draw", "From Y: " + old.y + " to " + newp.y);
 		old.x = newp.x;
 		old.y = newp.y;
 	}
@@ -65,6 +67,8 @@ public class LevelDraw {
 		canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
 		old.x = newp.x;
 		old.y = newp.y;
+		
+		
 	}
 	
 	public PointF translate(PointF dev){
@@ -80,14 +84,14 @@ public class LevelDraw {
 	
 	/*
 	 * This is a raw version. I am trying to find a good translation method in order to evenly distribute the 400 x points over
-	 * the screen and to translate the deviation.
-	 */
+	 * the screen and to translate the deviation.	 */
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
+		Log.e("Draw start", ">>>>>>>><<<<<<<<");
 		for(int i = 0; i < buffer.length; i++){
 			drawFloor(translate(buffer[i]), canvas);
 		}
+		Log.e("Draw stop", "---------------------");
 	}
 	
 	
-
 }
