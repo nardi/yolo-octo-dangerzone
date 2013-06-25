@@ -11,7 +11,7 @@ public class LevelGenerator {
 	
 	public LevelGenerator(int length) {
 		level = new float[length * 30];
-		beats = FFTBeatDetector.getBeats().toArray(); //TODO retrieve beats here
+		//beats = FFTBeatDetector.getBeats().toArray(); //TODO retrieve beats here
 		
 		
 	}
@@ -20,7 +20,7 @@ public class LevelGenerator {
 		int beatCounter = 0;
 		for(int i = 0; i < level.length;){
 			//Als er een beat is, hier iets leuks doen
-			if()
+			//if()
 			//Als er geen beat is, iets anders alternatiefs doen (plat stuk oid)
 				
 			//XXX NIET VERGETEN i TE INCREMENTEN!

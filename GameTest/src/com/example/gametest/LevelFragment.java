@@ -63,7 +63,7 @@ public class LevelFragment extends GameFragment {
 	
 	@Override
 	protected boolean onTouch(View v, MotionEvent me) {
-		Log.e("Action","Pressed");
+		
 		return true;
 	}
 	
