@@ -117,7 +117,7 @@ public class SimpleBeatDetector implements BeatDetector {
 	private float calcAverage (float[] samples) {
 		float avg = 0;
 		for (int i = 0; i < samples.length; i++) {
-			avg += (samples[i] * samples[i]);
+			avg += samples[i];
 		}
 		return avg / samples.length;
 	}
@@ -136,7 +136,7 @@ public class SimpleBeatDetector implements BeatDetector {
 	
 	// Berekent de intensiteitsfactor C die bepaalt of een bepaald energieniveau een beat is of niet
 	private float calcC (float v) {
-		return (float) ((-0.0025714 * v) + 1.5142857);
+		return (float)Math.sqrt((-0.0025714 * v) + 1.5142857);
 	}
 	
 	public double estimateTempo() {

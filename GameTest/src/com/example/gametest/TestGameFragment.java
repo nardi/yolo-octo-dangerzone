@@ -11,8 +11,6 @@ import java.util.List;
 import ddf.minim.analysis.FFT;
 import ddf.minim.analysis.WindowFunction;
 
-//import ddf.minim.analysis.FFT;
-
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 
@@ -190,7 +188,6 @@ public class TestGameFragment extends GameFragment {
 						shortBuffer.position(0);
 						
 						fft.forward(mix);
-						//double amplitude = Math.sqrt(l[freqBand] * l[freqBand] + r[freqBand] * r[freqBand]);
 						Log.i("FFT", Float.toString(fft.calcAvg(100, 250)));
 						sampleCounter += read;
 					}
