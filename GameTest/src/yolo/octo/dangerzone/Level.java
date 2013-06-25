@@ -3,11 +3,14 @@ package yolo.octo.dangerzone;
 
 import java.util.Random;
 
+import yolo.octo.dangerzone.beatdetection.BeatDetector;
+import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 import yolo.octo.dangerzone.core.GameFragment;
 import yolo.octo.dangerzone.core.GameObject;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.FloorPoint;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
+import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,7 +24,7 @@ public class Level extends GameObject {
 
 	public Paint paint;
 	public Canvas canvas;
-	LevelDraw lvlGen;
+	LevelDraw lvlDraw;
 	FloorBuffer buffer;
 	Character character = new Character(0,0);
 	Button button = new Button(0,0);
@@ -29,12 +32,14 @@ public class Level extends GameObject {
 	int speed = 1, bpm = 120;
 	//Coin[] coin = new Coin[bpm];
 	
-	public Level() {
+	public Level(BeatDetector beatDet, long length) {
 		paint = new Paint();
 		paint.setColor(Color.rgb(143,205,158));
 		paint.setTextSize(12);
-		lvlGen = new LevelDraw();
-		buffer = new FloorBuffer(generateDevs());
+		lvlDraw = new LevelDraw();
+		LevelGenerator lvlGen = new LevelGenerator(beatDet, length);
+		lvlGen.generateLevel();
+		buffer = new FloorBuffer(lvlGen.level);
 		buffer.fillBuffer();
 		addObject(character);
 		addObject(button);
@@ -50,11 +55,11 @@ public class Level extends GameObject {
 	@Override
 	public void onUpdate(long dt) {
 		if (update && !character.jumping) {
-			character.y = lvlGen.getHeight() - 100;
+			character.y = lvlDraw.getHeight() - 100;
 			//float height = (this.getView().getHeight() * 2/3) - 45;
 			//character.y = -1*(buffer.getHeight(this.getView())) + height;
 		} else if (update) {
-			character.groundY = lvlGen.getHeight() - 100;
+			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
 		for (int i = 0; i < speed; i++) {
@@ -66,8 +71,8 @@ public class Level extends GameObject {
 	@Override
 	public void onDraw(Canvas canvas){
 		canvas.drawColor(Color.rgb(124,139,198));
-		lvlGen.view = getParentFragment().getView();
-		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
+		lvlDraw.view = getParentFragment().getView();
+		lvlDraw.drawFromBuffer(buffer.getBuffer(), canvas);
 		int width = getParentFragment().getView().getWidth();
 		character.x = (int)(width/4.0);
 		character.addSprite(getParentFragment().getView());

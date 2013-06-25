@@ -3,19 +3,20 @@ package yolo.octo.dangerzone.lvlgen;
 import java.util.List;
 
 import yolo.octo.dangerzone.beatdetection.Beat;
+import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 
 public class LevelGenerator {
 	
-	float[] level;
+	public float[] level;
 	Beat[] beats;
 	double lastIntens;
 	//Indices per second
 	int ips = 30;
 	
-	public LevelGenerator(int length, FFTBeatDetector beatDet) {
-		level = new float[400 + (length * 30)];
-		beats = (Beat[])beatDet.getBeats().toArray(); //TODO retrieve beats here
+	public LevelGenerator(BeatDetector beatDet, long length) {
+		level = new float[(int) (400 + (length * 30))];
+		beats = (Beat[]) (beatDet.getBeats().toArray()); //TODO retrieve beats here
 	}
 	
 	public void generateLevel(){

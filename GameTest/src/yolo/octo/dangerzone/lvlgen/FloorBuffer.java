@@ -20,10 +20,10 @@ public class FloorBuffer {
 	private int pointCounter;
 	private float[] buffer;
 	private PointF[] tempBuffer;
-	private FloorPoint[] points;
+	private float[] points;
 	
 	/* Initialiseer de waardes voor de buffer */
-	public FloorBuffer(FloorPoint[] points) {
+	public FloorBuffer(float[] points) {
 		this.points = points;
 		index = 0;
 		bufferSize = 400;
@@ -42,7 +42,7 @@ public class FloorBuffer {
 	public void fillBuffer() {
 		for (int i = 0; i < bufferSize; i++) {
 			if (i < points.length) {
-				buffer[i] = points[i].getDev();
+				buffer[i] = points[i];
 			}
 			
 			else {
@@ -55,7 +55,7 @@ public class FloorBuffer {
 	/* Vervangt het meest linker punt met het nieuwe, meest rechter punt. */
 	public void update() {
 		if (pointCounter < points.length) {
-			buffer[index] = points[pointCounter].getDev();
+			buffer[index] = points[pointCounter];
 		}
 		else {
 			buffer[index] = 0;
