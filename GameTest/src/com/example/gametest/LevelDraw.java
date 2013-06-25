@@ -20,12 +20,11 @@ public class LevelDraw {
 	private boolean init = true;
 	private int playerX;
 	private float playerY;
-	Character character = new Character (70, 50);
-	Coin coin = new Coin(200, 200);
+	Coin[] coin = new Coin[120];
 	
 	public LevelDraw() {
 		paint = new Paint();
-		paint.setColor(Color.BLUE);
+		paint.setColor(Color.rgb(143,205,100));
 		old = new PointF(0 , 0);
 	}
 	/*
@@ -71,8 +70,10 @@ public class LevelDraw {
 		}
 		old.x = newp.x;
 		old.y = newp.y;
-		
-		
+	}
+	
+	public void fillFloor(PointF newp, Canvas canvas) {
+		canvas.drawLine(newp.x, newp.y, newp.x, view.getHeight(), paint);
 	}
 	
 	public PointF translate(PointF dev){
@@ -90,10 +91,16 @@ public class LevelDraw {
 	 * This is a raw version. I am trying to find a good translation method in order to evenly distribute the 400 x points over
 	 * the screen and to translate the deviation.	 */
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
-		//playerY = translate(buffer[playerX]).y;
-		playerY = (float)(view.getHeight() * 2.0/3.0);
+		playerY = translate(buffer[playerX]).y;
+		
+		//playerY = (float)(view.getHeight() * 2.0/3.0);
 		for(int i = 0; i < buffer.length; i++){
-			drawFloor(translate(buffer[i]), canvas);
+			PointF buf = translate(buffer[i]);
+			if (i != playerX) {
+				drawFloor(buf, canvas);
+				fillFloor(buf, canvas);
+			}
+
 		}
 		old.x = -1;
 		old.y = -1;

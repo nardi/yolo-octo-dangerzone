@@ -2,7 +2,7 @@ package com.example.gametest;
 
 import java.util.Random;
 
-import android.content.Intent;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,41 +18,58 @@ public class LevelFragment extends GameFragment {
 	LevelDraw lvlGen;
 	FloorBuffer buffer;
 	Character character = new Character(0,0);
+	Button button = new Button(0,0);
 	boolean update = false;
-	int speed = 1;
+	int speed = 3, bpm = 120;
+	//Coin[] coin = new Coin[bpm];
 	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTargetFps(42);
 		paint = new Paint();
-		paint.setColor(Color.RED);
+		paint.setColor(Color.rgb(143,205,158));
 		paint.setTextSize(12);
 		lvlGen = new LevelDraw();
 		buffer = new FloorBuffer(generateDevs());
 		buffer.fillBuffer();
 		addObject(character);
+		addObject(button);
+		
+		/*
+		for (int i = 0; i < bpm; i++) {
+			coin[i] = new Coin(i*400, 200);
+			coin[i].speed = speed + (speed/3);
+			addObject(coin[i]);
+		} */
 
 		run();
 	}
 
 	@Override
 	public void onUpdate(long dt) {
-		if (update) {
-			character.y = lvlGen.getHeight() - 45;
+		if (update && !character.jumping) {
+			character.y = lvlGen.getHeight() - 100;
 			//float height = (this.getView().getHeight() * 2/3) - 45;
 			//character.y = -1*(buffer.getHeight(this.getView())) + height;
+		} else if (update) {
+			character.groundY = lvlGen.getHeight() - 100;
 		}
+		
 
 	}
 	
 	@Override
 	public void onDraw(Canvas canvas){
-		canvas.drawColor(Color.BLACK);
-		//canvas.drawText("Hello Wordl", 100, 100, paint);
+		canvas.drawColor(Color.rgb(124,139,198));
 		lvlGen.view = this.getView();
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
 		int width = this.getView().getWidth();
 		character.x = (int)(width/4.0);
+		character.addSprite(this.getView());
+		
+		int height = this.getView().getHeight();
+		button.y = height - 150;
+		button.addSprite(this.getView());
 
 		for (int i = 0; i < speed; i++) {
 			buffer.update();
@@ -63,7 +80,18 @@ public class LevelFragment extends GameFragment {
 	
 	@Override
 	protected boolean onTouch(View v, MotionEvent me) {
-		
+
+		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
+			if (me.getX() < 150 && me.getY() > v.getHeight() - 150 && character.jumping == false) {
+				character.jumping = true;
+				character.direction = true;
+				button.pressed = true;
+			}
+		}
+		if (me.getActionMasked()==MotionEvent.ACTION_UP) {
+			button.pressed = false;
+		}
+
 		return true;
 	}
 	
