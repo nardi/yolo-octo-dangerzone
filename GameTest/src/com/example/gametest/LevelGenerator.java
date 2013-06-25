@@ -10,17 +10,16 @@ public class LevelGenerator {
 	//Indices per second
 	int ips = 30;
 	
-	public LevelGenerator(int length) {
+	public LevelGenerator(int length, FFTBeatDetector beatDet) {
 		level = new float[length * 30];
-		beats = FFTBeatDetector.getBeats().toArray(); //TODO retrieve beats here
-		
-		
+		beats = (Beat[])beatDet.getBeats().toArray(); //TODO retrieve beats here
 	}
 	
 	public void generateLevel(){
 		int beatCounter = 0;
 		for(int i = 0; i < level.length;i++){
 			//Als er een beat is, hier iets leuks doen
+
 			if(beats[beatCounter].startTime /33 == i){
 				//XXX Hier is dus een beat.
 				if(beats[beatCounter].intensity > lastIntens){
