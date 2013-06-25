@@ -14,7 +14,7 @@ public class LevelGenerator {
 	int ips = 30;
 	
 	public LevelGenerator(int length, FFTBeatDetector beatDet) {
-		level = new float[length * 30];
+		level = new float[400 + (length * 30)];
 		beats = (Beat[])beatDet.getBeats().toArray(); //TODO retrieve beats here
 	}
 	

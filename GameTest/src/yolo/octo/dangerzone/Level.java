@@ -26,7 +26,7 @@ public class Level extends GameObject {
 	Character character = new Character(0,0);
 	Button button = new Button(0,0);
 	boolean update = false;
-	int speed = 3, bpm = 120;
+	int speed = 1, bpm = 120;
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level() {
@@ -57,6 +57,9 @@ public class Level extends GameObject {
 			character.groundY = lvlGen.getHeight() - 100;
 		}
 		
+		for (int i = 0; i < speed; i++) {
+			buffer.update();
+		}
 
 	}
 	
@@ -73,9 +76,7 @@ public class Level extends GameObject {
 		button.y = height - 150;
 		button.addSprite(getParentFragment().getView());
 
-		for (int i = 0; i < speed; i++) {
-			buffer.update();
-		}
+		
 		
 		update = true;
 	}

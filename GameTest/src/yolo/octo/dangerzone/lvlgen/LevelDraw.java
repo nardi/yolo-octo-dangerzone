@@ -3,6 +3,7 @@ package yolo.octo.dangerzone.lvlgen;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.util.Log;
@@ -46,7 +47,7 @@ public class LevelDraw {
 			old.y = view.getHeight() * 2/3;
 			old.x = 150;
 			playerX = (int) ((view.getWidth()/4.0 * 399.0) / view.getWidth());
-			Log.e("Navi", "" + playerX);
+			//Log.e("Navi", "" + playerX);
 		}
 		
 		paint.setStrokeWidth(10);
@@ -72,9 +73,9 @@ public class LevelDraw {
 		old.y = newp.y;
 	}
 	
-	public void fillFloor(PointF newp, Canvas canvas) {
-		canvas.drawLine(newp.x, newp.y, newp.x, view.getHeight(), paint);
-	}
+	//public void fillFloor(PointF newp, Canvas canvas) {
+	//	canvas.drawLine(newp.x, newp.y, newp.x, view.getHeight(), paint);
+	//}
 	
 	public PointF translate(PointF dev){
 		if(view != null){
@@ -91,17 +92,34 @@ public class LevelDraw {
 	 * Calls drawFloor with values from the ringbuffer.
 	 */
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
+		if (init) {
+			init = false;
+			old.y = view.getHeight() * 2/3;
+			old.x = 150;
+			playerX = (int) ((view.getWidth()/4.0 * 399.0) / view.getWidth());
+			//Log.e("Navi", "" + playerX);
+		}
 		playerY = translate(buffer[playerX]).y;
+		Path path = new Path();
+		path.moveTo(buffer[0].x, buffer[0].y);
 		
 		//playerY = (float)(view.getHeight() * 2.0/3.0);
 		for(int i = 0; i < buffer.length; i++){
 			PointF buf = translate(buffer[i]);
+			path.lineTo(buffer[i].x, buffer[i].y);
+			
+			
 			if (i != playerX) {
-				drawFloor(buf, canvas);
-				fillFloor(buf, canvas);
+				//drawFloor(buf, canvas);
+				//fillFloor(buf, canvas);
 			}
 
 		}
+		Paint paint2 = new Paint();
+		paint2.setColor(Color.BLUE);
+		path.lineTo(view.getWidth(), view.getHeight());
+		path.lineTo(0, view.getHeight());
+		canvas.drawPath(path, paint2);
 		old.x = -1;
 		old.y = -1;
 	}
