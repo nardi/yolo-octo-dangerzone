@@ -275,7 +275,7 @@ public class TestGameFragment extends GameFragment {
 		
 		// De collision check kan ook nog naar Coin.onUpdate verplaatst worden
 		if (checkCollisionCoin(touchX, touchY, coin))
-			coin.detatch();
+			coin.detach();
 	}
 
 	/*

@@ -1,10 +1,113 @@
 package yolo.octo.dangerzone;
 
+import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.ShortBuffer;
+
+import nobleworks.libmpg.MP3Decoder;
+import android.app.Activity;
+import android.content.Intent;
+import android.database.Cursor;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
+import yolo.octo.dangerzone.beatdetection.BeatDetector;
+import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 import yolo.octo.dangerzone.core.GameObject;
 
 public class Menu extends GameObject {
-	public Menu() {	
-		//dingen maken
+	protected void onAttach() {	
+		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+	    intent.setType("audio/x-mp3");
+	    Intent chooser = Intent.createChooser(intent, "Select soundfile");
+	    getParentFragment().startActivityForResult(chooser, 1);
+	}
+	
+	/*
+	 * Genakt van MultimediaAudio :)
+	 * TODO Ehhhhh kan dit echt niet anders...
+	 */
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == Activity.RESULT_OK) {
+			Uri uri = data.getData();
+			String path;
+			if ("content".equalsIgnoreCase(uri.getScheme())) {
+				/*
+				 * Source:
+				 * http://www.androidsnippets.com/get-file-path-of-gallery-image
+				 */
+				String[] proj = { MediaStore.Images.Media.DATA };
+				Cursor cursor = getParentFragment().getActivity().managedQuery(uri, proj, // Which columns to
+														// return
+						null, // WHERE clause; which rows to return (all rows)
+						null, // WHERE clause selection arguments (none)
+						null); // Order-by clause (ascending by name)
+				int column_index = cursor
+						.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+				cursor.moveToFirst();
+				path = cursor.getString(column_index);
+			} else if ("file".equalsIgnoreCase(uri.getScheme())) {
+				path = uri.getPath();
+			} else {
+				Log.e("Menu", "Something went wrong...");
+				return;
+			}
+			
+			new Thread(loadLevel(path)).start();
+		}
+	}
+	
+	private Runnable loadLevel(final String path) {
+		return new Runnable() {
+			public void run() {
+				try {
+					MP3Decoder md = new MP3Decoder(path);
+					int fftBufferSize = 1024;
+					int bufferSize = fftBufferSize * 100;
+					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * fftBufferSize * md.getNumChannels());
+					// Audio data is little endian, so for correct bytes -> short conversion:
+					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+					float[] audioData = new float[fftBufferSize];
+					
+					BeatDetector bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), md.getNumChannels() * fftBufferSize);
+					
+					int read = -1;
+					while (read != 0) {
+						int samplesLeft = read = md.readSamples(shortBuffer);
+						
+						while (samplesLeft > 0) {
+							int i, j;
+							for (i = 0, j = 0;
+								 i < samplesLeft - 1 && i < fftBufferSize - 1;
+								 i += 2, j++) {
+								audioData[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) / Short.MAX_VALUE;
+							}
+							while (j < fftBufferSize) {
+								audioData[j++] = 0;
+							}
+							
+							bd.newSamples(audioData);
+							samplesLeft -= fftBufferSize;
+						}
+						
+						shortBuffer.position(0);
+					}
+					bd.finishSong();
+					
+					// dingen met bd doen
+					
+					Level level = new Level();
+					swapFor(new Level());
+				} catch (Exception e) {
+					Log.e("loadLevel", "Oops!", e);
+				}
+			}
+		};
 	}
 
 	public void wanneerGebruikerOpButtonDruktOfzo() {
