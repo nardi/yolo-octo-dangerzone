@@ -10,6 +10,8 @@ import java.util.List;
 
 import ddf.minim.analysis.FFT;
 
+//import ddf.minim.analysis.FFT;
+
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
 
@@ -174,7 +176,7 @@ public class TestGameFragment extends GameFragment {
 					float[] mix = new float[bufferSize / 2];
 					long sampleCounter = 0;
 					
-					FFT fft = new FFT(bufferSize, 44100);
+					FFT fft = new FFT(bufferSize / 2, 44100);
 					double freqRes = 44100.0 / 1024;
 					int freqBand = (int)(270 / freqRes);
 					
@@ -182,7 +184,7 @@ public class TestGameFragment extends GameFragment {
 					while (read != 0) {
 						read = md.readSamples(shortBuffer);
 						for (int i = 0, j = 0; i < read - 1; i += 2, j++) {
-							mix[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) * Short.MAX_VALUE;
+							mix[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) / Short.MAX_VALUE;
 						}
 						shortBuffer.position(0);
 						
