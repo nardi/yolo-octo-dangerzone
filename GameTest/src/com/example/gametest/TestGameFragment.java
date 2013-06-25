@@ -85,7 +85,7 @@ public class TestGameFragment extends GameFragment {
 				return;
 			}
 			
-			new Thread(doeEensFFT(path)).start();
+			new Thread(detectTempo(path)).start();
 		}
 	}
 	
@@ -212,16 +212,16 @@ public class TestGameFragment extends GameFragment {
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
-					double[] audioData = new double[bufferSize];
+					float[] audioData = new float[bufferSize / 2];
 					long sampleCounter = 0;
 					
-					BeatDetector bd = new FFTBeatDetector(md.getRate(), md.getNumChannels());
+					BeatDetector bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), bufferSize);
 					
 					int read = -1;
 					while (read != 0) {
 						read = md.readSamples(shortBuffer);
-						for (int i = 0; i < read; i++) {
-							audioData[i] = (double)shortBuffer.get() / Short.MAX_VALUE;
+						for (int i = 0, j = 0; i < read - 1; i += 2, j++) {
+							audioData[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) / Short.MAX_VALUE;
 						}
 						shortBuffer.position(0);
 						

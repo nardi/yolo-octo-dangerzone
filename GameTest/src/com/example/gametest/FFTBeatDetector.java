@@ -3,32 +3,38 @@ package com.example.gametest;
 import java.util.ArrayList;
 import java.util.List;
 
+import ddf.minim.analysis.FFT;
+
 import android.util.Log;
 
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 public class FFTBeatDetector implements BeatDetector{
 	private SimpleBeatDetector lowFrequency;
-	private DoubleFFT_1D fft;
+	private FFT fft;
 	
-	public FFTBeatDetector (int sampleRate, int channels) {
-		fft = new DoubleFFT_1D(1024);
+	public FFTBeatDetector (int sampleRate, int channels, int bufferSize) {
+		fft = new FFT(bufferSize / 2, 44100);
+		fft.window(FFT.NONE);
+		fft.noAverages();
+		
 		lowFrequency = new SimpleBeatDetector(sampleRate, channels);
 	}
 	
 	@Override
-	public boolean newSamples(double[] samples) {
-		fft.realForward(samples);
-		Log.i("detectTempo", " Energy :" + calcAverage(samples, 0, 6));
-		return lowFrequency.newEnergy(calcAverage(samples, 0, 6), 1024);
+	public boolean newSamples(float[] samples) {
+		fft.forward(samples);
+		Log.i("detectTempo", " Energy :" + fft.calcAvg(100, 250));
+		return lowFrequency.newEnergy(fft.calcAvg(100, 250) * fft.calcAvg(100, 250), 1024);
 	}
 	
-	private double findMax (double[] array) {
-		double biggest = 0;
+	private float findMax (float[] array) {
+		float biggest = 0;
 		for (int i = 0; i < array.length; i++) {
 		}
 		return biggest;
 	}
+	
 	@Override
 	/*Hier moet meer gebeuren*/
 	public void finishSong() {
@@ -50,8 +56,8 @@ public class FFTBeatDetector implements BeatDetector{
 		return lowFrequency.getSections();
 	}
 	
-	private double calcAverage (double[] samples, int offset, int length) {
-		double avg = 0;
+	private float calcAverage (float[] samples, int offset, int length) {
+		float avg = 0;
 		for (int i = offset; i < offset + length; i++) {
 			avg += (samples[i] * samples[i]);
 		}

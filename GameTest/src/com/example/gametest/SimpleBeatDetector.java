@@ -15,8 +15,8 @@ public class SimpleBeatDetector implements BeatDetector {
 	private static final int LOWEST_BPM = 60;
 	private static final int HIGHEST_BPM = 200;
 	
-	private CircularDoubleBuffer historyBuffer;
-	private double[] tempBuffer;
+	private CircularFloatBuffer historyBuffer;
+	private float[] tempBuffer;
 	private int historyPosition = 0;
 	//private double localEnergy = 0;
 
@@ -40,21 +40,21 @@ public class SimpleBeatDetector implements BeatDetector {
 	public SimpleBeatDetector (int sampleRate, int channels) {
 		this.sampleRate = sampleRate;
 		this.channels = channels;
-		historyBuffer = new CircularDoubleBuffer(sampleRate / 1024);
-		tempBuffer = new double[historyBuffer.getLength()]; //Gebruikt voor berekeningen op history
+		historyBuffer = new CircularFloatBuffer(sampleRate / 1024);
+		tempBuffer = new float[historyBuffer.getLength()]; //Gebruikt voor berekeningen op history
 		//historyPosition = historyBuffer.placeFrom(0, reference, 0, reference.length);
 	}
 	
-	public boolean newSamples(double[] samples) {
+	public boolean newSamples(float[] samples) {
 		return newEnergy(calcAverage(samples), samples.length); 
 	}
 	
-	public boolean newEnergy(double instantEnergy, int fromSamples) {
+	public boolean newEnergy(float instantEnergy, int fromSamples) {
 		historyBuffer.getFrom(0, tempBuffer, 0, tempBuffer.length);
 		historyPosition = historyBuffer.placeFrom(historyPosition, instantEnergy);
 
-		double avgEnergy = calcAverage(tempBuffer);
-		double c = calcC(calcVariance(tempBuffer, avgEnergy));
+		float avgEnergy = calcAverage(tempBuffer);
+		float c = calcC(calcVariance(tempBuffer, avgEnergy));
 		
 		boolean isBeat = instantEnergy > c * avgEnergy;
 		long time = (1000 * sampleCounter / channels) / sampleRate;
@@ -114,8 +114,8 @@ public class SimpleBeatDetector implements BeatDetector {
 	}
 	
 	// Berekent de afwijking van de locale energy met zijn history
-	private double calcAverage (double[] samples) {
-		double avg = 0;
+	private float calcAverage (float[] samples) {
+		float avg = 0;
 		for (int i = 0; i < samples.length; i++) {
 			avg += (samples[i] * samples[i]);
 		}
@@ -123,8 +123,8 @@ public class SimpleBeatDetector implements BeatDetector {
 	}
 	
 	// Berekent de afwijking van de locale energy met zijn history
-	private double calcVariance (double[] energyHistory, double avgEnergy) {
-		double variance = 0;
+	private float calcVariance (float[] energyHistory, float avgEnergy) {
+		float variance = 0;
 
 		// Krijg variantie total
 		for (int i = 0; i < energyHistory.length; i++) {
@@ -135,8 +135,8 @@ public class SimpleBeatDetector implements BeatDetector {
 	}
 	
 	// Berekent de intensiteitsfactor C die bepaalt of een bepaald energieniveau een beat is of niet
-	private double calcC (double v) {
-		return (-0.0025714 * v) + 1.5142857;
+	private float calcC (float v) {
+		return (float) ((-0.0025714 * v) + 1.5142857);
 	}
 	
 	public double estimateTempo() {
@@ -144,7 +144,7 @@ public class SimpleBeatDetector implements BeatDetector {
 		long[] beatTimes = new long[beats.size() - 1];
 		//long totalBeatTime = 0;
 		//double avgBeatTime;
-		double medianBeatTime;
+		float medianBeatTime;
 
 		for (int i = 0; i < beats.size() - 1; i++) {
 			long time = beats.get(i + 1).time() - beats.get(i).time();
@@ -160,7 +160,7 @@ public class SimpleBeatDetector implements BeatDetector {
 		medianBeatTime = beatTimes[beatTimes.length - numBeatTimes / 2 - 1];
 		if (beatTimes.length % 2 == 0) {
 	      double prev = beatTimes[beatTimes.length - numBeatTimes / 2];
-	      medianBeatTime = (prev + medianBeatTime) / 2;
+	      medianBeatTime = (float) ((prev + medianBeatTime) / 2);
 	    }
 		
 		// Mediaan lijkt beste resultaat te geven

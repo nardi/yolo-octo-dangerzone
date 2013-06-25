@@ -10,7 +10,8 @@ import java.util.List;
  */
 
 public interface BeatDetector {
-	public boolean newSamples(double[] samples);
+	//public boolean newSamples(double[] samples);
+	public boolean newSamples(float[] samples);
 	public void finishSong();
 	public double estimateTempo();
 	public List<Beat> getBeats();
