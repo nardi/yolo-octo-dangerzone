@@ -9,6 +9,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import ddf.minim.analysis.FFT;
+import ddf.minim.analysis.WindowFunction;
 
 //import ddf.minim.analysis.FFT;
 
@@ -177,8 +178,8 @@ public class TestGameFragment extends GameFragment {
 					long sampleCounter = 0;
 					
 					FFT fft = new FFT(bufferSize / 2, 44100);
-					double freqRes = 44100.0 / 1024;
-					int freqBand = (int)(270 / freqRes);
+					fft.window(FFT.NONE);
+					fft.noAverages();
 					
 					int read = -1;
 					while (read != 0) {
@@ -190,7 +191,7 @@ public class TestGameFragment extends GameFragment {
 						
 						fft.forward(mix);
 						//double amplitude = Math.sqrt(l[freqBand] * l[freqBand] + r[freqBand] * r[freqBand]);
-						Log.i("FFT", Float.toString(fft.getFreq(262)));
+						Log.i("FFT", Float.toString(fft.calcAvg(100, 250)));
 						sampleCounter += read;
 					}
 				} catch (Exception e) {

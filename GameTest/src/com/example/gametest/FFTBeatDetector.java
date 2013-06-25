@@ -27,6 +27,7 @@ public class FFTBeatDetector implements BeatDetector{
 		double biggest = 0;
 		for (int i = 0; i < array.length; i++) {
 		}
+		return biggest;
 	}
 	@Override
 	/*Hier moet meer gebeuren*/
