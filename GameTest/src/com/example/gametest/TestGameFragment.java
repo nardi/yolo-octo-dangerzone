@@ -8,6 +8,12 @@ import java.nio.ShortBuffer;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import yolo.octo.dangerzone.Coin;
+import yolo.octo.dangerzone.beatdetection.BeatDetector;
+import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
+import yolo.octo.dangerzone.beatdetection.Section;
+import yolo.octo.dangerzone.core.GameFragment;
+
 import ddf.minim.analysis.FFT;
 import ddf.minim.analysis.WindowFunction;
 

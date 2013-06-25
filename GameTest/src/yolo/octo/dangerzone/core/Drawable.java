@@ -1,4 +1,4 @@
-package com.example.gametest;
+package yolo.octo.dangerzone.core;
 
 import android.graphics.Canvas;
 

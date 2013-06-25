@@ -7,7 +7,7 @@
  * Maak EERST de punten aan, en daarna de buffer.
  */
 
-package com.example.gametest;
+package yolo.octo.dangerzone.lvlgen;
 
 import android.graphics.Point;
 

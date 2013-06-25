@@ -1,4 +1,4 @@
-package com.example.gametest;
+package yolo.octo.dangerzone.beatdetection;
 
 public class Beat {
 	public long startTime;

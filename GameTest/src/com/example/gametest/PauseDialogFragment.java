@@ -1,5 +1,6 @@
 package com.example.gametest;
 
+import yolo.octo.dangerzone.core.GameFragment;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;

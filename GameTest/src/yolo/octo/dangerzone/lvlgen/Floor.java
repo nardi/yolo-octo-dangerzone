@@ -1,4 +1,4 @@
-package com.example.gametest;
+package yolo.octo.dangerzone.lvlgen;
 
 public class Floor {
 	/* TODO:

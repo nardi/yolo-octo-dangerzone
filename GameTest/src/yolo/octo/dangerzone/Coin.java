@@ -1,5 +1,6 @@
-package com.example.gametest;
+package yolo.octo.dangerzone;
 
+import yolo.octo.dangerzone.core.GameObject;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;

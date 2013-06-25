@@ -1,4 +1,8 @@
-package com.example.gametest;
+package yolo.octo.dangerzone;
+
+import com.example.gametest.R;
+import com.example.gametest.R.layout;
+import com.example.gametest.R.menu;
 
 import android.os.Bundle;
 import android.app.Activity;

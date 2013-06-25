@@ -1,8 +1,10 @@
-package com.example.gametest;
+package yolo.octo.dangerzone.beatdetection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import yolo.octo.dangerzone.core.CircularFloatBuffer;
 
 /*
  * Deze onthoudt "energies" en kan zo van nieuwe energies bepalen of deze
@@ -142,8 +144,8 @@ public class SimpleBeatDetector implements BeatDetector {
 	public double estimateTempo() {
 		int numBeatTimes = 0;
 		long[] beatTimes = new long[beats.size() - 1];
-		//long totalBeatTime = 0;
-		//double avgBeatTime;
+		long totalBeatTime = 0;
+		double avgBeatTime;
 		float medianBeatTime;
 
 		for (int i = 0; i < beats.size() - 1; i++) {
@@ -154,7 +156,7 @@ public class SimpleBeatDetector implements BeatDetector {
 				numBeatTimes++;
 			}
 		}
-		//avgBeatTime = ((double)totalBeatTime / numBeatTimes);
+		avgBeatTime = ((double)totalBeatTime / numBeatTimes);
 		
 		Arrays.sort(beatTimes);
 		medianBeatTime = beatTimes[beatTimes.length - numBeatTimes / 2 - 1];
@@ -164,7 +166,7 @@ public class SimpleBeatDetector implements BeatDetector {
 	    }
 		
 		// Mediaan lijkt beste resultaat te geven
-		return 60000 / medianBeatTime;
+		return 60000 / avgBeatTime;
 	}
 	
 	public List<Beat> getBeats() {
