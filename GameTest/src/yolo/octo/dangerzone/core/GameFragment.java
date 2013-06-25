@@ -46,7 +46,7 @@ public class GameFragment extends Fragment
 	public boolean showStats = false;
 	public boolean alwaysRecieveEvents = false;
 	
-	private List<GameObject> childObjects = new ArrayList<GameObject>();
+	protected final List<GameObject> childObjects = new ArrayList<GameObject>();
 	private boolean iterating = false;
 	private List<GameObject> objectsToRemove = new ArrayList<GameObject>();
 	
@@ -83,16 +83,17 @@ public class GameFragment extends Fragment
 	}
 	
 	public void addObject(GameObject go) {
-		childObjects.add(go);
-		go.setParentFragment(this);
+		addObject(go, childObjects.size());
 	}
 	
 	public void addObject(GameObject go, int index) {
 		childObjects.add(index, go);
 		go.setParentFragment(this);
+		go.onAttach();
 	}
 
 	public int removeObject(GameObject go) {
+		go.onDetach();
 		int index = childObjects.indexOf(go);
 		if (iterating)
 			objectsToRemove.add(go);
