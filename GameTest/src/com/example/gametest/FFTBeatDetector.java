@@ -3,6 +3,8 @@ package com.example.gametest;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+
 import edu.emory.mathcs.jtransforms.fft.DoubleFFT_1D;
 
 public class FFTBeatDetector implements BeatDetector{
@@ -17,9 +19,15 @@ public class FFTBeatDetector implements BeatDetector{
 	@Override
 	public boolean newSamples(double[] samples) {
 		fft.realForward(samples);
+		Log.i("detectTempo", " Energy :" + calcAverage(samples, 0, 6));
 		return lowFrequency.newEnergy(calcAverage(samples, 0, 6), 1024);
 	}
-
+	
+	private double findMax (double[] array) {
+		double biggest = 0;
+		for (int i = 0; i < array.length; i++) {
+		}
+	}
 	@Override
 	/*Hier moet meer gebeuren*/
 	public void finishSong() {
