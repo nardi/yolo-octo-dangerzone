@@ -87,8 +87,8 @@ public class LevelDraw {
 	}
 	
 	/*
-	 * This is a raw version. I am trying to find a good translation method in order to evenly distribute the 400 x points over
-	 * the screen and to translate the deviation.	 */
+	 * Calls drawFloor with values from the ringbuffer.
+	 */
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
 		//playerY = translate(buffer[playerX]).y;
 		playerY = (float)(view.getHeight() * 2.0/3.0);
