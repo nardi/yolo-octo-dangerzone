@@ -60,7 +60,7 @@ public class LevelGenerator {
 			else
 				level[beatIndex2] = level[beatIndex1] - beat2.intensity; */
 			
-			level[beatIndex2] = beat2.intensity;
+			level[beatIndex2] = i % 2 == 0 ? beat2.intensity : 0;
 			
 			base = level[beatIndex1];
 			yDiff = level[beatIndex2] - base;

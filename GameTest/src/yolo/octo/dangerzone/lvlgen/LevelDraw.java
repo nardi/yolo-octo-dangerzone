@@ -107,13 +107,12 @@ public class LevelDraw {
 		for (int i = 0; i < buffer.length; i++) {
 			translate(buffer[i]);
 			if (buffer[i].y < view.getHeight() * (1/6f)) {
-				translateY = view.getHeight() * (1/6f) - buffer[i].y;
-				Log.i("viewHeight", "" + view.getHeight());
-				Log.i("y", "" + buffer[i].y);
-				Log.i("translateY", "" + translateY);
+				float newTY = view.getHeight() * (1/6f) - buffer[i].y;
+				if (newTY > translateY)
+					translateY = newTY;
 			}
 		}
-		playerY = buffer[playerX].y;
+		playerY = buffer[playerX].y + translateY;
 		
 		Path path = new Path();
 		path.moveTo(buffer[0].x, buffer[0].y);
@@ -134,8 +133,9 @@ public class LevelDraw {
 		paint2.setColor(Color.BLUE);
 		path.lineTo(view.getWidth(), view.getHeight());
 		path.lineTo(0, view.getHeight());
-		path.offset(0, translateY);
+		canvas.translate(0, translateY);
 		canvas.drawPath(path, paint2);
+		canvas.translate(0, -translateY);
 		old.x = -1;
 		old.y = -1;
 	}
