@@ -27,9 +27,10 @@ public class LevelGenerator {
 	 */
 	public void generateLevel(){
 		int beatCounter = 0;
-		for(int i = 0; i < level.length;i++){
+		level[0] = 0;
+		for(int i = 1; i < level.length;i++){
 			
-			/* If a beta is detected, its intensity is compared to the intensity
+			/* If a beat is detected, its intensity is compared to the intensity
 			 * of the previous beat. Based on this, the level will either go 
 			 * up or down.
 			 */
