@@ -2,6 +2,8 @@ package yolo.octo.dangerzone.lvlgen;
 
 import java.util.List;
 
+import android.util.Log;
+
 import yolo.octo.dangerzone.beatdetection.Beat;
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
@@ -73,13 +75,14 @@ public class LevelGenerator {
 		
 		int beatCounter = 0;
 		level[0] = 0;
-		for(int i = 1; i < level.length;i++){
+		for(int i = 1; i < level.length && beatCounter < beats.size();i++){
 			
 			/* If a beat is detected, its intensity is compared to the intensity
 			 * of the previous beat. Based on this, the level will either go 
 			 * up or down.
 			 */
-			if(beats.get(beatCounter).startTime /33 == i){
+			
+			if(beats.get(beatCounter).startTime / 33 == i){
 				//XXX Hier is dus een beat.
 				if(beats.get(beatCounter).intensity > lastIntens){
 					makeInc(beats.get(beatCounter).intensity, i);
@@ -164,6 +167,11 @@ public class LevelGenerator {
 					level[p] += (level[i - 1] + level[q]) / (q - i);
 				}
 				i = q;
+				
+				if(i > level.length - 3){
+					Log.e("oob", "never ending");
+					break;
+				}
 			}
 			/*
 			 * If no gap is found just increment i.
