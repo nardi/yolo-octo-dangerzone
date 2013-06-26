@@ -1,7 +1,13 @@
 package yolo.octo.dangerzone;
 
 
+import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.ShortBuffer;
 import java.util.Random;
+
+import nobleworks.libmpg.MP3Decoder;
 
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
@@ -14,6 +20,9 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,6 +34,8 @@ public class Level extends GameObject {
 	public Paint paint;
 	public Canvas canvas;
 
+	private AudioTrack at;
+	private Runnable mp3;
 	private LevelDraw lvlDraw;
 	private FloorBuffer buffer;
 	private Character character = new Character(0,0);
@@ -36,7 +47,7 @@ public class Level extends GameObject {
 
 	//Coin[] coin = new Coin[bpm];
 	
-	public Level(BeatDetector beatDet, long length) {
+	public Level(BeatDetector beatDet, long length, String path) {
 		paint = new Paint();
 		paint.setColor(Color.rgb(143,205,158));
 		paint.setTextSize(12);
@@ -46,8 +57,10 @@ public class Level extends GameObject {
 		lvlGen.generateLevel();
 		buffer = new FloorBuffer(lvlGen.level);
 		buffer.fillBuffer();
-		
+		mp3 = playMp3(path);
 		addObject(character);
+		new Thread(mp3).start();
+		
 		
 		/*
 		for (int i = 0; i < bpm; i++) {
@@ -86,17 +99,8 @@ public class Level extends GameObject {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
-		
-		/* Based on the time the last update occurred, multiple updates could be skipped,
-		 * or it could prevent updating too fast.
-		 */
-		updateTime += dt;
-		if (updateTime > minTime) {
-			int x = (int)(updateTime / minTime);
-			for (int i = 0; i < speed; i++) {
-				buffer.update(x);
-			}
-			updateTime -= (int)(x * minTime);
+		for (int i = 0; i < speed; i++) {
+			buffer.update();
 		}
 	}
 	
@@ -114,6 +118,49 @@ public class Level extends GameObject {
 		update = true;
 	}
 	
-	
-		
+	private Runnable playMp3(final String path) {
+		return new Runnable() {
+			public void run() {
+				try {
+					MP3Decoder md = new MP3Decoder(path);
+					
+					int channels = AudioFormat.CHANNEL_OUT_DEFAULT;
+					switch (md.getNumChannels()) {
+						case 1: channels = AudioFormat.CHANNEL_OUT_MONO; break;
+						case 2: channels = AudioFormat.CHANNEL_OUT_STEREO; break;
+					}
+					int bufferSize = AudioTrack.getMinBufferSize(md.getRate(),
+							channels, AudioFormat.ENCODING_PCM_16BIT);
+					short[] buffer = new short[bufferSize];
+					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(bufferSize * 2);
+					// Audio data is little endian, so for correct bytes -> short conversion:
+					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+					at = new AudioTrack(AudioManager.STREAM_MUSIC,
+							md.getRate(), channels,
+							AudioFormat.ENCODING_PCM_16BIT, bufferSize,
+							AudioTrack.MODE_STREAM);
+
+					at.play();
+					int readSamples = -1;
+					while (readSamples != 0) {
+						readSamples = md.readSamples(shortBuffer);
+						shortBuffer.get(buffer, 0, readSamples);
+						shortBuffer.position(0);
+						at.write(buffer, 0, readSamples);
+						Log.v("playMp3", "Wrote " + readSamples + " samples");
+					}
+					/* TODO Stopping here leaves no guarantee everything has been
+					 * played, but whatever */ 
+					at.stop();
+					AudioTrack temp = at;
+					at = null;
+					temp.release();
+					Log.d("playMp3", "Done decoding!");
+				} catch (Exception e) {
+					Log.e("playMp3", "Oops!", e);
+				}
+			}
+		};
+	}
 }
