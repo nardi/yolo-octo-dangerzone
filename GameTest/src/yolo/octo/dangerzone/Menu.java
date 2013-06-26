@@ -35,11 +35,15 @@ public class Menu extends GameObject {
 	public boolean picking = false;
 	public boolean song = false;
 	Button pickASong;
+	Paint top;
+	Paint bottom;
 	
 	protected void onAttach() {	
-		Paint top = new Paint();
-		Paint bottom = new Paint();
-		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.BLUE, "Song");
+		top = new Paint();
+		bottom = new Paint();
+		top.setColor(Color.rgb(183, 219, 149));
+		bottom.setColor(Color.rgb(127, 139, 197));
+		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.RED, "Song");
 		pickASong.setOnTouchListener(new OnTouchListener() {
 				public boolean onTouch(View v, MotionEvent me) {
 					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && song == false) {
@@ -151,11 +155,13 @@ public class Menu extends GameObject {
 	
 	@Override
 	public void onDraw(Canvas canvas){
-		canvas.drawRect(r, paint)
-		canvas.drawColor(Color.rgb(255,140,0));
-		pickASong.setPosition((float) (this.getParentFragment().getView().getWidth() / 2) ,this.getParentFragment().getView().getHeight() / 2);
-		int height = this.getParentFragment().getView().getHeight() / 2;
-		int width = (int) (this.getParentFragment().getView().getWidth() / 2.2);
+		
+		int height = this.getParentFragment().getView().getHeight();
+		int width = this.getParentFragment().getView().getWidth();
+		canvas.drawRect(0, height / 2, width, height, top);
+		canvas.drawRect(0, 0, width, height / 2, bottom);
+		//canvas.drawRect(r, paint);
+		pickASong.setPosition(width / 2 , height / 2);
 		if (picking) {
 			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		    intent.setType("audio/x-mp3");
