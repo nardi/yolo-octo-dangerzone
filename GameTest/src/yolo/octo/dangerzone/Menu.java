@@ -18,8 +18,10 @@ import android.media.AudioTrack;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+import yolo.octo.dangerzone.beatdetection.Beat;
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
+import yolo.octo.dangerzone.beatdetection.Section;
 import yolo.octo.dangerzone.core.GameObject;
 
 public class Menu extends GameObject {
@@ -107,7 +109,10 @@ public class Menu extends GameObject {
 					}
 					bd.finishSong();
 					
-					// dingen met bd doen
+					for (Beat b : bd.getBeats())
+						Log.i("bt", "Beat at " + b.startTime + ", intensity: " + b.intensity);
+					for (Section s : bd.getSections())
+						Log.i("bt", "Section from " + s.startTime + " to " + s.endTime + ", intensity: " + s.intensity);
 					
 					//Level level = new Level(bd);
 					Log.e("Switching", "Switching to Level");
