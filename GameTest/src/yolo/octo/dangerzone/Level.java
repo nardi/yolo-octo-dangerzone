@@ -8,7 +8,6 @@ import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 import yolo.octo.dangerzone.core.GameFragment;
 import yolo.octo.dangerzone.core.GameObject;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
-import yolo.octo.dangerzone.lvlgen.FloorPoint;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import android.content.Intent;
@@ -101,29 +100,6 @@ public class Level extends GameObject {
 		update = true;
 	}
 	
-	public FloorPoint[] generateDevs(){
-		boolean dinges  = true;
-		FloorPoint[] array = new FloorPoint[760];
-		
-		if(dinges){	
-			for (int i = 0; i < 40; i++) {
-				array[i] = new FloorPoint(0.0);
-			}
-			for (int i = 0; i < 360; i++) {
-				array[i+40] = new FloorPoint(Math.sin(Math.toRadians(i)));
-			}
-			for (int i = 0; i < 360; i++) {
-				array[i+400] = new FloorPoint(Math.sin(Math.toRadians(i)));
-			}
-		}
-		else{
-			Random random = new Random();
-			random.setSeed(42);
-			for(int i = 0; i < 400; i++){
-				array[i] = new FloorPoint(random.nextFloat());
-			}
-		}
-		return array;
-	}
+	
 		
 }
