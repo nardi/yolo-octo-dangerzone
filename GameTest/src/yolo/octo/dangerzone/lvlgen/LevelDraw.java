@@ -131,7 +131,7 @@ public class LevelDraw {
 
 		}
 		Paint paint2 = new Paint();
-		paint2.setColor(Color.BLUE);
+		paint2.setColor(Color.rgb(183, 219, 149));
 		path.lineTo(view.getWidth(), view.getHeight());
 		path.lineTo(0, view.getHeight());
 		path.offset(0, translateY);

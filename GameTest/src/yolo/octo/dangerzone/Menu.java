@@ -8,10 +8,14 @@ import java.nio.ShortBuffer;
 import nobleworks.libmpg.MP3Decoder;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -38,12 +42,29 @@ public class Menu extends GameObject {
 	Button pickASong;
 	Paint top;
 	Paint bottom;
+	Bitmap logo, 
+		   gameName;
+	Resources res;
+	RectF logoRect,
+		  gameNameRect;
 	
 	protected void onAttach() {	
+		res = getParentFragment().getResources();
 		top = new Paint();
 		bottom = new Paint();
 		top.setColor(Color.rgb(183, 219, 149));
 		bottom.setColor(Color.rgb(127, 139, 197));
+		
+		logoRect = new RectF();
+		gameNameRect = new RectF();
+		
+		try {
+			this.logo = BitmapFactory.decodeResource(res, R.drawable.gezicht1);
+			this.gameName = BitmapFactory.decodeResource(res, R.drawable.logo);
+		} catch (Exception e){
+			Log.e("Menu", "Picca's falen!");
+		}
+		
 		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.RED, "Song");
 		pickASong.setOnTouchListener(new OnTouchListener() {
 				public boolean onTouch(View v, MotionEvent me) {
@@ -161,7 +182,11 @@ public class Menu extends GameObject {
 		int width = this.getParentFragment().getView().getWidth();
 		canvas.drawRect(0, height / 2, width, height, top);
 		canvas.drawRect(0, 0, width, height / 2, bottom);
+		
 		pickASong.setPosition(width / 2 , height / 2);
+		updateRects(height, width);
+		canvas.drawBitmap(logo, null, logoRect, null);
+		canvas.drawBitmap(gameName, null, gameNameRect, null);
 		if (picking) {
 			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		    intent.setType("audio/x-mp3");
@@ -190,6 +215,13 @@ public class Menu extends GameObject {
 		}
 	}
 	
+	private void updateRects (int height, int width) {
+		gameNameRect.set(0, 0, width, height / 4);
+		logoRect.set(0, height - (height / 5), width / 4, height);
+		// TODO Auto-generated method stub
+		
+	}
+
 	@Override
 	public void onUpdate(long dt){
 		time += dt;
