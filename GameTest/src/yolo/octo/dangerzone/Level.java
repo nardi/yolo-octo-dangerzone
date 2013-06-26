@@ -38,6 +38,7 @@ public class Level extends GameObject {
 		paint.setColor(Color.rgb(143,205,158));
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw();
+		Log.e("LvlGen", "Generating level");
 		LevelGenerator lvlGen = new LevelGenerator(beatDet, length);
 		lvlGen.generateLevel();
 		buffer = new FloorBuffer(lvlGen.level);

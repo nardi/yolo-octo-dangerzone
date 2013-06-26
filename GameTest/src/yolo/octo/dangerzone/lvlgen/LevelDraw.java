@@ -11,18 +11,18 @@ import android.view.View;
 
 public class LevelDraw {
 	
-	
 	public GameCanvas gameCanvas;
-	//public Canvas canvas;
 	public View view;
 	private Paint paint;
-	PointF old;
-	int y = 50;
+	private PointF old;
 	private boolean init = true;
+	private int y = 50;
 	private int playerX;
 	private float playerY;
-	Coin[] coin = new Coin[120];
+	private Coin[] coin = new Coin[120];
 	
+	/* Constructor for a level drawer.
+	 */
 	public LevelDraw() {
 		paint = new Paint();
 		paint.setColor(Color.rgb(143,205,100));
@@ -32,6 +32,10 @@ public class LevelDraw {
 	 * Following are the drawing functions for the level. Each function can 
 	 * either use the standard paint or the given paint. The drawFloor functions
 	 * save the point so each subsequent point will be drawn from the previous.
+	 */
+	
+	/* drawText() is used to write text to the screen, either with the standard paint
+	 * or a custom one.
 	 */
 	public void drawText(String toWrite, PointF loc, Canvas canvas){
 		canvas.drawText(toWrite, loc.x, loc.y, paint);
