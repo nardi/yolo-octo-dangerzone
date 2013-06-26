@@ -106,9 +106,14 @@ public class LevelDraw {
 		Path path = new Path();
 		path.moveTo(buffer[0].x, buffer[0].y);
 		
+		canvas.save();
+		
 		//playerY = (float)(view.getHeight() * 2.0/3.0);
-		for(int i = 0; i < buffer.length; i++){
-			PointF buf = translate(buffer[i]);
+		for (int i = 0; i < buffer.length; i++) {
+			translate(buffer[i]);
+			if (buffer[i].y < view.getHeight() * (1/6f)) {
+				canvas.translate(0, view.getHeight() * (1/6f) - buffer[i].y);
+			}
 			path.lineTo(buffer[i].x, buffer[i].y);
 			
 			
@@ -123,6 +128,7 @@ public class LevelDraw {
 		path.lineTo(view.getWidth(), view.getHeight());
 		path.lineTo(0, view.getHeight());
 		canvas.drawPath(path, paint2);
+		canvas.restore();
 		old.x = -1;
 		old.y = -1;
 	}

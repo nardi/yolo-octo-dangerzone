@@ -38,7 +38,7 @@ public class LevelGenerator {
 		 */
 		Beat firstBeat = beats.get(0);
 		int firstBeatIndex = timeToIndex(firstBeat.time());
-		level[firstBeatIndex] = firstBeat.intensity;
+		level[firstBeatIndex] = firstBeat.intensity * 6;
 		float base = 0;
 		float yDiff = level[firstBeatIndex];
 		for (int k = 0; k < firstBeatIndex; k++) {
@@ -60,7 +60,7 @@ public class LevelGenerator {
 			else
 				level[beatIndex2] = level[beatIndex1] - beat2.intensity; */
 			
-			level[beatIndex2] = beat2.intensity;
+			level[beatIndex2] = beat2.intensity * 6;
 			
 			base = level[beatIndex1];
 			yDiff = level[beatIndex2] - base;
