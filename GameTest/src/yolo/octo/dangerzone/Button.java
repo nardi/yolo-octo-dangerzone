@@ -95,7 +95,7 @@ public class Button extends GameObject {
 	public void setOnTouchListener(OnTouchListener otl) {
 		onTouchListener = otl;
 	}
-	
+
 	protected boolean onTouch(View v, MotionEvent me) {
 		if (rect.contains(me.getX(), me.getY())) {
 			return onTouchListener.onTouch(v, me);
