@@ -16,6 +16,7 @@ import yolo.octo.dangerzone.core.GameObject;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
+import yolo.octo.dangerzone.lvlgen.Score;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -33,6 +34,7 @@ public class Level extends GameObject {
 
 	public Paint paint;
 	public Canvas canvas;
+	private Score score;
 
 	private AudioTrack at;
 	private Runnable mp3;
@@ -48,10 +50,11 @@ public class Level extends GameObject {
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length, String path) {
+		score = new Score();
 		paint = new Paint();
 		paint.setColor(Color.rgb(143,205,158));
 		paint.setTextSize(12);
-		lvlDraw = new LevelDraw();
+		lvlDraw = new LevelDraw(score);
 		Log.e("LvlGen", "Generating level");
 		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed);
 		lvlGen.generateLevel();
@@ -59,6 +62,7 @@ public class Level extends GameObject {
 		buffer.fillBuffer();
 		mp3 = playMp3(path);
 		addObject(character);
+		
 		new Thread(mp3).start();
 		
 		
