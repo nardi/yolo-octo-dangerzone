@@ -38,9 +38,13 @@ public class LevelGenerator {
 				//XXX Hier is dus een beat.
 				if(beats.get(beatCounter).intensity > lastIntens){
 					makeInc(beats.get(beatCounter).intensity, i);
+					lastIntens = beats.get(beatCounter).intensity;
+					beatCounter++;
 				}
 				else{
 					makeDec(beats.get(beatCounter).intensity, i);
+					lastIntens = beats.get(beatCounter).intensity;
+					beatCounter++;
 				}
 				
 				// TODO: obstacle/coin generator
@@ -79,7 +83,7 @@ public class LevelGenerator {
 	public void makeInc(float intensity, int index){
 		//Maak hier een functie die een helling genereert in de level array. Hiervoor moet de deviatie denk ik als -100 tot 100 oid 
 		//worden aangegeven.
-		level[index] = level[index - 1] + intensity;
+		level[index] = (float)lastIntens + intensity;
 	}
 	
 	/* makeDec() generates a valley when the previous intensity was lower than
@@ -87,7 +91,7 @@ public class LevelGenerator {
 	 */
 	public void makeDec(float intensity, int index){
 		//Hetzelfde als makeInc, maar dan voor een helling omlaag, kan evt ook in 1 functie.
-		level[index] = level[index - 1] - intensity;
+		level[index] = (float)lastIntens - intensity;
 	}
 	
 	
@@ -112,9 +116,9 @@ public class LevelGenerator {
 				 */
 				for(int p = i; p < q; p++){
 					level[p] = level[p - 1];
-					level[p] += (level[i - 1] + level[q]) / q;
+					level[p] += (level[i - 1] + level[q]) / (q - i);
 				}
-				i += q - i;
+				i = q;
 			}
 			/*
 			 * If no gap is found just increment i.
@@ -124,5 +128,4 @@ public class LevelGenerator {
 			}
 		}
 	}
-
 }
