@@ -105,6 +105,7 @@ public class Level extends GameObject {
 		}
 		
 		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
+			playing = true;
 			int now = 1000 * at.getPlaybackHeadPosition() / at.getSampleRate();
 			diff += now - t;
 			Log.e("diff", "Diff: " + diff);
@@ -195,7 +196,6 @@ public class Level extends GameObject {
 	public void onRun(){
 		if (at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PAUSED){
 			at.play();
-			playing = true;
 		}
 	}
 }
