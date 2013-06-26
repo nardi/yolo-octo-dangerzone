@@ -44,9 +44,9 @@ public class Level extends GameObject {
 	private Button jumpButton;
 	private boolean update = false;
 	private int speed = 4, bpm = 120;
-	private long updateTime = 0;
-	private double minTime = 1000/30;
-
+	private int diff;
+	private boolean fadeOut;
+	
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length, String path) {
@@ -64,6 +64,7 @@ public class Level extends GameObject {
 		addObject(character);
 		
 		new Thread(mp3).start();
+		diff = 0;
 		
 		
 		/*
@@ -93,6 +94,8 @@ public class Level extends GameObject {
 		addObject(jumpButton);
 	}
 
+	long t = 0;
+	
 	@Override
 	public void onUpdate(long dt) {
 		if (update && !character.jumping) {
@@ -102,15 +105,28 @@ public class Level extends GameObject {
 		} else if (update) {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
-		updateTime += dt;
-		if (updateTime > minTime) {
-			int x = (int)(updateTime / minTime);
-			for (int i = 0; i < speed; i++) {
-				buffer.update(x);
+		
+		if(at != null && at.getState() == at.PLAYSTATE_PLAYING){
+			int now = 1000 * at.getPlaybackHeadPosition() / at.getSampleRate();
+			diff += now - t;
+			Log.e("diff", "Diff: " + diff);
+			while(diff > 33){
+				Log.e("Update", " Updating buffer");
+				buffer.update(speed);
+				diff -= 33;
 			}
-			if (x > 1 )
-				Log.e("FrameSkip", "Skipped " + (x-1) + " frames");
-			updateTime -= (int)(x * minTime);
+			t = now;
+		}
+		
+		if(at != null && at.getState() == at.PLAYSTATE_STOPPED){
+			AudioTrack temp = at;
+			at = null;
+			temp.release();
+			fadeOut = true;
+		}
+		
+		if(fadeOut){
+			buffer.update(speed);
 		}
 		
 	}
@@ -165,9 +181,6 @@ public class Level extends GameObject {
 					/* TODO Stopping here leaves no guarantee everything has been
 					 * played, but whatever */ 
 					at.stop();
-					AudioTrack temp = at;
-					at = null;
-					temp.release();
 					Log.d("playMp3", "Done decoding!");
 				} catch (Exception e) {
 					Log.e("playMp3", "Oops!", e);
