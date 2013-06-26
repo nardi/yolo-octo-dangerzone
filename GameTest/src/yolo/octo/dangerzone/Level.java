@@ -98,10 +98,17 @@ public class Level extends GameObject {
 		} else if (update) {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
-		
-		for (int i = 0; i < speed; i++) {
-			buffer.update();
+		updateTime += dt;
+		if (updateTime > minTime) {
+			int x = (int)(updateTime / minTime);
+			for (int i = 0; i < speed; i++) {
+				buffer.update(x);
+			}
+			if (x > 1 )
+				Log.e("FrameSkip", "Skipped " + (x-1) + " frames");
+			updateTime -= (int)(x * minTime);
 		}
+		
 	}
 	
 	@Override
