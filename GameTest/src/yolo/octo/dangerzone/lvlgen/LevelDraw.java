@@ -13,7 +13,9 @@ public class LevelDraw {
 	
 	public GameCanvas gameCanvas;
 	public View view;
+	private Score score;
 	private Paint paint;
+	private Paint text;
 	private PointF old;
 	private boolean init = true;
 	private int y = 50;
@@ -23,10 +25,14 @@ public class LevelDraw {
 	
 	/* Constructor for a level drawer.
 	 */
-	public LevelDraw() {
+	public LevelDraw(Score score) {
 		paint = new Paint();
 		paint.setColor(Color.rgb(143,205,100));
+		text = new Paint();
+		text.setColor(Color.WHITE);
+		text.setTextSize(40);
 		old = new PointF(0 , 0);
+		this.score = score;
 	}
 	/*
 	 * Following are the drawing functions for the level. Each function can 
@@ -37,12 +43,17 @@ public class LevelDraw {
 	/* drawText() is used to write text to the screen, either with the standard paint
 	 * or a custom one.
 	 */
+	
 	public void drawText(String toWrite, PointF loc, Canvas canvas){
 		canvas.drawText(toWrite, loc.x, loc.y, paint);
 	}
 	
 	public void drawText(String toWrite, PointF loc, Paint brush, Canvas canvas){
 		canvas.drawText(toWrite, loc.x, loc.y, brush);
+	}
+	
+	public void drawScore(int score, Canvas canvas) {
+		canvas.drawText("Score: " + score, 10, 40, text);
 	}
 	
 	public void drawFloor(PointF newp, Canvas canvas){
@@ -103,6 +114,8 @@ public class LevelDraw {
 			//Log.e("Navi", "" + playerX);
 		}
 		float translateY = 0;
+		
+		drawScore(score.getScore(), canvas);
 		
 		for (int i = 0; i < buffer.length; i++) {
 			translate(buffer[i]);

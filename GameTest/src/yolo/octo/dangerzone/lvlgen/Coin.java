@@ -9,6 +9,7 @@ public class Coin extends GameObject {
 	public float x, y;
 	public float radius = 40;
 	public int speed = 0;
+	private Score score;
 	
 	Paint coinPaint = new Paint(); {
 		coinPaint.setColor(Color.rgb(212,175,55));
