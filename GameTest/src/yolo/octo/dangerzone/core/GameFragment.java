@@ -87,9 +87,9 @@ public class GameFragment extends Fragment
 	}
 	
 	public void addObject(GameObject go, int index) {
-		childObjects.add(index, go);
 		go.setParentFragment(this);
 		go.onAttach();
+		childObjects.add(index, go);
 	}
 
 	public int removeObject(GameObject go) {

@@ -24,6 +24,7 @@ public class Level extends GameObject {
 
 	public Paint paint;
 	public Canvas canvas;
+
 	private LevelDraw lvlDraw;
 	private FloorBuffer buffer;
 	private Character character = new Character(0,0);
@@ -32,6 +33,7 @@ public class Level extends GameObject {
 	private int speed = 1, bpm = 120;
 	private long updateTime = 0;
 	private double minTime = 1000/30;
+
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length) {
@@ -40,7 +42,7 @@ public class Level extends GameObject {
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw();
 		Log.e("LvlGen", "Generating level");
-		LevelGenerator lvlGen = new LevelGenerator(beatDet, length);
+		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed);
 		lvlGen.generateLevel();
 		buffer = new FloorBuffer(lvlGen.level);
 		buffer.fillBuffer();
@@ -84,12 +86,17 @@ public class Level extends GameObject {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
-		updateTime += dt;
 		
-		if (updateTime > 
-		for (int i = 0; i < speed; i++) {
-			
-			buffer.update();
+		/* Based on the time the last update occurred, multiple updates could be skipped,
+		 * or it could prevent updating too fast.
+		 */
+		updateTime += dt;
+		if (updateTime > minTime) {
+			int x = (int)(updateTime / minTime);
+			for (int i = 0; i < speed; i++) {
+				buffer.update(x);
+			}
+			updateTime -= (int)(x * minTime);
 		}
 	}
 	
@@ -101,7 +108,8 @@ public class Level extends GameObject {
 		character.x = (int)(canvas.getWidth()/4.0);
 		character.addSprite(getParentFragment().getView());
 		
-		jumpButton.setPosition(75, canvas.getHeight() - 75);
+		if (jumpButton != null)
+			jumpButton.setPosition(75, canvas.getHeight() - 75);
 		
 		update = true;
 	}
