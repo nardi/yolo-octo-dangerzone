@@ -11,22 +11,21 @@ import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 public class LevelGenerator {
 	public float[] level;
 	private List<Beat> beats;
-	private double lastIntens;
 	//Indices per second
 	private int speed;
+	private int preload;
 	
-	
-	/* Constructor class - creates the level generator		
+	/* Constructor class - creates the level generator
 	 */
-	public LevelGenerator(BeatDetector beatDet, long length, int speed) {
+	public LevelGenerator(BeatDetector beatDet, long length, int speed, int preload) {
 		this.speed = speed;
-		level = new float[(int)(400 + (length / (1000 / (speed * 30))))];
-		//beats = (Beat[]) (beatDet.getBeats().toArray()); //TODO retrieve beats here
+		this.preload = preload / (1000 / (speed * 30));
+		level = new float[(int)(this.preload + (length / (1000 / (speed * 30))))];
 		beats = beatDet.getBeats();
 	}
 	
 	private int timeToIndex(long time) {
-		return (int)(time / (1000 / (speed * 30)));
+		return (int)(preload + time / (1000 / (speed * 30)));
 	}
 	
 	/* generateLevel() will generate the level using the beat-data 
@@ -41,8 +40,8 @@ public class LevelGenerator {
 		level[firstBeatIndex] = firstBeat.intensity;
 		float base = 0;
 		float yDiff = level[firstBeatIndex];
-		for (int k = 0; k < firstBeatIndex; k++) {
-			float factor = k / (float)firstBeatIndex;
+		for (int k = preload; k < firstBeatIndex; k++) {
+			float factor = (k - preload) / (float)(firstBeatIndex - preload);
 			level[k] = base + yDiff * factor;
 		}
 		
@@ -60,7 +59,7 @@ public class LevelGenerator {
 			else
 				level[beatIndex2] = level[beatIndex1] - beat2.intensity; */
 			
-			level[beatIndex2] = i % 2 == 0 ? beat2.intensity : 0;
+			level[beatIndex2] = i % 2 == 0 ? beat2.intensity * 2 : beat2.intensity;
 			
 			base = level[beatIndex1];
 			yDiff = level[beatIndex2] - base;
