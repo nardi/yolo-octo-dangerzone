@@ -57,8 +57,9 @@ public class SimpleBeatDetector implements BeatDetector {
 
 		float avgEnergy = calcAverage(tempBuffer);
 		float c = calcC(calcVariance(tempBuffer, avgEnergy));
+		float doubleC = c * c;
 		
-		boolean isBeat = instantEnergy > c * avgEnergy;
+		boolean isBeat = instantEnergy > Math.sqrt(c) * avgEnergy;
 		long time = (1000 * sampleCounter / channels) / sampleRate;
 
 		if (currentBeat != null) {
@@ -68,8 +69,8 @@ public class SimpleBeatDetector implements BeatDetector {
 				currentBeat.finish(time);
 				beats.add(currentBeat);
 				if (currentSection == null
-				 || avgEnergy / currentSection.intensity > c * c
-				 || currentSection.intensity / avgEnergy > c * c) {
+				 || avgEnergy / currentSection.intensity > doubleC
+				 || currentSection.intensity / avgEnergy > doubleC) {
 					if (currentSection != null) {
 						currentSection.finish(currentBeat);
 						sections.add(currentSection);
@@ -119,7 +120,7 @@ public class SimpleBeatDetector implements BeatDetector {
 	private float calcAverage (float[] samples) {
 		float avg = 0;
 		for (int i = 0; i < samples.length; i++) {
-			avg += samples[i];
+			avg += Math.abs(samples[i]);
 		}
 		return avg / samples.length;
 	}
@@ -138,7 +139,7 @@ public class SimpleBeatDetector implements BeatDetector {
 	
 	// Berekent de intensiteitsfactor C die bepaalt of een bepaald energieniveau een beat is of niet
 	private float calcC (float v) {
-		return (float)Math.sqrt((-0.0025714 * v) + 1.5142857);
+		return -0.0025714f * v + 1.5142857f;
 	}
 	
 	public double estimateTempo() {

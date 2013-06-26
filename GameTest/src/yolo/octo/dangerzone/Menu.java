@@ -78,13 +78,13 @@ public class Menu extends GameObject {
 					MP3Decoder md = new MP3Decoder(path);
 					int fftBufferSize = 1024;
 					int bufferSize = fftBufferSize * 100;
-					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * fftBufferSize * md.getNumChannels());
+					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize * md.getNumChannels());
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
-					float[] audioData = new float[fftBufferSize];
+					float[] audioData = new float[fftBufferSize / 2];
 					
-					bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), md.getNumChannels() * fftBufferSize);
+					bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), fftBufferSize / 2);
 					
 					int read = -1;
 					while (read != 0) {
@@ -97,7 +97,7 @@ public class Menu extends GameObject {
 								 i += 2, j++) {
 								audioData[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) / Short.MAX_VALUE;
 							}
-							while (j < fftBufferSize) {
+							while (j < fftBufferSize / 2) {
 								audioData[j++] = 0;
 							}
 							
@@ -116,7 +116,7 @@ public class Menu extends GameObject {
 					
 					//Level level = new Level(bd);
 					Log.e("Switching", "Switching to Level");
-					length  = md.getLength()/ md.getRate();
+					length = md.getLength() / md.getRate();
 					swapFor(new Level(bd, length));
 				} catch (Exception e) {
 					Log.e("loadLevel", "Oops!", e);
@@ -133,7 +133,6 @@ public class Menu extends GameObject {
 		paint.setTextSize(40);
 		int height = this.getParentFragment().getView().getHeight() / 2;
 		int width = (int) (this.getParentFragment().getView().getWidth() / 2.2);
-		Log.v("Draw", "Drawing: " + print);
 		switch(print){
 			case 0:
 				canvas.drawText("Loading", width, height, paint);
@@ -158,7 +157,6 @@ public class Menu extends GameObject {
 		if(time > 750){
 			print++;
 			if(print > 3){
-				Log.e("update", "Resetting print");
 				print = 0;
 			}
 			time = 0;

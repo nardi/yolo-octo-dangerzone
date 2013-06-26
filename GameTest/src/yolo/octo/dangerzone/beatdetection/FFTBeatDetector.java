@@ -14,7 +14,7 @@ public class FFTBeatDetector implements BeatDetector{
 	private FFT fft;
 	
 	public FFTBeatDetector(int sampleRate, int channels, int bufferSize) {
-		fft = new FFT(bufferSize, 44100);
+		fft = new FFT(bufferSize, sampleRate);
 		fft.window(FFT.NONE);
 		fft.noAverages();
 		
@@ -27,9 +27,9 @@ public class FFTBeatDetector implements BeatDetector{
 	public boolean newSamples(float[] samples) {
 		fft.forward(samples);
 		//Log.i("detectTempo", " Energy :" + fft.calcAvg(100, 250));
-		boolean lowBeat = lowFrequency.newEnergy(fft.calcAvg(80, 220), 1024);
-		highFrequency.newEnergy(fft.calcAvg(10000, 17000), 1024);
-		midFrequency.newEnergy(fft.calcAvg(350, 1500), 1024);
+		boolean lowBeat = lowFrequency.newEnergy(fft.calcAvg(80, 230), 1024);
+		highFrequency.newEnergy(fft.calcAvg(9000, 17000), 1024);
+		midFrequency.newEnergy(fft.calcAvg(280, 2000), 1024);
 		return lowBeat;
 	}
 	
@@ -50,9 +50,11 @@ public class FFTBeatDetector implements BeatDetector{
 		List<Beat> highBeats = highFrequency.getBeats();
 		int lbIndex = 0;
 		for (Beat hb : highBeats) {
-			for (Beat lb = lowBeats.get(lbIndex);
-				 lb.startTime >= hb.startTime;
-				 lb = lowBeats.get(++lbIndex)) {
+			for (; lbIndex < lowBeats.size(); lbIndex++) {
+				Beat lb = lowBeats.get(lbIndex);
+				if (lb.startTime > hb.startTime) {
+					break;
+				}
 				// Als een hb binnen een lb valt, draagt deze bij aan de intensiteit
 				if (lb.startTime <= hb.startTime
 			     && lb.endTime > hb.startTime) {
@@ -71,6 +73,7 @@ public class FFTBeatDetector implements BeatDetector{
 			b.intensity /= maxBeatIntensity;
 		}
 		
+		float maxSectionIntensity = 0;
 		lbIndex = 0;
 		for (Section s : midFrequency.getSections()) {
 			int bestMatch = 0;
@@ -100,6 +103,13 @@ public class FFTBeatDetector implements BeatDetector{
 			int endBeat = bestMatch;
 			s.beats.clear();
 			s.beats.addAll(lowBeats.subList(startBeat, endBeat));
+			if (s.intensity > maxSectionIntensity) {
+				maxSectionIntensity = s.intensity;
+			}
+		}
+
+		for (Section s : midFrequency.getSections()) {
+			s.intensity /= maxSectionIntensity;
 		}
 	}
 	
@@ -115,7 +125,7 @@ public class FFTBeatDetector implements BeatDetector{
 
 	@Override
 	public List<Section> getSections() {
-		return lowFrequency.getSections();
+		return midFrequency.getSections();
 	}
 	
 	private float calcAverage(float[] samples, int offset, int length) {
