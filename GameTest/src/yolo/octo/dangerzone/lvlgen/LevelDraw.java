@@ -102,13 +102,24 @@ public class LevelDraw {
 			playerX = (int) ((view.getWidth()/4.0 * 399.0) / view.getWidth());
 			//Log.e("Navi", "" + playerX);
 		}
-		playerY = translate(buffer[playerX]).y;
+		float translateY = 0;
+		
+		for (int i = 0; i < buffer.length; i++) {
+			translate(buffer[i]);
+			if (buffer[i].y < view.getHeight() * (1/6f)) {
+				float newTY = view.getHeight() * (1/6f) - buffer[i].y;
+				if (newTY > translateY)
+					translateY = newTY;
+			}
+		}
+		playerY = buffer[playerX].y + translateY;
+		
 		Path path = new Path();
 		path.moveTo(buffer[0].x, buffer[0].y);
 		
 		//playerY = (float)(view.getHeight() * 2.0/3.0);
-		for(int i = 0; i < buffer.length; i++){
-			PointF buf = translate(buffer[i]);
+		
+		for (int i = 1; i < buffer.length; i++) {
 			path.lineTo(buffer[i].x, buffer[i].y);
 			
 			
@@ -119,10 +130,12 @@ public class LevelDraw {
 
 		}
 		Paint paint2 = new Paint();
-		paint2.setColor(Color.BLUE);
+		paint2.setColor(Color.rgb(183, 219, 149));
 		path.lineTo(view.getWidth(), view.getHeight());
 		path.lineTo(0, view.getHeight());
+		canvas.translate(0, translateY);
 		canvas.drawPath(path, paint2);
+		canvas.translate(0, -translateY);
 		old.x = -1;
 		old.y = -1;
 	}
