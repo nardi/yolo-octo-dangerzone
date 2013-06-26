@@ -99,7 +99,7 @@ public class LevelDraw {
 			init = false;
 			old.y = view.getHeight() * 2/3;
 			old.x = 150;
-			playerX = (int) ((view.getWidth()/4.0 * 399.0) / view.getWidth());
+			playerX = (int)(399/4f);
 			//Log.e("Navi", "" + playerX);
 		}
 		float translateY = 0;

@@ -16,6 +16,7 @@ import yolo.octo.dangerzone.core.GameObject;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -38,12 +39,13 @@ public class Level extends GameObject {
 	private Runnable mp3;
 	private LevelDraw lvlDraw;
 	private FloorBuffer buffer;
-	private Character character = new Character(0,0);
+	private Character character;
 	private Button jumpButton;
 	private boolean update = false;
 	private int speed = 4, bpm = 120;
 	private long updateTime = 0;
 	private double minTime = 1000/30;
+	private int preloadTime = 1500;
 
 	//Coin[] coin = new Coin[bpm];
 	
@@ -53,12 +55,11 @@ public class Level extends GameObject {
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw();
 		Log.e("LvlGen", "Generating level");
-		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed);
+		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed, preloadTime);
 		lvlGen.generateLevel();
 		buffer = new FloorBuffer(lvlGen.level);
 		buffer.fillBuffer();
 		mp3 = playMp3(path);
-		addObject(character);
 		new Thread(mp3).start();
 		
 		
@@ -71,7 +72,8 @@ public class Level extends GameObject {
 	}
 	
 	protected void onAttach() {
-		jumpButton = new Button(getParentFragment().getActivity(), 0, 0, 100, 100, Color.RED, "Jump");
+		Context context = getParentFragment().getActivity();
+		jumpButton = new Button(context, 0, 0, 100, 100, Color.RED, "Jump");
 		jumpButton.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent me) {
 				if (me.getActionMasked() == MotionEvent.ACTION_DOWN && character.jumping == false) {
@@ -87,6 +89,9 @@ public class Level extends GameObject {
 			}
 		});
 		addObject(jumpButton);
+		
+		character = new Character(context, 0,0);
+		addObject(character);
 	}
 
 	@Override
@@ -110,7 +115,6 @@ public class Level extends GameObject {
 		lvlDraw.view = getParentFragment().getView();
 		lvlDraw.drawFromBuffer(buffer.getBuffer(), canvas);
 		character.x = (int)(canvas.getWidth()/4.0);
-		character.addSprite(getParentFragment().getView());
 	
 		if (jumpButton != null)
 			jumpButton.setPosition(75, canvas.getHeight() - 75);
@@ -140,8 +144,11 @@ public class Level extends GameObject {
 							md.getRate(), channels,
 							AudioFormat.ENCODING_PCM_16BIT, bufferSize,
 							AudioTrack.MODE_STREAM);
-
+					int preloadSamples = md.getRate() * channels * preloadTime / 1000;
+					short[] preloadBuffer = new short[preloadSamples];
+					
 					at.play();
+					at.write(preloadBuffer, 0, preloadSamples);
 					int readSamples = -1;
 					while (readSamples != 0) {
 						readSamples = md.readSamples(shortBuffer);

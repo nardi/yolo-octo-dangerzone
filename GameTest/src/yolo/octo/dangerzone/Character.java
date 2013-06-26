@@ -34,14 +34,11 @@ public class Character extends GameObject {
 		character.setShadowLayer(2, 0, 0, Color.argb(0x42, 0, 0, 0));
 	}
 	
-	public Character(float x, float y) {
+	public Character(Context context, float x, float y) {
 		this.x = x;
 		this.groundY = y;
 		this.y = y;
-	}
-	
-	public void addSprite(View v) {
-		Context context = v.getContext();
+		
 	    Resources res = context.getResources();
 	    try {
 			Bitmap spriteBig = BitmapFactory.decodeResource(res, R.drawable.hashtag);
