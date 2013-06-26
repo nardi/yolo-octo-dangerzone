@@ -65,6 +65,11 @@ public class FloorBuffer {
 		pointCounter++;
 	}
 	
+	public void update(int skip){
+		for(int i = 0; i < skip; i++){
+			update();
+		}
+	}
 	
 	/* Geeft de buffer terug voor de teken klasse, in de volgorde van aller linker 
 	 * punt op scherm naar aller rechter punt. 

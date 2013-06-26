@@ -110,7 +110,6 @@ public class LevelGenerator {
 				
 			//XXX NIET VERGETEN i TE INCREMENTEN! Is nu incremented
 		}
-		interpolate();
 	}
 	
 	
@@ -123,62 +122,5 @@ public class LevelGenerator {
 		//XXX (int) (waarde +0.5) == round ;)
 		index = time/1000 * ips;
 		return index;
-	}
-	
-	/* makeInc() generates a hill when the previous intensity was lower than
-	 * the current.
-	 */
-	public void makeInc(float intensity, int index){
-		//Maak hier een functie die een helling genereert in de level array. Hiervoor moet de deviatie denk ik als -100 tot 100 oid 
-		//worden aangegeven.
-		level[index] = (float)lastIntens + intensity;
-	}
-	
-	/* makeDec() generates a valley when the previous intensity was lower than
-	 * the current.
-	 */
-	public void makeDec(float intensity, int index){
-		//Hetzelfde als makeInc, maar dan voor een helling omlaag, kan evt ook in 1 functie.
-		level[index] = (float)lastIntens - intensity;
-	}
-	
-	
-	/* interpolate() fills the gaps made in generateLevel by interpolating 
-	 * between the beats' intensity values
-	 */
-	public void interpolate(){
-		for(int i = 0; i < level.length - 1;){
-			int q = i;
-			/*
-			 * Found a gap between two beats.
-			 */
-			if(level[i] == -2){
-				/*
-				 * Finding the end of the gap.
-				 */
-				while(level[q] == -2 && q < level.length - 1){
-					q++;
-				}
-				/*
-				 * Add the average value to the deviation of the beginning of the gap.
-				 */
-				for(int p = i; p < q; p++){
-					level[p] = level[p - 1];
-					level[p] += (level[i - 1] + level[q]) / (q - i);
-				}
-				i = q;
-				
-				if(i > level.length - 3){
-					Log.e("oob", "never ending");
-					break;
-				}
-			}
-			/*
-			 * If no gap is found just increment i.
-			 */
-			else{
-				i++;
-			}
-		}
 	}
 }
