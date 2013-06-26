@@ -37,10 +37,13 @@ public class LevelGenerator {
 		 * Interpoleren tussen 0 en eerste beat.
 		 */
 		Beat firstBeat = beats.get(0);
-		float firstBeatIndex = timeToIndex(firstBeat.time());
-		level[(int) firstBeatIndex] = firstBeat.intensity;
+		int firstBeatIndex = timeToIndex(firstBeat.time());
+		level[firstBeatIndex] = firstBeat.intensity;
+		float base = 0;
+		float yDiff = level[firstBeatIndex];
 		for (int k = 0; k < firstBeatIndex; k++) {
-			level[k] = level[(int) firstBeatIndex] * k / (float)firstBeatIndex;
+			float factor = k / (float)firstBeatIndex;
+			level[k] = base + yDiff * factor;
 		}
 		
 		/*
@@ -59,18 +62,23 @@ public class LevelGenerator {
 			
 			level[beatIndex2] = beat2.intensity;
 			
+			base = level[beatIndex1];
+			yDiff = level[beatIndex2] - base;
 			for (int k = beatIndex1 + 1; k < beatIndex2; k++) {
-				level[k] = (level[beatIndex2] - level[beatIndex1]) *
-						(k - beatIndex1) / (float)(beatIndex2 - beatIndex1);
+				float factor = (k - beatIndex1) / (float)(beatIndex2 - beatIndex1);
+				level[k] = base + yDiff * factor;
 			}
 		}
 		
 		/*
 		 * Interpoleren tussen laatste beat en einde array.
 		 */
-		float lastBeatIndex = timeToIndex(beats.get(beats.size() - 1).time());
+		int lastBeatIndex = timeToIndex(beats.get(beats.size() - 1).time());
+		base = level[lastBeatIndex];
+		yDiff = 0 - level[lastBeatIndex];
 		for (int k = (int) (lastBeatIndex - 1); k < level.length; k++) {
-			level[k] = level[(int) lastBeatIndex] * (1 - (k - lastBeatIndex) / (float)(level.length - 1 - lastBeatIndex));
+			float factor = (k - lastBeatIndex) / (float)(level.length - 1 - lastBeatIndex);
+			level[k] = base + yDiff * factor;
 		}	
 	}
 }
