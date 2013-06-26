@@ -9,6 +9,9 @@ import nobleworks.libmpg.MP3Decoder;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -20,6 +23,11 @@ import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 import yolo.octo.dangerzone.core.GameObject;
 
 public class Menu extends GameObject {
+	
+	private BeatDetector bd;
+	public long length;
+	public int time, print;
+	
 	protected void onAttach() {	
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 	    intent.setType("audio/x-mp3");
@@ -74,7 +82,7 @@ public class Menu extends GameObject {
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
 					float[] audioData = new float[fftBufferSize];
 					
-					BeatDetector bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), md.getNumChannels() * fftBufferSize);
+					bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), md.getNumChannels() * fftBufferSize);
 					
 					int read = -1;
 					while (read != 0) {
@@ -101,17 +109,56 @@ public class Menu extends GameObject {
 					
 					// dingen met bd doen
 					
-					Level level = new Level();
-					swapFor(new Level());
+					//Level level = new Level(bd);
+					Log.e("Switching", "Switching to Level");
+					length  = md.getLength()/ md.getRate();
+					swapFor(new Level(bd, length));
 				} catch (Exception e) {
 					Log.e("loadLevel", "Oops!", e);
 				}
 			}
 		};
 	}
+	
+	@Override
+	public void onDraw(Canvas canvas){
+		Paint paint = new Paint();
+		canvas.drawColor(Color.BLACK);
+		paint.setColor(Color.RED);
+		paint.setTextSize(25);
+		int height = this.getParentFragment().getView().getHeight() / 2;
+		int width = this.getParentFragment().getView().getWidth() / 2;
+		Log.e("Draw", "Drawing");
+		switch(print){
+			case 0:
+				canvas.drawText("Loading", width, height, paint);
+			case 1:
+				canvas.drawText("Loading.", width, height, paint);
+			case 2:
+				canvas.drawText("Loading..", width, height, paint);
+			case 3:
+				canvas.drawText("Loading...", width, height, paint);
+		}
+	}
+	
+	@Override
+	public void onUpdate(long dt){
+		if(time > 750){
+			print++;
+			if(print > 3){
+				Log.e("update", "Resetting print");
+				print = 0;
+			}
+			time = 0;
+		}
+		else{
+			time += dt;
+		}
+	}
+	
 
 	public void wanneerGebruikerOpButtonDruktOfzo() {
 		// verkrijg mp3 pad voor Level
-		this.swapFor(new Level());
+		this.swapFor(new Level(bd, length));
 	}
 }
