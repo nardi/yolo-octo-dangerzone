@@ -30,7 +30,7 @@ public class Level extends GameObject {
 	private Character character = new Character(0,0);
 	private Button jumpButton;
 	private boolean update = false;
-	private int speed = 1, bpm = 120;
+	private int speed = 4, bpm = 120;
 	private long updateTime = 0;
 	private double minTime = 1000/30;
 
