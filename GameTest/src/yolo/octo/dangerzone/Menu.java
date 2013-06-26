@@ -18,6 +18,9 @@ import android.media.AudioTrack;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 import yolo.octo.dangerzone.beatdetection.Beat;
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
@@ -30,12 +33,27 @@ public class Menu extends GameObject {
 	public long length;
 	public int time, print;
 	private String path;
+	public boolean picking = false;
+	public boolean song = false;
+	Button pickASong;
 	
 	protected void onAttach() {	
-		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-	    intent.setType("audio/x-mp3");
-	    Intent chooser = Intent.createChooser(intent, "Select soundfile");
-	    getParentFragment().startActivityForResult(chooser, 1);
+		Paint top = new Paint();
+		Paint bottom = new Paint();
+		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.BLUE, "Song");
+		pickASong.setOnTouchListener(new OnTouchListener() {
+				public boolean onTouch(View v, MotionEvent me) {
+					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && song == false) {
+						picking = true;
+					}
+					if (me.getActionMasked() == MotionEvent.ACTION_UP) {
+					}
+
+					return true;
+				}
+			});
+	
+	addObject(pickASong);
 	}
 	
 	/*
@@ -76,6 +94,7 @@ public class Menu extends GameObject {
 		return new Runnable() {
 			public void run() {
 				try {
+					song = true;
 					MP3Decoder md = new MP3Decoder(path);
 					int fftBufferSize = 1024;
 					int bufferSize = fftBufferSize * 100;
@@ -133,25 +152,36 @@ public class Menu extends GameObject {
 	
 	@Override
 	public void onDraw(Canvas canvas){
-		canvas.drawColor(Color.BLACK);
+		//canvas.drawRect(r, paint)
+		canvas.drawColor(Color.rgb(255,140,0));
+		pickASong.setPosition((float) (this.getParentFragment().getView().getWidth() / 2) ,this.getParentFragment().getView().getHeight() / 2);
 		int height = this.getParentFragment().getView().getHeight() / 2;
 		int width = (int) (this.getParentFragment().getView().getWidth() / 2.2);
+		if (picking) {
+			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+		    intent.setType("audio/x-mp3");
+		    Intent chooser = Intent.createChooser(intent, "Select soundfile");
+		    getParentFragment().startActivityForResult(chooser, 1);
+		    picking = false;
+		}
+		if (song) {
 		switch(print){
 			case 0:
-				canvas.drawText("Loading", width, height, paint);
+				pickASong.setText("Loading   ");
 				break;
 			case 1:
-				canvas.drawText("Loading.", width, height, paint);
+				pickASong.setText("Loading.  ");
 				break;
 			case 2:
-				canvas.drawText("Loading..", width, height, paint);
+				pickASong.setText("Loading.. ");
 				break;
 			case 3:
-				canvas.drawText("Loading...", width, height, paint);
+				pickASong.setText("Loading...");
 				break;
 			default:
-				canvas.drawText("Loading", width, height, paint);
+				pickASong.setText("Loading");
 				break;
+		}
 		}
 	}
 	
