@@ -99,7 +99,7 @@ public class LevelGenerator {
 	 * between the beats' intensity values
 	 */
 	public void interpolate(){
-		for(int i = 0; i < level.length;){
+		for(int i = 0; i < level.length - 1;){
 			int q = i;
 			/*
 			 * Found a gap between two beats.
