@@ -147,6 +147,7 @@ public class Level extends GameObject {
 						readSamples = md.readSamples(shortBuffer);
 						shortBuffer.get(buffer, 0, readSamples);
 						shortBuffer.position(0);
+						while (at.getPlayState() != AudioTrack.PLAYSTATE_PLAYING);
 						at.write(buffer, 0, readSamples);
 						Log.v("playMp3", "Wrote " + readSamples + " samples");
 					}
@@ -162,5 +163,17 @@ public class Level extends GameObject {
 				}
 			}
 		};
+	}
+	
+	public void onHalt(){
+		if(at != null){
+			this.at.pause();
+		}
+	}
+	
+	public void onRun(){
+		if (at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PAUSED){
+			at.play();
+		}
 	}
 }

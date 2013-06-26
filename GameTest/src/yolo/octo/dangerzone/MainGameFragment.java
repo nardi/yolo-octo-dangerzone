@@ -31,4 +31,20 @@ public class MainGameFragment extends GameFragment {
 			menu.onActivityResult(requestCode, resultCode, data);
 		}
 	}
+	
+	@Override
+	public void onHalt(){
+		if (childObjects.get(0) instanceof Level) {
+			Level lvl = (Level)childObjects.get(0);
+			lvl.onHalt();
+		}
+	}
+	
+	@Override
+	public void onRun(){
+		if (childObjects.get(0) instanceof Level) {
+			Level lvl = (Level)childObjects.get(0);
+			lvl.onRun();
+		}
+	}
 }

@@ -3,6 +3,7 @@ package yolo.octo.dangerzone.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -196,6 +197,7 @@ public class GameFragment extends Fragment
 	protected void onDraw(Canvas canvas) {}
 	protected void postDraw(Canvas canvas) {}
 	
+	@SuppressLint("WrongCall")
 	public final void draw(Canvas canvas) {
 		preDraw(canvas);
 		onDraw(canvas);
