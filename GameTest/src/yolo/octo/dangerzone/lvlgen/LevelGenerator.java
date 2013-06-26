@@ -104,7 +104,7 @@ public class LevelGenerator {
 				/*
 				 * Finding the end of the gap.
 				 */
-				while(level[q] == -2 && q < level.length){
+				while(level[q] == -2 && q < level.length - 1){
 					q++;
 				}
 				/*
