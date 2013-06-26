@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 
 public class Level extends GameObject {
 
@@ -24,7 +25,7 @@ public class Level extends GameObject {
 	LevelDraw lvlGen;
 	FloorBuffer buffer;
 	Character character = new Character(0,0);
-	Button button = new Button(0,0);
+	Button jumpButton;
 	boolean update = false;
 	int speed = 3, bpm = 120;
 	//Coin[] coin = new Coin[bpm];
@@ -36,8 +37,8 @@ public class Level extends GameObject {
 		lvlGen = new LevelDraw();
 		buffer = new FloorBuffer(generateDevs());
 		buffer.fillBuffer();
+		
 		addObject(character);
-		addObject(button);
 		
 		/*
 		for (int i = 0; i < bpm; i++) {
@@ -45,6 +46,25 @@ public class Level extends GameObject {
 			coin[i].speed = speed + (speed/3);
 			addObject(coin[i]);
 		} */
+	}
+	
+	protected void onAttach() {
+		jumpButton = new Button(getParentFragment().getActivity(), 0, 0, 100, 100, Color.RED, "Jump");
+		jumpButton.setOnTouchListener(new OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent me) {
+				if (me.getActionMasked() == MotionEvent.ACTION_DOWN && character.jumping == false) {
+					character.jumping = true;
+					character.direction = true;
+					jumpButton.pressed = true;
+				}
+				if (me.getActionMasked() == MotionEvent.ACTION_UP) {
+					jumpButton.pressed = false;
+				}
+
+				return true;
+			}
+		});
+		addObject(jumpButton);
 	}
 
 	@Override
@@ -56,8 +76,6 @@ public class Level extends GameObject {
 		} else if (update) {
 			character.groundY = lvlGen.getHeight() - 100;
 		}
-		
-
 	}
 	
 	@Override
@@ -65,36 +83,16 @@ public class Level extends GameObject {
 		canvas.drawColor(Color.rgb(124,139,198));
 		lvlGen.view = getParentFragment().getView();
 		lvlGen.drawFromBuffer(buffer.getBuffer(), canvas);
-		int width = getParentFragment().getView().getWidth();
-		character.x = (int)(width/4.0);
+		character.x = (int)(canvas.getWidth()/4.0);
 		character.addSprite(getParentFragment().getView());
-		
-		int height = getParentFragment().getView().getHeight();
-		button.y = height - 150;
-		button.addSprite(getParentFragment().getView());
 
 		for (int i = 0; i < speed; i++) {
 			buffer.update();
 		}
 		
+		jumpButton.setPosition(75, canvas.getHeight() - 75);
+		
 		update = true;
-	}
-	
-	@Override
-	protected boolean onTouch(View v, MotionEvent me) {
-
-		if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
-			if (me.getX() < 150 && me.getY() > v.getHeight() - 150 && character.jumping == false) {
-				character.jumping = true;
-				character.direction = true;
-				button.pressed = true;
-			}
-		}
-		if (me.getActionMasked()==MotionEvent.ACTION_UP) {
-			button.pressed = false;
-		}
-
-		return true;
 	}
 	
 	public FloorPoint[] generateDevs(){

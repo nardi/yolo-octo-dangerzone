@@ -18,6 +18,7 @@ public class MainGameFragment extends GameFragment {
         super.onCreate(savedInstanceState);
         
         setTargetFps(42);
+        //this.showStats = true;
         
 		addObject(new Menu());
 		

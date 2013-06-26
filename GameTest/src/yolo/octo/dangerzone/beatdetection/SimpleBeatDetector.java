@@ -68,8 +68,8 @@ public class SimpleBeatDetector implements BeatDetector {
 				currentBeat.finish(time);
 				beats.add(currentBeat);
 				if (currentSection == null
-				 || avgEnergy / currentSection.intensity > c
-				 || currentSection.intensity / avgEnergy > c) {
+				 || avgEnergy / currentSection.intensity > c * c
+				 || currentSection.intensity / avgEnergy > c * c) {
 					if (currentSection != null) {
 						currentSection.finish(currentBeat);
 						sections.add(currentSection);

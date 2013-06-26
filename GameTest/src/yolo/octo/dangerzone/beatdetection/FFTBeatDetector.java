@@ -22,8 +22,8 @@ public class FFTBeatDetector implements BeatDetector{
 	@Override
 	public boolean newSamples(float[] samples) {
 		fft.forward(samples);
-		Log.i("detectTempo", " Energy :" + fft.calcAvg(100, 250));
-		return lowFrequency.newEnergy(fft.calcAvg(100, 250), 1024);
+		//Log.i("detectTempo", " Energy :" + fft.calcAvg(100, 250));
+		return lowFrequency.newEnergy(fft.calcAvg(80, 220), 1024);
 	}
 	
 	private float findMax(float[] array) {
@@ -36,7 +36,6 @@ public class FFTBeatDetector implements BeatDetector{
 	}
 	
 	@Override
-	/*Hier moet meer gebeuren*/
 	public void finishSong() {
 		lowFrequency.finishSong();
 		float maxBeatIntensity = 1;
@@ -65,7 +64,7 @@ public class FFTBeatDetector implements BeatDetector{
 		return lowFrequency.getSections();
 	}
 	
-	private float calcAverage (float[] samples, int offset, int length) {
+	private float calcAverage(float[] samples, int offset, int length) {
 		float avg = 0;
 		for (int i = offset; i < offset + length; i++) {
 			avg += (samples[i] * samples[i]);
