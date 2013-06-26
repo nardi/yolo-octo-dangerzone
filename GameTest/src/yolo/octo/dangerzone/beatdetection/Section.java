@@ -7,12 +7,12 @@ public class Section {
 	public long startTime;
 	public long endTime; // of length, kan ook
 	public final List<Beat> beats = new ArrayList<Beat>();
-	public double intensity;
+	public float intensity;
 	public double avgTempo;
 	
 	private int length;
 	
-	public Section(Beat startBeat, double startIntensity) {
+	public Section(Beat startBeat, float startIntensity) {
 		beats.add(startBeat);
 		startTime = startBeat.startTime;
 		endTime = startBeat.endTime;
@@ -20,7 +20,7 @@ public class Section {
 		length = 1;
 	}
 	
-	public void add(Beat beat, double newIntensity) {
+	public void add(Beat beat, float newIntensity) {
 		beats.add(beat);
 		endTime = beat.endTime;
 		length++;

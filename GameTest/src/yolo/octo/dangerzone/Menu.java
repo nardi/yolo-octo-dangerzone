@@ -18,8 +18,10 @@ import android.media.AudioTrack;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+import yolo.octo.dangerzone.beatdetection.Beat;
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
+import yolo.octo.dangerzone.beatdetection.Section;
 import yolo.octo.dangerzone.core.GameObject;
 
 public class Menu extends GameObject {
@@ -76,13 +78,13 @@ public class Menu extends GameObject {
 					MP3Decoder md = new MP3Decoder(path);
 					int fftBufferSize = 1024;
 					int bufferSize = fftBufferSize * 100;
-					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * fftBufferSize * md.getNumChannels());
+					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize * md.getNumChannels());
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
-					float[] audioData = new float[fftBufferSize];
+					float[] audioData = new float[fftBufferSize / 2];
 					
-					bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), md.getNumChannels() * fftBufferSize);
+					bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), fftBufferSize / 2);
 					
 					int read = -1;
 					while (read != 0) {
@@ -95,7 +97,7 @@ public class Menu extends GameObject {
 								 i += 2, j++) {
 								audioData[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) / Short.MAX_VALUE;
 							}
-							while (j < fftBufferSize) {
+							while (j < fftBufferSize / 2) {
 								audioData[j++] = 0;
 							}
 							
@@ -107,11 +109,14 @@ public class Menu extends GameObject {
 					}
 					bd.finishSong();
 					
-					// dingen met bd doen
+					for (Beat b : bd.getBeats())
+						Log.i("bt", "Beat at " + b.startTime + ", intensity: " + b.intensity);
+					for (Section s : bd.getSections())
+						Log.i("bt", "Section from " + s.startTime + " to " + s.endTime + ", intensity: " + s.intensity);
 					
 					//Level level = new Level(bd);
 					Log.e("Switching", "Switching to Level");
-					length  = md.getLength()/ md.getRate();
+					length = md.getLength() / md.getRate();
 					swapFor(new Level(bd, length));
 				} catch (Exception e) {
 					Log.e("loadLevel", "Oops!", e);
@@ -120,15 +125,16 @@ public class Menu extends GameObject {
 		};
 	}
 	
-	@Override
-	public void onDraw(Canvas canvas){
-		Paint paint = new Paint();
-		canvas.drawColor(Color.BLACK);
+	Paint paint = new Paint(); {
 		paint.setColor(Color.RED);
 		paint.setTextSize(40);
+	};
+	
+	@Override
+	public void onDraw(Canvas canvas){
+		canvas.drawColor(Color.BLACK);
 		int height = this.getParentFragment().getView().getHeight() / 2;
 		int width = (int) (this.getParentFragment().getView().getWidth() / 2.2);
-		//Log.v("Draw", "Drawing: " + print);
 		switch(print){
 			case 0:
 				canvas.drawText("Loading", width, height, paint);
@@ -150,16 +156,10 @@ public class Menu extends GameObject {
 	
 	@Override
 	public void onUpdate(long dt){
+		time += dt;
 		if(time > 750){
-			print++;
-			if(print > 3){
-				//Log.e("update", "Resetting print");
-				print = 0;
-			}
-			time = 0;
-		}
-		else{
-			time += dt;
+			print = (print + 1) % 4;
+			time = time % 750;
 		}
 	}
 	
