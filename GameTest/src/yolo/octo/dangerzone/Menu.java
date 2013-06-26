@@ -32,6 +32,7 @@ public class Menu extends GameObject {
 	private BeatDetector bd;
 	public long length;
 	public int time, print;
+	private String path;
 	public boolean picking = false;
 	public boolean song = false;
 	Button pickASong;
@@ -88,7 +89,7 @@ public class Menu extends GameObject {
 				Log.e("Menu", "Something went wrong...");
 				return;
 			}
-			
+			this.path = path;
 			new Thread(loadLevel(path)).start();
 		}
 	}
@@ -140,7 +141,7 @@ public class Menu extends GameObject {
 					//Level level = new Level(bd);
 					Log.e("Switching", "Switching to Level");
 					length = 1000 * md.getLength() / md.getRate();
-					swapFor(new Level(bd, length));
+					swapFor(new Level(bd, length, path));
 				} catch (Exception e) {
 					Log.e("loadLevel", "Oops!", e);
 				}
@@ -160,7 +161,6 @@ public class Menu extends GameObject {
 		int width = this.getParentFragment().getView().getWidth();
 		canvas.drawRect(0, height / 2, width, height, top);
 		canvas.drawRect(0, 0, width, height / 2, bottom);
-		//canvas.drawRect(r, paint);
 		pickASong.setPosition(width / 2 , height / 2);
 		if (picking) {
 			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -202,6 +202,6 @@ public class Menu extends GameObject {
 
 	public void wanneerGebruikerOpButtonDruktOfzo() {
 		// verkrijg mp3 pad voor Level
-		this.swapFor(new Level(bd, length));
+		this.swapFor(new Level(bd, length, path));
 	}
 }
