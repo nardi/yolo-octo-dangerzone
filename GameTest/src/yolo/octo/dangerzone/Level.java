@@ -29,7 +29,7 @@ public class Level extends GameObject {
 	Character character = new Character(0,0);
 	Button jumpButton;
 	boolean update = false;
-	int speed = 1, bpm = 120;
+	int speed = 4, bpm = 120;
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length) {
@@ -38,7 +38,7 @@ public class Level extends GameObject {
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw();
 		Log.e("LvlGen", "Generating level");
-		LevelGenerator lvlGen = new LevelGenerator(beatDet, length);
+		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed);
 		lvlGen.generateLevel();
 		buffer = new FloorBuffer(lvlGen.level);
 		buffer.fillBuffer();
