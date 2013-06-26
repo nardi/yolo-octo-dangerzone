@@ -24,12 +24,16 @@ public class Level extends GameObject {
 
 	public Paint paint;
 	public Canvas canvas;
-	LevelDraw lvlDraw;
-	FloorBuffer buffer;
-	Character character = new Character(0,0);
-	Button jumpButton;
-	boolean update = false;
-	int speed = 4, bpm = 120;
+
+	private LevelDraw lvlDraw;
+	private FloorBuffer buffer;
+	private Character character = new Character(0,0);
+	private Button jumpButton;
+	private boolean update = false;
+	private int speed = 1, bpm = 120;
+	private long updateTime = 0;
+	private double minTime = 1000/30;
+
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length) {
@@ -82,8 +86,17 @@ public class Level extends GameObject {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
-		for (int i = 0; i < speed; i++) {
-			buffer.update();
+		
+		/* Based on the time the last update occurred, multiple updates could be skipped,
+		 * or it could prevent updating too fast.
+		 */
+		updateTime += dt;
+		if (updateTime > minTime) {
+			int x = (int)(updateTime / minTime);
+			for (int i = 0; i < speed; i++) {
+				buffer.update(x);
+			}
+			updateTime -= (int)(x * minTime);
 		}
 	}
 	
