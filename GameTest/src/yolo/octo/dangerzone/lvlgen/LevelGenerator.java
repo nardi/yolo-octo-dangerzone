@@ -8,7 +8,7 @@ import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 
 public class LevelGenerator {
 	public float[] level;
-	private Beat[] beats;
+	private List<Beat> beats;
 	private double lastIntens;
 	//Indices per second
 	private int ips = 30;
@@ -18,7 +18,8 @@ public class LevelGenerator {
 	 */
 	public LevelGenerator(BeatDetector beatDet, long length) {
 		level = new float[(int) (400 + (length * 30))];
-		beats = (Beat[]) (beatDet.getBeats().toArray()); //TODO retrieve beats here
+		//beats = (Beat[]) (beatDet.getBeats().toArray()); //TODO retrieve beats here
+		beats = beatDet.getBeats();
 	}
 	
 	/* generateLevel() will generate the level using the beat-data 
@@ -32,13 +33,13 @@ public class LevelGenerator {
 			 * of the previous beat. Based on this, the level will either go 
 			 * up or down.
 			 */
-			if(beats[beatCounter].startTime /33 == i){
+			if(beats.get(beatCounter).startTime /33 == i){
 				//XXX Hier is dus een beat.
-				if(beats[beatCounter].intensity > lastIntens){
-					makeInc(beats[beatCounter].intensity, i);
+				if(beats.get(beatCounter).intensity > lastIntens){
+					makeInc(beats.get(beatCounter).intensity, i);
 				}
 				else{
-					makeDec(beats[beatCounter].intensity, i);
+					makeDec(beats.get(beatCounter).intensity, i);
 				}
 				
 				// TODO: obstacle/coin generator
