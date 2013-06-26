@@ -110,6 +110,7 @@ public class Menu extends GameObject {
 					// dingen met bd doen
 					
 					//Level level = new Level(bd);
+					Log.e("Switching", "Switching to Level");
 					length  = md.getLength()/ md.getRate();
 					swapFor(new Level(bd, length));
 				} catch (Exception e) {
@@ -122,10 +123,12 @@ public class Menu extends GameObject {
 	@Override
 	public void onDraw(Canvas canvas){
 		Paint paint = new Paint();
+		canvas.drawColor(Color.BLACK);
 		paint.setColor(Color.RED);
 		paint.setTextSize(25);
 		int height = this.getParentFragment().getView().getHeight() / 2;
 		int width = this.getParentFragment().getView().getWidth() / 2;
+		Log.e("Draw", "Drawing");
 		switch(print){
 			case 0:
 				canvas.drawText("Loading", width, height, paint);
@@ -143,6 +146,7 @@ public class Menu extends GameObject {
 		if(time > 750){
 			print++;
 			if(print > 3){
+				Log.e("update", "Resetting print");
 				print = 0;
 			}
 			time = 0;
