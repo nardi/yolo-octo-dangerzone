@@ -128,7 +128,7 @@ public class Menu extends GameObject {
 		paint.setTextSize(40);
 		int height = this.getParentFragment().getView().getHeight() / 2;
 		int width = (int) (this.getParentFragment().getView().getWidth() / 2.2);
-		Log.e("Draw", "Drawing: " + print);
+		Log.v("Draw", "Drawing: " + print);
 		switch(print){
 			case 0:
 				canvas.drawText("Loading", width, height, paint);
