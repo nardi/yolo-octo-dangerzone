@@ -45,7 +45,7 @@ public class Level extends GameObject {
 	private long updateTime = 0;
 	private double minTime = 1000/30;
 	private int diff;
-	private boolean fadeOut;
+	private boolean fadeOut, playing;
 	
 	//Coin[] coin = new Coin[bpm];
 	
@@ -104,7 +104,7 @@ public class Level extends GameObject {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
-		if(at != null && at.getState() == at.PLAYSTATE_PLAYING){
+		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
 			int now = 1000 * at.getPlaybackHeadPosition() / at.getSampleRate();
 			diff += now - t;
 			Log.e("diff", "Diff: " + diff);
@@ -116,7 +116,7 @@ public class Level extends GameObject {
 			t = now;
 		}
 		
-		if(at != null && at.getState() == at.PLAYSTATE_STOPPED){
+		if(at != null && at.getPlayState() == at.PLAYSTATE_STOPPED && playing){
 			AudioTrack temp = at;
 			at = null;
 			temp.release();
@@ -195,6 +195,7 @@ public class Level extends GameObject {
 	public void onRun(){
 		if (at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PAUSED){
 			at.play();
+			playing = true;
 		}
 	}
 }
