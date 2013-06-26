@@ -96,7 +96,8 @@ public class Level extends GameObject {
 		character.x = (int)(canvas.getWidth()/4.0);
 		character.addSprite(getParentFragment().getView());
 		
-		jumpButton.setPosition(75, canvas.getHeight() - 75);
+		if (jumpButton != null)
+			jumpButton.setPosition(75, canvas.getHeight() - 75);
 		
 		update = true;
 	}
