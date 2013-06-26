@@ -125,12 +125,14 @@ public class Menu extends GameObject {
 		};
 	}
 	
-	@Override
-	public void onDraw(Canvas canvas){
-		Paint paint = new Paint();
-		canvas.drawColor(Color.BLACK);
+	Paint paint = new Paint(); {
 		paint.setColor(Color.RED);
 		paint.setTextSize(40);
+	};
+	
+	@Override
+	public void onDraw(Canvas canvas){
+		canvas.drawColor(Color.BLACK);
 		int height = this.getParentFragment().getView().getHeight() / 2;
 		int width = (int) (this.getParentFragment().getView().getWidth() / 2.2);
 		switch(print){
@@ -154,15 +156,10 @@ public class Menu extends GameObject {
 	
 	@Override
 	public void onUpdate(long dt){
+		time += dt;
 		if(time > 750){
-			print++;
-			if(print > 3){
-				print = 0;
-			}
-			time = 0;
-		}
-		else{
-			time += dt;
+			print = (print + 1) % 4;
+			time = time % 750;
 		}
 	}
 	
