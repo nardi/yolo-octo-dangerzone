@@ -104,7 +104,7 @@ public class FFTBeatDetector implements BeatDetector{
 			s.beats.clear();
 			s.beats.addAll(lowBeats.subList(startBeat, endBeat));
 			if (s.intensity > maxSectionIntensity) {
-				maxSectionIntensity = s.intensity;
+				maxSectionIntensity = (float) s.intensity;
 			}
 		}
 
