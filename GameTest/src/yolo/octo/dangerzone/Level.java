@@ -16,7 +16,7 @@ import yolo.octo.dangerzone.core.GameObject;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
-import android.content.Context;
+import yolo.octo.dangerzone.lvlgen.Score;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -34,12 +34,13 @@ public class Level extends GameObject {
 
 	public Paint paint;
 	public Canvas canvas;
+	private Score score;
 
 	private AudioTrack at;
 	private Runnable mp3;
 	private LevelDraw lvlDraw;
 	private FloorBuffer buffer;
-	private Character character;
+	private Character character = new Character(0,0);
 	private Button jumpButton;
 	private boolean update = false;
 	private int speed = 4, bpm = 120;
@@ -47,21 +48,24 @@ public class Level extends GameObject {
 	private double minTime = 1000/30;
 	private int preloadTime = 0;
 	private int diff;
-	private boolean fadeOut, playing;
-
+	private boolean fadeOut;
+	
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length, String path) {
+		score = new Score();
 		paint = new Paint();
 		paint.setColor(Color.rgb(143,205,158));
 		paint.setTextSize(12);
-		lvlDraw = new LevelDraw();
+		lvlDraw = new LevelDraw(score);
 		Log.e("LvlGen", "Generating level");
-		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed, preloadTime);
+		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed);
 		lvlGen.generateLevel();
 		buffer = new FloorBuffer(lvlGen.level);
 		buffer.fillBuffer();
 		mp3 = playMp3(path);
+		addObject(character);
+		
 		new Thread(mp3).start();
 		diff = 0;
 		
@@ -75,8 +79,7 @@ public class Level extends GameObject {
 	}
 	
 	protected void onAttach() {
-		Context context = getParentFragment().getActivity();
-		jumpButton = new Button(context, 0, 0, 100, 100, Color.RED, "Jump");
+		jumpButton = new Button(getParentFragment().getActivity(), 0, 0, 100, 100, Color.RED, "Jump");
 		jumpButton.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent me) {
 				if (me.getActionMasked() == MotionEvent.ACTION_DOWN && character.jumping == false) {
@@ -92,9 +95,6 @@ public class Level extends GameObject {
 			}
 		});
 		addObject(jumpButton);
-		
-		character = new Character(context, 0,0);
-		addObject(character);
 	}
 
 	long t = 0;
@@ -109,8 +109,7 @@ public class Level extends GameObject {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
-		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
-			playing = true;
+		if(at != null && at.getState() == at.PLAYSTATE_PLAYING){
 			int now = 1000 * at.getPlaybackHeadPosition() / at.getSampleRate();
 			diff += now - t;
 			Log.e("diff", "Diff: " + diff);
@@ -122,7 +121,7 @@ public class Level extends GameObject {
 			t = now;
 		}
 		
-		if(at != null && at.getPlayState() == at.PLAYSTATE_STOPPED && playing){
+		if(at != null && at.getState() == at.PLAYSTATE_STOPPED){
 			AudioTrack temp = at;
 			at = null;
 			temp.release();
@@ -132,6 +131,7 @@ public class Level extends GameObject {
 		if(fadeOut){
 			buffer.update(speed);
 		}
+		
 	}
 	
 	@Override
@@ -140,6 +140,7 @@ public class Level extends GameObject {
 		lvlDraw.view = getParentFragment().getView();
 		lvlDraw.drawFromBuffer(buffer.getBuffer(), canvas);
 		character.x = (int)(canvas.getWidth()/4.0);
+		character.addSprite(getParentFragment().getView());
 	
 		if (jumpButton != null)
 			jumpButton.setPosition(75, canvas.getHeight() - 75);
@@ -169,11 +170,16 @@ public class Level extends GameObject {
 							md.getRate(), channels,
 							AudioFormat.ENCODING_PCM_16BIT, bufferSize,
 							AudioTrack.MODE_STREAM);
+<<<<<<< HEAD
 					int preloadSamples = md.getRate() * channels * preloadTime / 1000;
 					//short[] preloadBuffer = new short[preloadSamples];
 					
 					at.play();
 					//at.write(preloadBuffer, 0, preloadSamples);
+=======
+
+					at.play();
+>>>>>>> ac4bce94a95ef22346b3568defac18bd629e49a5
 					int readSamples = -1;
 					while (readSamples != 0) {
 						readSamples = md.readSamples(shortBuffer);

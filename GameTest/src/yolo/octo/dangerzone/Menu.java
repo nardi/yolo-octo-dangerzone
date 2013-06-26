@@ -40,27 +40,27 @@ public class Menu extends GameObject {
 	public boolean picking = false;
 	public boolean song = false;
 	Button pickASong;
-	Paint top;
-	Paint bottom;
-	Bitmap logo, 
-		   gameName;
+	Paint top,
+		  bottom;
+	Bitmap logo,
+		   pnp;
 	Resources res;
 	RectF logoRect,
-		  gameNameRect;
+		  pnpRect;
 	
 	protected void onAttach() {	
 		res = getParentFragment().getResources();
 		top = new Paint();
 		bottom = new Paint();
-		top.setColor(Color.rgb(183, 219, 149));
-		bottom.setColor(Color.rgb(127, 139, 197));
 		
 		logoRect = new RectF();
-		gameNameRect = new RectF();
+		pnpRect = new RectF();
 		
+		top.setColor(Color.rgb(183, 219, 149));
+		bottom.setColor(Color.rgb(127, 139, 197));
 		try {
-			this.logo = BitmapFactory.decodeResource(res, R.drawable.gezicht1);
-			this.gameName = BitmapFactory.decodeResource(res, R.drawable.logo);
+			this.logo = BitmapFactory.decodeResource(res, R.drawable.logo);
+			this.pnp = BitmapFactory.decodeResource(res, R.drawable.pnp);
 		} catch (Exception e){
 			Log.e("Menu", "Picca's falen!");
 		}
@@ -180,13 +180,11 @@ public class Menu extends GameObject {
 		
 		int height = this.getParentFragment().getView().getHeight();
 		int width = this.getParentFragment().getView().getWidth();
-		canvas.drawRect(0, height / 2, width, height, top);
-		canvas.drawRect(0, 0, width, height / 2, bottom);
+			
+		drawMenu(canvas, height, width);
 		
 		pickASong.setPosition(width / 2 , height / 2);
-		updateRects(height, width);
-		canvas.drawBitmap(logo, null, logoRect, null);
-		canvas.drawBitmap(gameName, null, gameNameRect, null);
+		/* Set by the button in the Main menu*/
 		if (picking) {
 			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		    intent.setType("audio/x-mp3");
@@ -194,32 +192,38 @@ public class Menu extends GameObject {
 		    getParentFragment().startActivityForResult(chooser, 1);
 		    picking = false;
 		}
+		
 		if (song) {
-		switch(print){
-			case 0:
-				pickASong.setText("Loading   ");
-				break;
-			case 1:
-				pickASong.setText("Loading.  ");
-				break;
-			case 2:
-				pickASong.setText("Loading.. ");
-				break;
-			case 3:
-				pickASong.setText("Loading...");
-				break;
-			default:
-				pickASong.setText("Loading");
-				break;
-		}
+			switch(print){
+				case 0:
+					pickASong.setText("Loading   ");
+					break;
+				case 1:
+					pickASong.setText("Loading.  ");
+					break;
+				case 2:
+					pickASong.setText("Loading.. ");
+					break;
+				case 3:
+					pickASong.setText("Loading...");
+					break;
+				default:
+					pickASong.setText("Loading");
+					break;
+			}
 		}
 	}
 	
-	private void updateRects (int height, int width) {
-		gameNameRect.set(0, 0, width, height / 4);
-		logoRect.set(0, height - (height / 5), width / 4, height);
-		// TODO Auto-generated method stub
+	/* Draws the menu*/
+	private void drawMenu (Canvas canvas, int height, int width) {
+		canvas.drawRect(0, height / 2, width, height, top);
+		canvas.drawRect(0, 0, width, height / 2, bottom);
 		
+		logoRect.set(0, 0, width, (float) (height / 3.5));
+		pnpRect.set(0, height - (height / 5), width / 3, height);
+		
+		canvas.drawBitmap(logo, null, logoRect, null);
+		canvas.drawBitmap(pnp, null, pnpRect, null);
 	}
 
 	@Override

@@ -30,12 +30,17 @@ public class LevelGenerator {
 		return y1 * (1 - cosFactor) + y2 * cosFactor;
 	}
 	
+	private float badassInterpolation(float y1, float y2, float factor) {
+		return y1 + factor * factor * (3 - 2 * factor) * (y2 - y1);
+	}
+	
 	/* generateLevel() will generate the level using the beat-data 
 	 * from the audio analysis.
 	 */
 	public void generateLevel() {
 		List<Beat> beats = bd.getBeats();
 		double tempo = bd.estimateTempo();
+		double beatSteps = 4 * (60000 / tempo) / (1000 / (speed * 30));
 		
 		/*
 		 * Interpoleren tussen 0 en eerste beat.
@@ -45,7 +50,8 @@ public class LevelGenerator {
 		level[firstBeatIndex] = 0;
 		for (int k = preload; k < firstBeatIndex; k++) {
 			float factor = (k - preload) / (float)(firstBeatIndex - preload);
-			level[k] = cosineInterpolation(0, level[firstBeatIndex], factor);
+			level[k] = badassInterpolation(0, level[firstBeatIndex], factor);
+			level[k] += factor * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
 		}
 		
 		/*
@@ -66,22 +72,19 @@ public class LevelGenerator {
 			
 			for (int k = beatIndex1 + 1; k < beatIndex2; k++) {
 				float factor = (k - beatIndex1) / (float)(beatIndex2 - beatIndex1);
-				level[k] = cosineInterpolation(level[beatIndex1], level[beatIndex2], factor);
+				level[k] = badassInterpolation(level[beatIndex1], level[beatIndex2], factor);
+				level[k] += -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
 			}
 		}
 		
 		/*
 		 * Interpoleren tussen laatste beat en einde array.
 		 */
-		int lastBeatIndex = timeToIndex(beats.get(beats.size() - 1).startTime);
+		int lastBeatIndex = timeToIndex(beats.get(beats.size() - 1).startTime);		
 		for (int k = (int) (lastBeatIndex - 1); k < level.length; k++) {
 			float factor = (k - lastBeatIndex) / (float)(level.length - 1 - lastBeatIndex);
-			level[k] = cosineInterpolation(level[lastBeatIndex], 0, factor);
+			level[k] = badassInterpolation(level[lastBeatIndex], 0, factor);
+			level[k] += (1 - factor) * -0.15f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
 		}		
-		
-		double beatSteps = 4 * (60000 / tempo) / (1000 / (speed * 30));
-		for (int i = 0; i < level.length; i++) {
-			level[i] = -0.15f * (float)Math.cos(2 * Math.PI * (i - firstBeatIndex) / beatSteps);
-		}
 	}
 }
