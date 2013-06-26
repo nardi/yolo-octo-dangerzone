@@ -125,19 +125,26 @@ public class Menu extends GameObject {
 		Paint paint = new Paint();
 		canvas.drawColor(Color.BLACK);
 		paint.setColor(Color.RED);
-		paint.setTextSize(25);
+		paint.setTextSize(40);
 		int height = this.getParentFragment().getView().getHeight() / 2;
-		int width = this.getParentFragment().getView().getWidth() / 2;
-		Log.e("Draw", "Drawing");
+		int width = (int) (this.getParentFragment().getView().getWidth() / 2.2);
+		Log.e("Draw", "Drawing: " + print);
 		switch(print){
 			case 0:
 				canvas.drawText("Loading", width, height, paint);
+				break;
 			case 1:
 				canvas.drawText("Loading.", width, height, paint);
+				break;
 			case 2:
 				canvas.drawText("Loading..", width, height, paint);
+				break;
 			case 3:
 				canvas.drawText("Loading...", width, height, paint);
+				break;
+			default:
+				canvas.drawText("Loading", width, height, paint);
+				break;
 		}
 	}
 	
