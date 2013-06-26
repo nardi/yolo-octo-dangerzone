@@ -42,9 +42,9 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	}
 	
 	public void addObject(GameObject go, int index) {
-		childObjects.add(index, go);
 		go.setParent(this);
 		go.onAttach();
+		childObjects.add(index, go);
 	}
 
 	public int removeObject(GameObject go) {

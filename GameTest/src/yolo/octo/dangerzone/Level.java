@@ -8,7 +8,6 @@ import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 import yolo.octo.dangerzone.core.GameFragment;
 import yolo.octo.dangerzone.core.GameObject;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
-import yolo.octo.dangerzone.lvlgen.FloorPoint;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import android.content.Intent;
@@ -25,12 +24,16 @@ public class Level extends GameObject {
 
 	public Paint paint;
 	public Canvas canvas;
-	LevelDraw lvlDraw;
-	FloorBuffer buffer;
-	Character character = new Character(0,0);
-	Button jumpButton;
-	boolean update = false;
-	int speed = 1, bpm = 120;
+
+	private LevelDraw lvlDraw;
+	private FloorBuffer buffer;
+	private Character character = new Character(0,0);
+	private Button jumpButton;
+	private boolean update = false;
+	private int speed = 1, bpm = 120;
+	private long updateTime = 0;
+	private double minTime = 1000/30;
+
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length) {
@@ -39,7 +42,7 @@ public class Level extends GameObject {
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw();
 		Log.e("LvlGen", "Generating level");
-		LevelGenerator lvlGen = new LevelGenerator(beatDet, length);
+		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed);
 		lvlGen.generateLevel();
 		buffer = new FloorBuffer(lvlGen.level);
 		buffer.fillBuffer();
@@ -83,8 +86,17 @@ public class Level extends GameObject {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
-		for (int i = 0; i < speed; i++) {
-			buffer.update();
+		
+		/* Based on the time the last update occurred, multiple updates could be skipped,
+		 * or it could prevent updating too fast.
+		 */
+		updateTime += dt;
+		if (updateTime > minTime) {
+			int x = (int)(updateTime / minTime);
+			for (int i = 0; i < speed; i++) {
+				buffer.update(x);
+			}
+			updateTime -= (int)(x * minTime);
 		}
 	}
 	
@@ -96,34 +108,12 @@ public class Level extends GameObject {
 		character.x = (int)(canvas.getWidth()/4.0);
 		character.addSprite(getParentFragment().getView());
 		
-		jumpButton.setPosition(75, canvas.getHeight() - 75);
+		if (jumpButton != null)
+			jumpButton.setPosition(75, canvas.getHeight() - 75);
 		
 		update = true;
 	}
 	
-	public FloorPoint[] generateDevs(){
-		boolean dinges  = true;
-		FloorPoint[] array = new FloorPoint[760];
-		
-		if(dinges){	
-			for (int i = 0; i < 40; i++) {
-				array[i] = new FloorPoint(0.0);
-			}
-			for (int i = 0; i < 360; i++) {
-				array[i+40] = new FloorPoint(Math.sin(Math.toRadians(i)));
-			}
-			for (int i = 0; i < 360; i++) {
-				array[i+400] = new FloorPoint(Math.sin(Math.toRadians(i)));
-			}
-		}
-		else{
-			Random random = new Random();
-			random.setSeed(42);
-			for(int i = 0; i < 400; i++){
-				array[i] = new FloorPoint(random.nextFloat());
-			}
-		}
-		return array;
-	}
+	
 		
 }

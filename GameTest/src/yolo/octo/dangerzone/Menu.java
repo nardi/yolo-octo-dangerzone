@@ -135,7 +135,7 @@ public class Menu extends GameObject {
 					
 					//Level level = new Level(bd);
 					Log.e("Switching", "Switching to Level");
-					length = md.getLength() / md.getRate();
+					length = 1000 * md.getLength() / md.getRate();
 					swapFor(new Level(bd, length));
 				} catch (Exception e) {
 					Log.e("loadLevel", "Oops!", e);
