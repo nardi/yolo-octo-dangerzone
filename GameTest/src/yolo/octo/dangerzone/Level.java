@@ -45,7 +45,7 @@ public class Level extends GameObject {
 	private int speed = 4, bpm = 120;
 	private long updateTime = 0;
 	private double minTime = 1000/30;
-	private int preloadTime = 1500;
+	private int preloadTime = 0;
 	private int diff;
 	private boolean fadeOut, playing;
 
@@ -170,10 +170,10 @@ public class Level extends GameObject {
 							AudioFormat.ENCODING_PCM_16BIT, bufferSize,
 							AudioTrack.MODE_STREAM);
 					int preloadSamples = md.getRate() * channels * preloadTime / 1000;
-					short[] preloadBuffer = new short[preloadSamples];
+					//short[] preloadBuffer = new short[preloadSamples];
 					
 					at.play();
-					at.write(preloadBuffer, 0, preloadSamples);
+					//at.write(preloadBuffer, 0, preloadSamples);
 					int readSamples = -1;
 					while (readSamples != 0) {
 						readSamples = md.readSamples(shortBuffer);
