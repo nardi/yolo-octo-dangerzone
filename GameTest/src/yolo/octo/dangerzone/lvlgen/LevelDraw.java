@@ -51,7 +51,6 @@ public class LevelDraw {
 			old.y = view.getHeight() * 2/3;
 			old.x = 150;
 			playerX = (int) ((view.getWidth()/4.0 * 399.0) / view.getWidth());
-			//Log.e("Navi", "" + playerX);
 		}
 		
 		paint.setStrokeWidth(10);

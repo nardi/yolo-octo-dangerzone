@@ -78,7 +78,7 @@ public class Character extends GameObject {
 		Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
 		 
 		return resizedBitmap;
-		}
+	}
 	
 	public void onDraw(Canvas canvas) {
 	//	canvas.drawCircle(x, y, radius, character);
