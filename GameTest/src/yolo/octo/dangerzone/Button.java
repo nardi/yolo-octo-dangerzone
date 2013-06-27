@@ -23,6 +23,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 
+/*
+ * Button
+ * Has a text field, color, position and size.
+ * Used in the game and in the menu. 
+ */
 public class Button extends GameObject {
 	float x, y, width, height;
 	Bitmap button1, button2;
@@ -40,6 +45,7 @@ public class Button extends GameObject {
 	}
 	String text;
 	
+	/* Constructor*/
 	public Button(Context context, float x, float y, float width, float height, int color, String text) {
 		this.x = x;
 		this.y = y;
@@ -51,6 +57,7 @@ public class Button extends GameObject {
 		setText(text);
 
 	    Resources res = context.getResources();
+	    /* Tries using the button pictures*/
 	    try {
 			this.button1 = BitmapFactory.decodeResource(res, R.drawable.button1);
 			this.button2 = BitmapFactory.decodeResource(res, R.drawable.button2);
@@ -58,7 +65,7 @@ public class Button extends GameObject {
 	        Log.e("Button", "Error is " + e);
 	    }
 	}
-	
+	/* Used to update the size and location of the button (only changes on a rotation)*/
 	private void updateRect() {
 		rect.left = x - width / 2;
 		rect.right = x + width / 2;
@@ -80,22 +87,25 @@ public class Button extends GameObject {
 		updateRect();
 	}
 	
+	/* Used to set the size*/
 	public void setSize(float width, float height) {
 		this.width = width;
 		this.height = height;
 		updateRect();
 	}
 	
+	/* Draws the button on the canvas*/
 	protected void onDraw(Canvas canvas) {
 		Bitmap button = pressed ? button2 : button1;	
 		canvas.drawBitmap(button, null, rect, paint);
 		canvas.drawText(text, x, y - ((textPaint.descent() + textPaint.ascent()) / 2), textPaint);
 	}
-
+	
+	/* Functions to handle the touch*/
 	public void setOnTouchListener(OnTouchListener otl) {
 		onTouchListener = otl;
 	}
-
+	
 	protected boolean onTouch(View v, MotionEvent me) {
 		if (rect.contains(me.getX(), me.getY())) {
 			return onTouchListener.onTouch(v, me);
