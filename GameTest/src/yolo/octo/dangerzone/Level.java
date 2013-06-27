@@ -146,12 +146,16 @@ public class Level extends GameObject {
 			diff += now - prevT;
 			//Log.e("diff", "Diff: " + diff);
 			int framesSkipped = 0;
+			
 			while(diff > minTime){
 				if(framesSkipped > 1){
 					Log.e("Update", " Skipped " + framesSkipped + " frames");
 				}
 				buffer.update(speed);
 				diff -= minTime;
+				if(diff < 1){
+					Log.e("Diff", "Diff<1");
+				}
 				framesSkipped++;
 			}
 			prevT = now;
