@@ -25,13 +25,12 @@ import android.view.View;
 public class FloorBuffer {
 	private int index;
 	private int bufferSize;
-
 	private int pointCounter = 0;
 	private int randomInt;
 	private int offset;
+	private float[] points;
 	private float[] buffer;
 	private PointF[] tempBuffer;
-	private float[] points;
 	private Random colGen = new Random();
 
 	
@@ -47,11 +46,10 @@ public class FloorBuffer {
 		fillBuffer();
 	}
 	
+	
 	/* Initialiseer de buffer met de eerste >bufferSize< aantal waardes.
 	 * Als er minder waardes dan dit zijn, wordt er een plat vlak gegenereerd.
 	 */
-	
-
 	private void fillBuffer() {
 		int toSkip = Math.min(bufferSize, offset);
 		offset -= toSkip;

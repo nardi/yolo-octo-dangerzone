@@ -22,7 +22,7 @@ public class LevelComplete extends GameObject {
 	protected void onAttach() {
 		Context context = getParentFragment().getActivity();
 		player = new Character(context, 0, 0);
-		octo = new Character(context, );
+		//octo = new Character(context, );
 	}
 	
 	public void onUpdate(long dt) {
