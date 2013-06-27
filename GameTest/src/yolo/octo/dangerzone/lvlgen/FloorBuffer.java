@@ -22,15 +22,17 @@ public class FloorBuffer {
 	private float[] buffer;
 	private PointF[] tempBuffer;
 	private float[] points;
+	private int offset;
 	
 	/* Initialiseer de waardes voor de buffer */
-	public FloorBuffer(float[] points) {
+	public FloorBuffer(float[] points, int offset) {
 		this.points = points;
 		index = 0;
 		bufferSize = 400;
 		buffer = new float[bufferSize];
 		tempBuffer = new PointF[bufferSize];
 		pointCounter = bufferSize;
+		this.offset = offset + 99;
 		
 		fillBuffer();
 	}
@@ -76,7 +78,13 @@ public class FloorBuffer {
 	 * punt op scherm naar aller rechter punt. 
 	 */
 	public PointF[] getBuffer() {
-		for (int i = index, j = 0; j < bufferSize; i++, j++) {
+		int j = 0;
+		while (offset > 0 && j < bufferSize) {
+			tempBuffer[j] = new PointF();
+			offset--;
+			j++;
+		}
+		for (int i = index; j < bufferSize; i++, j++) {
 			i %= bufferSize;
 			tempBuffer[j] = new PointF();
 			tempBuffer[j].y = buffer[i];	

@@ -14,9 +14,9 @@ public class LevelGenerator {
 	
 	/* Constructor class - creates the level generator
 	 */
-	public LevelGenerator(BeatDetector bd, long length, int speed, int preload) {
+	public LevelGenerator(BeatDetector bd, long length, int speed) {
 		this.speed = speed;
-		this.preload = 99 + preload / (1000 / (speed * 30));
+		this.preload = 0;
 		level = new float[(int)(this.preload + (length / (1000 / (speed * 30))))];
 		this.bd = bd;
 	}
@@ -53,8 +53,8 @@ public class LevelGenerator {
 		level[firstBeatIndex] = 0;
 		for (int k = preload; k < firstBeatIndex; k++) {
 			float factor = (k - preload) / (float)(firstBeatIndex - preload);
-			level[k] = level[firstBeatIndex] * factor;
-			//level[k] = cosineInterpolation(0, level[firstBeatIndex], factor);
+			//level[k] = level[firstBeatIndex] * factor;
+			level[k] = badassInterpolation(0, level[firstBeatIndex], factor);
 			//level[k] += factor * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
 		}
 		
@@ -71,13 +71,24 @@ public class LevelGenerator {
 				level[beatIndex2] = level[beatIndex1] + beat2.intensity;
 			else
 				level[beatIndex2] = level[beatIndex1] - beat2.intensity; */
-			
-			level[beatIndex2] = 0.7f * beat2.intensity * (i % 2 == 0 ? 1 : -1);
+
+			switch (i % 4) {
+				case 0:
+				case 2:
+					level[beatIndex2] = 0;
+					break;
+				case 1:
+					level[beatIndex2] = beat2.intensity;
+					break;
+				case 3:
+					level[beatIndex2] = beat2.intensity;
+					break;
+			}
 			
 			for (int k = beatIndex1 + 1; k < beatIndex2; k++) {
 				float factor = (k - beatIndex1) / (float)(beatIndex2 - beatIndex1);
-				level[k] = level[beatIndex1] * (1 - factor) + level[beatIndex2] * factor;
-				//level[k] = cosineInterpolation(level[beatIndex1], level[beatIndex2], factor);
+				//level[k] = level[beatIndex1] * (1 - factor) + level[beatIndex2] * factor;
+				level[k] = badassInterpolation(level[beatIndex1], level[beatIndex2], factor);
 				//level[k] += -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
 			}
 		}
@@ -88,8 +99,8 @@ public class LevelGenerator {
 		int lastBeatIndex = timeToIndex(beats.get(beats.size() - 1).startTime);		
 		for (int k = (int) (lastBeatIndex - 1); k < level.length; k++) {
 			float factor = (k - lastBeatIndex) / (float)(level.length - 1 - lastBeatIndex);
-			level[k] = level[lastBeatIndex] * (1 - factor);
-			//level[k] = cosineInterpolation(level[lastBeatIndex], 0, factor);
+			//level[k] = level[lastBeatIndex] * (1 - factor);
+			level[k] = badassInterpolation(level[lastBeatIndex], 0, factor);
 			//level[k] += (1 - factor) * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
 		}		
 	}
