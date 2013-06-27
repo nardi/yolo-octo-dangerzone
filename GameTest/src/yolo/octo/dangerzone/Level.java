@@ -184,7 +184,7 @@ public class Level extends GameObject {
 				AudioTrack.MODE_STREAM);
 		int updatePeriod = md.getRate() / 30;
 		// Dingen synchroon laten lopen met de muziek is lastig, dit lijkt te werken
-		audioTrack.setPositionNotificationPeriod((int)(updatePeriod * 0.965));
+		audioTrack.setPositionNotificationPeriod((int)(updatePeriod * 0.97));
 		audioTrack.setPlaybackPositionUpdateListener(onAudioUpdate);
 		return new Runnable() {
 			public void run() {
