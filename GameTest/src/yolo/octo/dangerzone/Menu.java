@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.media.AudioFormat;
@@ -219,11 +220,29 @@ public class Menu extends GameObject {
 		canvas.drawRect(0, height / 2, width, height, top);
 		canvas.drawRect(0, 0, width, height / 2, bottom);
 		
-		logoRect.set(0, 0, width, (float) (height / 3.5));
+		//logoRect.set(0, 0, width, (float) (height / 3.5));
+		logo = getResizedBitmap(logo, height/2, height);
+		//logoRect.set(0, 0, width, (float) (logo.getHeight()/(height/3.5)));
 		pnpRect.set(0, height - (height / 5), width / 3, height);
 		
-		canvas.drawBitmap(logo, null, logoRect, null);
+		//canvas.drawBitmap(logo, null, logoRect, null);
 		canvas.drawBitmap(pnp, null, pnpRect, null);
+		
+		float left = (width/2) - (logo.getWidth()/2);
+		
+		canvas.drawBitmap(logo, left, 0, null);
+	}
+	
+	public Bitmap getResizedBitmap(Bitmap bm, double newHeight, int deviceHeight) {
+		int bitmapHeight = bm.getHeight();
+		int bitmapWidth = bm.getWidth();
+
+		// scale According to HEIGHT
+		int scaledHeight = (int)newHeight;
+		int scaledWidth = (scaledHeight * bitmapWidth) / bitmapHeight; 
+		bm = Bitmap.createScaledBitmap(bm, scaledWidth, scaledHeight, true);
+		 
+		return bm;
 	}
 
 	@Override
