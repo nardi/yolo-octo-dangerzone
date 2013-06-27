@@ -43,18 +43,11 @@ public class Level extends GameObject {
 	private Character character;
 	private Button jumpButton;
 	private boolean update = false;
-	private int bpm = 120;
-	private long updateTime = 0;
-	private long minTime = 33;
 	private int preloadTime = 0;
-	private long diff = 0;
-	private long prevT = 0;
 	private boolean fadeOut;
 	private LevelGenerator lvlGen;
-
 	private LevelComplete end;
-	//Coin[] coin = new Coin[bpm];
-	
+		
 	public Level(BeatDetector beatDet, long length, String path) {
 		this(new LevelGenerator(beatDet, length, speed), path);
 		try{
@@ -67,13 +60,6 @@ public class Level extends GameObject {
 		}catch(Exception ex){
 			Log.e("OutPutStream", "Could not save level to a file because: ", ex);
 		}
-		
-		/*
-		for (int i = 0; i < bpm; i++) {
-			coin[i] = new Coin(i*400, 200);
-			coin[i].speed = speed + (speed/3);
-			addObject(coin[i]);
-		} */
 	}
 	
 	public Level(LevelGenerator lvlGen, String path) {
@@ -122,8 +108,7 @@ public class Level extends GameObject {
 	public void onUpdate(long dt) {
 		if (update && !character.jumping) {
 			character.y = lvlDraw.getHeight() - 100;
-			//float height = (this.getView().getHeight() * 2/3) - 45;
-			//character.y = -1*(buffer.getHeight(this.getView())) + height;
+			
 		} else if (update) {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
