@@ -127,15 +127,14 @@ public class LevelGenerator implements Serializable {
 
 		}
 		
-		/* if (!sections.isEmpty()) {
+		if (!sections.isEmpty()) {
 			Section firstSection = sections.get(0);
 			int firstSectionIndex = timeToIndex(firstSection.startTime);
-			level[firstSectionIndex] += firstSection.intensity;
+			float prevSectionIntensity = firstSection.intensity * firstSectionIndex / 400f;
+			level[firstSectionIndex] += prevSectionIntensity;
 			for (int k = preload; k < firstSectionIndex; k++) {
 				float factor = (k - preload) / (float)(firstSectionIndex - preload);
-				//level[k] = level[firstBeatIndex] * factor;
-				level[k] += linearInterpolation(0, level[firstSectionIndex], factor);
-				//level[k] += factor * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
+				level[k] += badassInterpolation(0, prevSectionIntensity, factor);
 			}
 			
 			for (int i = 0; i < sections.size() - 1; i++) {
@@ -144,24 +143,29 @@ public class LevelGenerator implements Serializable {
 				Section section2 = sections.get(i + 1);
 				int sectionIndex2 = timeToIndex(section2.startTime);
 				
-				level[sectionIndex2] += (section2.intensity - section1.intensity);
+				float curSectionIntensity;				
+				if (section1.intensity > section2.intensity) {
+					curSectionIntensity = section2.intensity / 3;
+				} else {
+					curSectionIntensity = section2.intensity / 2;
+				}
+				level[sectionIndex2] += curSectionIntensity;
 				
 				for (int k = sectionIndex1 + 1; k < sectionIndex2; k++) {
 					float factor = (k - sectionIndex1) / (float)(sectionIndex2 - sectionIndex1);
-					//level[k] = level[sectionIndex1] * (1 - factor) + level[sectionIndex2] * factor;
-					level[k] += linearInterpolation(level[sectionIndex1], level[sectionIndex2], factor);
-					//level[k] += -0.10f * (float)Math.cos(2 * Math.PI * (k - firstSectionIndex) / sectionSteps);
+					level[k] += badassInterpolation(prevSectionIntensity, curSectionIntensity, factor);
 				}
+				
+				prevSectionIntensity = curSectionIntensity;
 			}
 			
-			int lastSectionIndex = timeToIndex(sections.get(sections.size() - 1).startTime);		
+			Section lastSection = sections.get(sections.size() - 1);
+			int lastSectionIndex = timeToIndex(lastSection.startTime);		
 			for (int k = lastSectionIndex + 1; k < level.length; k++) {
 				float factor = (k - lastSectionIndex) / (float)(level.length - 1 - lastSectionIndex);
-				//level[k] = level[lastSectionIndex] * (1 - factor);
-				level[k] += linearInterpolation(level[lastSectionIndex], 0, factor);
-				//level[k] += (1 - factor) * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstSectionIndex) / sectionSteps);
+				level[k] += badassInterpolation(prevSectionIntensity, 0, factor);
 			}
-		} */
+		}
 	}
 	
 	public float[] getLevel(){

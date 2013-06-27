@@ -1,11 +1,13 @@
 package yolo.octo.dangerzone.lvlgen;
 
 import yolo.octo.dangerzone.Character;
+import yolo.octo.dangerzone.core.GameObject;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.View;
 
-public class Collectable {
+public class Collectable extends GameObject {
 	private int type;
 	private float radius;
 	private int reward;
@@ -15,17 +17,19 @@ public class Collectable {
 	private Paint paint;
 	private static Score score;
 	private static Character character;
+	private View view;
 	
 	
-	
-	public Collectable(int type, int locIndex) {
+	public Collectable(int type, int locIndex, View view) {
 		this.type = type;
 		this.radius = 30;
 		
 		
 		//TODO: Zet locIndex (index in buffer) om in X.
 		// locIndex is waarde in buffer van links naar rechts: 0 tot 399, 0 is links en 399 is rechts.
-		
+		if(view != null){
+			this.x = (float)((view.getWidth() / 399.0) * locIndex);
+		}
 		//this.x =
 		
 		switch (type) {
@@ -65,7 +69,9 @@ public class Collectable {
 	
 	public void onUpdate(long dt) {
 		// TODO: Update x
-		
+		if(view != null){
+			this.x -= (float)(view.getWidth() / 399.0);
+		}
 		
 		checkColission();
 	}

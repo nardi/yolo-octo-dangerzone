@@ -77,9 +77,9 @@ public class Character extends GameObject {
 	/* If the character is in 'jump' mode, updateY changes the vertical position
 	 * depending on the direction and speed.
 	 */
-	private void updateY(long dt) {		   
-		y -= (dt/5) *speed;       
-		speed -= (dt/17) * gravity;   
+	private void updateY(long dt) {
+		y -= (dt/5f) * speed;       
+		speed -= (dt/17f) * gravity;
 		if(y > groundY){
 		    y = groundY;
 		    speed = 5.0; 

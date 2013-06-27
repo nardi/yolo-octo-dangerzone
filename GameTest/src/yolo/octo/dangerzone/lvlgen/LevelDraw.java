@@ -26,7 +26,6 @@ public class LevelDraw {
 	private int y = 50;
 	private int playerX;
 	private float playerY;
-	private Coin[] coin = new Coin[120];
 	
 	/* Constructor for a level drawer.
 	 */
@@ -104,8 +103,8 @@ public class LevelDraw {
 		
 		for (int i = 0; i < buffer.length; i++) {
 			translate(buffer[i]);
-			if (buffer[i].y < view.getHeight() * (1/6f)) {
-				float newTY = view.getHeight() * (1/6f) - buffer[i].y;
+			if (buffer[i].y < view.getHeight() * (0.35f)) {
+				float newTY = view.getHeight() * (0.35f) - buffer[i].y;
 				if (newTY > translateY)
 					translateY = newTY;
 			}
@@ -148,4 +147,7 @@ public class LevelDraw {
 		return playerY;
 	}
 	
+	public View getView(){
+		return this.view;
+	}
 }

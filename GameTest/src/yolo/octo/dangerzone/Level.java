@@ -6,15 +6,17 @@ import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+import java.util.Random;
+
 import nobleworks.libmpg.MP3Decoder;
 
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.core.GameObject;
+import yolo.octo.dangerzone.lvlgen.Collectable;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import yolo.octo.dangerzone.lvlgen.Score;
-import yolo.octo.dangerzone.lvlgen.Coin;
 import android.content.Context;
 
 import android.graphics.Canvas;
@@ -43,18 +45,12 @@ public class Level extends GameObject {
 	private Character character;
 	private Button jumpButton;
 	private boolean update = false;
-	private int bpm = 120;
-	private long updateTime = 0;
-	private long minTime = 33;
 	private int preloadTime = 0;
-	private long diff = 0;
-	private long prevT = 0;
 	private boolean fadeOut;
 	private LevelGenerator lvlGen;
-
+	private Random colGen = new Random();
 	private LevelComplete end;
-	//Coin[] coin = new Coin[bpm];
-	
+		
 	public Level(BeatDetector beatDet, long length, String path) {
 		this(new LevelGenerator(beatDet, length, speed), path);
 		try{
@@ -67,13 +63,6 @@ public class Level extends GameObject {
 		}catch(Exception ex){
 			Log.e("OutPutStream", "Could not save level to a file because: ", ex);
 		}
-		
-		/*
-		for (int i = 0; i < bpm; i++) {
-			coin[i] = new Coin(i*400, 200);
-			coin[i].speed = speed + (speed/3);
-			addObject(coin[i]);
-		} */
 	}
 	
 	public Level(LevelGenerator lvlGen, String path) {
@@ -94,8 +83,6 @@ public class Level extends GameObject {
 		Context context = getParentFragment().getActivity();
 		
 		character = new Character(context, 0, 0);
-		Coin coin = new Coin(0,0);
-		addObject(coin);
 		addObject(character);
 		
 		jumpButton = new Button(context, 0, 0, 100, 100, Color.RED, "Jump");
@@ -122,8 +109,7 @@ public class Level extends GameObject {
 	public void onUpdate(long dt) {
 		if (update && !character.jumping) {
 			character.y = lvlDraw.getHeight() - 100;
-			//float height = (this.getView().getHeight() * 2/3) - 45;
-			//character.y = -1*(buffer.getHeight(this.getView())) + height;
+			
 		} else if (update) {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
@@ -147,6 +133,12 @@ public class Level extends GameObject {
 		@Override
 		public void onPeriodicNotification(AudioTrack arg0) {
 			buffer.update(speed);
+			int randomInt = colGen.nextInt(100);
+			if (randomInt <= 3) {
+				//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
+				//addObject(new Collectable(randomInt, 399, lvlDraw.getView()));
+				// Geef 399 mee!!! (Want hij moe trechts beginnen
+			}
 		}
 		@Override
 		public void onMarkerReached(AudioTrack arg0) {
@@ -188,7 +180,7 @@ public class Level extends GameObject {
 				AudioTrack.MODE_STREAM);
 		int updatePeriod = md.getRate() / 30;
 		// Dingen synchroon laten lopen met de muziek is lastig, dit lijkt te werken
-		audioTrack.setPositionNotificationPeriod((int)(updatePeriod * 0.97));
+		audioTrack.setPositionNotificationPeriod((int)(updatePeriod * 0.969));
 		audioTrack.setPlaybackPositionUpdateListener(onAudioUpdate);
 		return new Runnable() {
 			public void run() {

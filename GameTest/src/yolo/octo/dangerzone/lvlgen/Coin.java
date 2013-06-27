@@ -42,9 +42,6 @@ public class Coin extends GameObject {
 		if (character != null) {
 			
 			
-			/* # is X by Y. Iets in X*Y moet in coin vallen. 
-			 * PosX + X >= coin.x 
-			 */
 			
 			
 			position = character.getCharacterPos();
