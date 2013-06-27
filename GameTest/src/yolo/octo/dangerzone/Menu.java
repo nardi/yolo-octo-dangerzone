@@ -149,7 +149,7 @@ public class Menu extends GameObject {
 						ObjectInputStream lvlImporter = new ObjectInputStream(input);
 						LevelGenerator lvlGen = (LevelGenerator) lvlImporter.readObject();
 						lvlImporter.close();
-						level = new Level(bd, length, path, lvlGen);
+						level = new Level(lvlGen, path);
 						ready = true;
 						Log.e("Import", "Succes!");
 						
@@ -194,11 +194,6 @@ public class Menu extends GameObject {
 							Log.i("bt", "Beat at " + b.startTime + ", intensity: " + b.intensity);
 						for (Section s : bd.getSections())
 							Log.i("bt", "Section from " + s.startTime + " to " + s.endTime + ", intensity: " + s.intensity);
-						
-						/* Stop elevator, start elevator bell */
-						elevator.stop();
-						MediaPlayer bell = MediaPlayer.create(context, R.raw.elevator_bell);
-						bell.start();
 						
 						//Level level = new Level(bd);
 						Log.e("Switching", "Switching to Level");

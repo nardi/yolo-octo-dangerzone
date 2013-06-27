@@ -1,21 +1,14 @@
 package yolo.octo.dangerzone;
 
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
-import java.util.Random;
-
 import nobleworks.libmpg.MP3Decoder;
 
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
-import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
-import yolo.octo.dangerzone.core.GameFragment;
 import yolo.octo.dangerzone.core.GameObject;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
@@ -23,35 +16,35 @@ import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import yolo.octo.dangerzone.lvlgen.Score;
 import yolo.octo.dangerzone.lvlgen.Coin;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
-import android.os.Bundle;
+import android.media.AudioTrack.OnPlaybackPositionUpdateListener;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
 public class Level extends GameObject {
-
+	private static final int speed = 8;
+	
 	public Paint paint;
 	public Canvas canvas;
 	private Score score;
 
 	private AudioTrack at;
-	private Runnable mp3;
+	private String path;
 	private LevelDraw lvlDraw;
 	private FloorBuffer buffer;
 	private Character character;
 	private Button jumpButton;
 	private boolean update = false;
-	private int speed = 8, bpm = 120;
+	private int bpm = 120;
 	private long updateTime = 0;
-	private double minTime = 1/30.0;
+	private long minTime = 33;
 	private int preloadTime = 0;
 	private long diff = 0;
 	private long prevT = 0;
@@ -61,15 +54,7 @@ public class Level extends GameObject {
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length, String path) {
-		score = new Score();
-		paint = new Paint();
-		paint.setColor(Color.rgb(143,205,158));
-		paint.setTextSize(12);
-		lvlDraw = new LevelDraw(score);
-		Log.e("LvlGen", "Generating level");
-
-		lvlGen = new LevelGenerator(beatDet, length, speed);
-		lvlGen.generateLevel();
+		this(new LevelGenerator(beatDet, length, speed), path);
 		try{
 			String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
 			Log.e("OutPutStream", "Path: " + savedPath);
@@ -81,10 +66,6 @@ public class Level extends GameObject {
 			Log.e("OutPutStream", "Could not save level to a file because: ", ex);
 		}
 		
-		int preloadPoints = preloadTime / (1000 / (speed * 30));
-		buffer = new FloorBuffer(lvlGen.getLevel(), preloadPoints);
-		mp3 = playMp3(path);
-		
 		/*
 		for (int i = 0; i < bpm; i++) {
 			coin[i] = new Coin(i*400, 200);
@@ -93,7 +74,7 @@ public class Level extends GameObject {
 		} */
 	}
 	
-	public Level(BeatDetector beatDet, long length, String path, LevelGenerator lvlGen) {
+	public Level(LevelGenerator lvlGen, String path) {
 		this.lvlGen = lvlGen;
 		score = new Score();
 		paint = new Paint();
@@ -103,9 +84,10 @@ public class Level extends GameObject {
 		
 		int preloadPoints = preloadTime / (1000 / (speed * 30));
 		buffer = new FloorBuffer(lvlGen.getLevel(), preloadPoints);
-		mp3 = playMp3(path);
+		
+		this.path = path;
 	}
-	
+
 	protected void onAttach() {
 		Context context = getParentFragment().getActivity();
 		
@@ -131,7 +113,7 @@ public class Level extends GameObject {
 		});
 		
 		addObject(jumpButton);
-		new Thread(mp3).start();
+		new Thread(playMp3(path)).start();
 	}
 	
 	@Override
@@ -142,22 +124,6 @@ public class Level extends GameObject {
 			//character.y = -1*(buffer.getHeight(this.getView())) + height;
 		} else if (update) {
 			character.groundY = lvlDraw.getHeight() - 100;
-		}
-		
-		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
-			long now = 1000L * at.getPlaybackHeadPosition() / at.getSampleRate();
-			diff += now - prevT;
-			//Log.e("diff", "Diff: " + diff);
-			int framesSkipped = 0;
-			while(diff > minTime){
-				if(framesSkipped > 1){
-					Log.e("Update", " Skipped " + framesSkipped + " frames");
-				}
-				buffer.update(speed);
-				diff -= minTime;
-				framesSkipped++;
-			}
-			prevT = now;
 		}
 		
 		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_STOPPED){
@@ -174,6 +140,16 @@ public class Level extends GameObject {
 		
 	}
 	
+	private OnPlaybackPositionUpdateListener onAudioUpdate = new OnPlaybackPositionUpdateListener() {
+		@Override
+		public void onPeriodicNotification(AudioTrack arg0) {
+			buffer.update(speed);
+		}
+		@Override
+		public void onMarkerReached(AudioTrack arg0) {
+		}
+	};
+	
 	@Override
 	public void onDraw(Canvas canvas){
 		canvas.drawColor(Color.rgb(124,139,198));
@@ -188,27 +164,31 @@ public class Level extends GameObject {
 	}
 	
 	private Runnable playMp3(final String path) {
+		final MP3Decoder md = new MP3Decoder(path);
+		
+		int afChannels = AudioFormat.CHANNEL_OUT_DEFAULT;
+		switch (md.getNumChannels()) {
+			case 1: afChannels = AudioFormat.CHANNEL_OUT_MONO; break;
+			case 2: afChannels = AudioFormat.CHANNEL_OUT_STEREO; break;
+		}
+		final int bufferSize = AudioTrack.getMinBufferSize(md.getRate(),
+				afChannels, AudioFormat.ENCODING_PCM_16BIT);
+		final short[] buffer = new short[bufferSize];
+		ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(bufferSize * 2);
+		// Audio data is little endian, so for correct bytes -> short conversion:
+		nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+		final ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+		final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+				md.getRate(), afChannels,
+				AudioFormat.ENCODING_PCM_16BIT, bufferSize,
+				AudioTrack.MODE_STREAM);
+		int updatePeriod = md.getRate() / 30;
+		// Dingen synchroon laten lopen met de muziek is lastig, dit lijkt te werken
+		audioTrack.setPositionNotificationPeriod((int)(updatePeriod * 0.965));
+		audioTrack.setPlaybackPositionUpdateListener(onAudioUpdate);
 		return new Runnable() {
 			public void run() {
 				try {
-					MP3Decoder md = new MP3Decoder(path);
-					
-					int afChannels = AudioFormat.CHANNEL_OUT_DEFAULT;
-					switch (md.getNumChannels()) {
-						case 1: afChannels = AudioFormat.CHANNEL_OUT_MONO; break;
-						case 2: afChannels = AudioFormat.CHANNEL_OUT_STEREO; break;
-					}
-					int bufferSize = AudioTrack.getMinBufferSize(md.getRate(),
-							afChannels, AudioFormat.ENCODING_PCM_16BIT);
-					short[] buffer = new short[bufferSize];
-					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(bufferSize * 2);
-					// Audio data is little endian, so for correct bytes -> short conversion:
-					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
-					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
-					AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-							md.getRate(), afChannels,
-							AudioFormat.ENCODING_PCM_16BIT, bufferSize,
-							AudioTrack.MODE_STREAM);
 					int preloadSamples = md.getRate() * md.getNumChannels() * preloadTime / 1000;
 					short[] preloadBuffer = new short[preloadSamples];
 					
@@ -224,9 +204,9 @@ public class Level extends GameObject {
 						at.write(buffer, 0, readSamples);
 						Log.v("playMp3", "Wrote " + readSamples + " samples");
 					}
-					/* TODO Stopping here leaves no guarantee everything has been
+					/* Stopping here leaves no guarantee everything has been
 					 * played, but whatever */ 
-					//at.stop();
+					at.stop();
 					Log.d("playMp3", "Done decoding!");
 				} catch (Exception e) {
 					Log.e("playMp3", "Oops!", e);
