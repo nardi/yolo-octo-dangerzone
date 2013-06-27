@@ -18,12 +18,12 @@ import android.util.Log;
 import android.view.View;
 
 public class Character extends GameObject {
-	private double height=0, speed=5.0;
-	float x, y, groundY, radius = 40;
-	Bitmap sprite;
-	boolean jumping = false;
-	boolean direction = false;
-	long previous = 0, start = 0;
+	private double speed=5.0;
+	public float x, y, groundY, radius = 40;
+	private Bitmap sprite;
+	public boolean jumping = false;
+	public boolean direction = false;
+	private long previous = 0, start = 0;
 	
 	public static final double gravity = 0.3;
 	
@@ -81,5 +81,9 @@ public class Character extends GameObject {
 	//	canvas.drawCircle(x, y, radius, character);
 		canvas.drawBitmap(sprite, x-50, y, null);
 	}
-
+	
+	public float[] getCharacterPos() {
+		float[] pos = {x, y, radius};
+		return pos;
+	}
 }
