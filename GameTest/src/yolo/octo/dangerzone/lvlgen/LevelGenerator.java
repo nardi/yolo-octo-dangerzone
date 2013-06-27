@@ -24,7 +24,10 @@ public class LevelGenerator {
 	private int timeToIndex(long time) {
 		return (int)(preload + time / (1000 / (speed * 30)));
 	}
-	
+	/* Deze is dus niet nodig*/
+	private float regularInterpolation (float y1, float y2, float factor) {
+		return y1 + ((y2 - y1) * factor);
+	}
 	private float cosineInterpolation(float y1, float y2, float factor) {
 		float cosFactor = (float)((1 - Math.cos(factor * Math.PI)) / 2);
 		return y1 * (1 - cosFactor) + y2 * cosFactor;
