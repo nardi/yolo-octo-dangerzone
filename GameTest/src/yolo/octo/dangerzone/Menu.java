@@ -69,8 +69,9 @@ public class Menu extends GameObject {
 		logoRect = new RectF();
 		pnpRect = new RectF();
 		
-		top.setColor(Color.rgb(183, 219, 149));
-		bottom.setColor(Color.rgb(127, 139, 197));
+		top.setColor(Color.rgb(127, 139, 197));
+		bottom.setColor(Color.rgb(183, 219, 149));
+		
 		try {
 			this.logo = BitmapFactory.decodeResource(res, R.drawable.logo);
 			this.pnp = BitmapFactory.decodeResource(res, R.drawable.pnp);
@@ -266,8 +267,9 @@ public class Menu extends GameObject {
 	
 	/* Draws the menu*/
 	private void drawMenu (Canvas canvas, int height, int width) {
-		canvas.drawRect(0, height / 2, width, height, top);
-		canvas.drawRect(0, 0, width, height / 2, bottom);
+		canvas.drawRect(0, 0, width, height / 2, top);
+		canvas.drawRect(0, height / 2, width, height, bottom);
+		
 		
 		pnp = getResizedBitmap(pnp, height/5, height, width);
 		canvas.drawBitmap(pnp, 0, (height/5 )*4, null);
