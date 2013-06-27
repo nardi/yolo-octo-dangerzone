@@ -31,7 +31,6 @@ public class FloorBuffer {
 	private float[] points;
 	private float[] buffer;
 	private PointF[] tempBuffer;
-	private Random colGen = new Random();
 
 	
 	/* Initialiseer de waardes voor de buffer */
@@ -58,11 +57,6 @@ public class FloorBuffer {
 				buffer[i] = points[pointCounter];
 				pointCounter++;
 				
-				randomInt = colGen.nextInt(100);
-				if (randomInt <= 3) {
-					//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
-					// Geef i mee!!!
-				}
 			}
 			else {
 				buffer[i] = 0;
@@ -79,11 +73,7 @@ public class FloorBuffer {
 			if (offset > 0)
 				offset--;
 			
-			randomInt = colGen.nextInt(100);
-			if (randomInt <= 3) {
-				//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
-				// Geef 399 mee!!! (Want hij moe trechts beginnen
-			}
+			
 
 		}
 		else {

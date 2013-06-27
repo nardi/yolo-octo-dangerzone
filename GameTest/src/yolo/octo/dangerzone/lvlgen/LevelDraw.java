@@ -26,7 +26,6 @@ public class LevelDraw {
 	private int y = 50;
 	private int playerX;
 	private float playerY;
-	private Coin[] coin = new Coin[120];
 	
 	/* Constructor for a level drawer.
 	 */
@@ -148,4 +147,7 @@ public class LevelDraw {
 		return playerY;
 	}
 	
+	public View getView(){
+		return this.view;
+	}
 }

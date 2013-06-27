@@ -6,15 +6,17 @@ import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
+import java.util.Random;
+
 import nobleworks.libmpg.MP3Decoder;
 
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.core.GameObject;
+import yolo.octo.dangerzone.lvlgen.Collectable;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import yolo.octo.dangerzone.lvlgen.Score;
-import yolo.octo.dangerzone.lvlgen.Coin;
 import android.content.Context;
 
 import android.graphics.Canvas;
@@ -46,6 +48,7 @@ public class Level extends GameObject {
 	private int preloadTime = 0;
 	private boolean fadeOut;
 	private LevelGenerator lvlGen;
+	private Random colGen = new Random();
 	private LevelComplete end;
 		
 	public Level(BeatDetector beatDet, long length, String path) {
@@ -80,8 +83,6 @@ public class Level extends GameObject {
 		Context context = getParentFragment().getActivity();
 		
 		character = new Character(context, 0, 0);
-		Coin coin = new Coin(0,0);
-		addObject(coin);
 		addObject(character);
 		
 		jumpButton = new Button(context, 0, 0, 100, 100, Color.RED, "Jump");
@@ -132,6 +133,12 @@ public class Level extends GameObject {
 		@Override
 		public void onPeriodicNotification(AudioTrack arg0) {
 			buffer.update(speed);
+			int randomInt = colGen.nextInt(100);
+			if (randomInt <= 3) {
+				//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
+				//addObject(new Collectable(randomInt, 399, lvlDraw.getView()));
+				// Geef 399 mee!!! (Want hij moe trechts beginnen
+			}
 		}
 		@Override
 		public void onMarkerReached(AudioTrack arg0) {
