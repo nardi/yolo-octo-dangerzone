@@ -56,7 +56,7 @@ public class Level extends GameObject {
 	private double prevT = 0;
 	private boolean fadeOut;
 	private LevelGenerator lvlGen;
-	
+	private LevelComplete end;
 	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length, String path) {
@@ -166,6 +166,7 @@ public class Level extends GameObject {
 		
 		if(fadeOut){
 			buffer.update(speed);
+			//switch
 		}
 		
 	}

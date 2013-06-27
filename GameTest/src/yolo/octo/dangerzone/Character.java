@@ -48,6 +48,19 @@ public class Character extends GameObject {
 	    } 
 	}
 	
+	public Character(Context context, float x, float y, int temp) {
+		this.x = x;
+		this.groundY = y;
+		this.y = y;
+		
+	    Resources res = context.getResources();
+	    try {
+			Bitmap spriteBig = BitmapFactory.decodeResource(res, R.drawable.octo);
+			this.sprite = getResizedBitmap(spriteBig, 100, 100);
+	    } catch (Exception e) {
+	        Log.d("kak","Error is " + e);
+	    } 	
+	}
 	protected void onUpdate(long dt){
 		if (jumping) {
 			updateY(dt);
