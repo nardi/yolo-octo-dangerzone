@@ -26,6 +26,8 @@ public class LevelGenerator implements Serializable {
 		this.preload = 0;
 		level = new float[(int)(this.preload + (length / (1000 / (speed * 30))))];
 		this.bd = bd;
+		
+		generateLevel();
 	}
 	
 	private int timeToIndex(long time) {
@@ -90,7 +92,7 @@ public class LevelGenerator implements Serializable {
 			else
 				level[beatIndex2] = level[beatIndex1] - beat2.intensity; */
 
-			level[beatIndex2] = beat2.intensity * (i % 2 == 0 ? 1 : -1);
+			level[beatIndex2] = 0.7f * beat2.intensity * (i % 2 == 0 ? 1 : -1);
 			
 			/* switch (i % 4) {
 				case 0:

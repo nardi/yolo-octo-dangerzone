@@ -22,7 +22,7 @@ public class FFTBeatDetector implements BeatDetector{
 	/* Constructor*/
 	public FFTBeatDetector(int sampleRate, int channels, int bufferSize) {
 		fft = new FFT(bufferSize, sampleRate);
-		fft.window(FFT.NONE);
+		fft.window(FFT.HAMMING);
 		fft.noAverages();
 		
 		lowFrequency = new SimpleBeatDetector(sampleRate, channels);
@@ -39,7 +39,7 @@ public class FFTBeatDetector implements BeatDetector{
 		/* Only the low frequency range is used to find a beat*/
 		boolean lowBeat = lowFrequency.newEnergy(fft.calcAvg(80, 230), 1024);
 		highFrequency.newEnergy(fft.calcAvg(9000, 17000), 1024);
-		midFrequency.newEnergy(fft.calcAvg(280, 2000), 1024);
+		midFrequency.newEnergy(fft.calcAvg(280, 2800), 1024);
 		return lowBeat;
 	}
 	
@@ -127,9 +127,9 @@ public class FFTBeatDetector implements BeatDetector{
 			}
 		}
 		/* Scales the intensities in the sections to fall between 0 and 1*/
-		for (Section s : midFrequency.getSections()) {
+		/* for (Section s : midFrequency.getSections()) {
 			s.intensity /= maxSectionIntensity;
-		}
+		} */
 	}
 	
 	@Override
@@ -147,6 +147,8 @@ public class FFTBeatDetector implements BeatDetector{
 	@Override
 	/* Only the middle frequency range is used for the section*/
 	public List<Section> getSections() {
+		if (midFrequency.getSections().isEmpty())
+			return lowFrequency.getSections();
 		return midFrequency.getSections();
 	}
 }
