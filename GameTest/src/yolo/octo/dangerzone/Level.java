@@ -33,7 +33,7 @@ public class Level extends GameObject {
 	private static final int speed = 8;
 	
 	public Paint paint;
-	public Canvas canvas;
+	//public Canvas canvas;
 	private Score score;
 
 	private AudioTrack at;
@@ -121,8 +121,9 @@ public class Level extends GameObject {
 		}
 		
 		if(fadeOut){
+			end = new LevelComplete(score);
 			buffer.update(speed);
-			//switch
+			swapFor(end);
 		}
 		
 	}
