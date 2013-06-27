@@ -48,10 +48,10 @@ public class Level extends GameObject {
 	private Character character;
 	private Button jumpButton;
 	private boolean update = false;
-	private int speed = 4, bpm = 120;
+	private int speed = 8, bpm = 120;
 	private long updateTime = 0;
 	private double minTime = 1000/30;
-	private int preloadTime = 0;
+	private int preloadTime = 1500;
 	private int diff = 0;
 	private long prevT = 0;
 	private boolean fadeOut;
@@ -78,7 +78,7 @@ public class Level extends GameObject {
 			
 		}catch(Exception e){
 			Log.e("Import", "Could not import level, generating new one");
-			lvlGen = new LevelGenerator(beatDet, length, speed, preloadTime);
+			lvlGen = new LevelGenerator(beatDet, length, speed);
 			lvlGen.generateLevel();
 			try{
 				Log.e("OutPutStream", "Path: " + savedPath);
@@ -92,11 +92,11 @@ public class Level extends GameObject {
 			
 		}
 		
-		buffer = new FloorBuffer(lvlGen.getLevel());
-		buffer.fillBuffer();
+		int preloadPoints = preloadTime / (1000 / (speed * 30));
+		buffer = new FloorBuffer(lvlGen.getLevel(), preloadPoints);
 		mp3 = playMp3(path);
 		
-		new Thread(mp3).start();
+		
 		
 		
 		/*
@@ -128,7 +128,9 @@ public class Level extends GameObject {
 				return true;
 			}
 		});
+		
 		addObject(jumpButton);
+		new Thread(mp3).start();
 	}
 	
 	@Override
