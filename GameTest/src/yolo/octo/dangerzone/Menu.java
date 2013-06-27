@@ -7,6 +7,7 @@ import java.nio.ShortBuffer;
 
 import nobleworks.libmpg.MP3Decoder;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -20,6 +21,7 @@ import android.graphics.RectF;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -51,6 +53,8 @@ public class Menu extends GameObject {
 		  pnpRect;
 	Level level;
 	
+	Context context;
+	
 	protected void onAttach() {	
 		
 		res = getParentFragment().getResources();
@@ -70,7 +74,10 @@ public class Menu extends GameObject {
 			Log.e("Menu", "Picca's falen!");
 		}
 		
+		context = getParentFragment().getActivity().getApplicationContext();
+
 		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.RED, "Pick a Song");
+
 		pickASong.setOnTouchListener(new OnTouchListener() {
 				public boolean onTouch(View v, MotionEvent me) {
 					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && !song) {
@@ -128,6 +135,8 @@ public class Menu extends GameObject {
 			public void run() {
 				try {
 					song = true;
+					MediaPlayer elevator = MediaPlayer.create(context, R.raw.elevator);
+					elevator.start();
 					MP3Decoder md = new MP3Decoder(path);
 					int fftBufferSize = 1024;
 					int bufferSize = fftBufferSize * 100;
@@ -169,9 +178,18 @@ public class Menu extends GameObject {
 					
 					//Level level = new Level(bd);
 					Log.e("Switching", "Switching to Level");
+					
+					/* Stop elevator, start elevator bell */
+					elevator.stop();
+					MediaPlayer bell = MediaPlayer.create(context, R.raw.elevator_bell);
+					bell.start();
+					
 					length = 1000 * md.getLength() / md.getRate();
 					level = new Level(bd, length, path);
 					ready = true;
+					
+
+					
 				} catch (Exception e) {
 					Log.e("loadLevel", "Oops!", e);
 				}
@@ -202,7 +220,9 @@ public class Menu extends GameObject {
 		    picking = false;
 		}
 		
+
 		if (ready) {
+			
 			pickASong.setText("Start Playing");
 		}
 		else if (song) {
