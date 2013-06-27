@@ -64,55 +64,6 @@ public class LevelDraw {
 		canvas.drawText("Score: " + score, 10, 40, text);
 	}
 	
-	/* drawFloor() is in charge of displaying the level on the screen. 
-	 */
-	public void drawFloor(PointF newp, Canvas canvas){
-		
-		/* If this is the first time the level is drawn, a few variables are 
-		 * initialized. 
-		 */
-		if (init) {
-			init = false;
-			old.y = view.getHeight() * 2/3;
-			playerX = (int) ((view.getWidth()/4.0 * 399.0) / view.getWidth());
-		}
-		
-		paint.setStrokeWidth(10);
-		
-		/* Draw a line from the previous point to the current point,
-		 * and save the current points for the next line.
-		 */
-		if(old.x >= 0 && old.y > 0){
-			canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
-		}
-		
-		old.x = newp.x;
-		old.y = newp.y;
-	}
-	
-	/* drawFloor() is in charge of displaying the level on the screen. 
-	 */
-	public void drawFloor(PointF newp, Paint brush, Canvas canvas){
-		
-		/* If this is the first time the level is drawn, a few variables are 
-		 * initialized. 
-		 */
-		if (init) {
-			init = false;
-			old.y = view.getHeight() * 2/3;
-			playerX = (int) ((view.getWidth()/4.0 * 399.0) / view.getWidth());
-		}
-		
-		/* Draw a line from the previous point to the current point,
-		 * and save the current points for the next line.
-		 */
-		if(old.x >= 0 && old.y > 0){
-			canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
-		}
-		old.x = newp.x;
-		old.y = newp.y;
-	}
-	
 	
 	/* The translate() function translates the values in the array to 
 	 * coordinates on the screen. 
@@ -135,19 +86,21 @@ public class LevelDraw {
 		return dev;
 	}
 	
-	/*
-	 * Calls drawFloor with values from the ring-buffer.
+	/* drawFromBuffer() draws a path using values retrieved from the ring-buffer.
 	 */
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
+		
+		/* Initialises a few values ont he first draw
+		 */
 		if (init) {
 			init = false;
 			old.y = view.getHeight() * 2/3;
-			old.x = 150;
 			playerX = (int)(399/4f);
 		}
 		float translateY = 0;
 		
 		drawScore(score.getScore(), canvas);
+		
 		
 		for (int i = 0; i < buffer.length; i++) {
 			translate(buffer[i]);
@@ -157,16 +110,19 @@ public class LevelDraw {
 					translateY = newTY;
 			}
 		}
+		
+		/* Retrieves the Y-value of the player's location.
+		 */
 		playerY = buffer[playerX].y + translateY;
 		
+		/* Draw the paths between the points
+		 */
 		Path path = new Path();
 		path.moveTo(buffer[0].x, buffer[0].y);
 		
-		
 		for (int i = 1; i < buffer.length; i++) {
 			path.lineTo(buffer[i].x, buffer[i].y);
-			
-			
+				
 			if (i != playerX) {
 				//drawFloor(buf, canvas);
 				//fillFloor(buf, canvas);
@@ -184,6 +140,10 @@ public class LevelDraw {
 		old.y = -1;
 	}
 	
+	
+	/* Returns the Y-value for the player, used with jumping and drawing the 
+	 * character.
+	 */
 	public float getHeight() {
 		return playerY;
 	}
