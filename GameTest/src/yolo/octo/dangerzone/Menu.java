@@ -38,8 +38,9 @@ public class Menu extends GameObject {
 	public long length;
 	public int time, print;
 	private String path;
-	public boolean picking = false;
-	public boolean song = false;
+	public boolean picking = false,
+				   song = false,
+				   ready = false;
 	Button pickASong;
 	Paint top,
 		  bottom;
@@ -48,6 +49,7 @@ public class Menu extends GameObject {
 	Resources res;
 	RectF logoRect,
 		  pnpRect;
+	Level level;
 	
 	protected void onAttach() {	
 		
@@ -68,11 +70,14 @@ public class Menu extends GameObject {
 			Log.e("Menu", "Picca's falen!");
 		}
 		
-		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.RED, "Song");
+		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.RED, "Pick a Song");
 		pickASong.setOnTouchListener(new OnTouchListener() {
 				public boolean onTouch(View v, MotionEvent me) {
-					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && song == false) {
+					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && !song) {
 						picking = true;
+					}
+					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && ready) {
+						swapFor(level);
 					}
 					if (me.getActionMasked() == MotionEvent.ACTION_UP) {
 					}
@@ -165,7 +170,8 @@ public class Menu extends GameObject {
 					//Level level = new Level(bd);
 					Log.e("Switching", "Switching to Level");
 					length = 1000 * md.getLength() / md.getRate();
-					swapFor(new Level(bd, length, path));
+					level = new Level(bd, length, path);
+					ready = true;
 				} catch (Exception e) {
 					Log.e("loadLevel", "Oops!", e);
 				}
@@ -196,7 +202,10 @@ public class Menu extends GameObject {
 		    picking = false;
 		}
 		
-		if (song) {
+		if (ready) {
+			pickASong.setText("Start Playing");
+		}
+		else if (song) {
 			switch(print){
 				case 0:
 					pickASong.setText("Loading   ");
@@ -215,6 +224,7 @@ public class Menu extends GameObject {
 					break;
 			}
 		}
+		
 	}
 	
 	/* Draws the menu*/
@@ -261,7 +271,6 @@ public class Menu extends GameObject {
 		}
 	}
 	
-
 	public void wanneerGebruikerOpButtonDruktOfzo() {
 		// verkrijg mp3 pad voor Level
 		this.swapFor(new Level(bd, length, path));
