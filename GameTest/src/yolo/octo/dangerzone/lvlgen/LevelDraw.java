@@ -92,10 +92,12 @@ public class LevelDraw {
 	//}
 	
 	public PointF translate(PointF dev){
+		int height = Math.min(view.getWidth(), view.getHeight());
+		
 		if(view != null){
-			dev.x = (float)((view.getWidth() /399.0) * dev.x);
+			dev.x = (float)((view.getWidth() / 399.0) * dev.x);
 			
-			dev.y = (float)((view.getHeight() * (2.0/3.0)) - (dev.y * (1.0/5.0) * view.getHeight()));
+			dev.y = (float)((view.getHeight() * (2f/3f)) - (dev.y * (2f/7f) * height));
 			return dev;
 		}
 		Log.e("View", "View == null");
