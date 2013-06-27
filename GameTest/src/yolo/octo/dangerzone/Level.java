@@ -23,6 +23,9 @@ import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import yolo.octo.dangerzone.lvlgen.Score;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -56,8 +59,6 @@ public class Level extends GameObject {
 	private double prevT = 0;
 	private boolean fadeOut;
 	private LevelGenerator lvlGen;
-	
-	//Coin[] coin = new Coin[bpm];
 	
 	public Level(BeatDetector beatDet, long length, String path) {
 		score = new Score();
@@ -172,6 +173,7 @@ public class Level extends GameObject {
 	
 	@Override
 	public void onDraw(Canvas canvas){
+		
 		canvas.drawColor(Color.rgb(124,139,198));
 		lvlDraw.view = getParentFragment().getView();
 		lvlDraw.drawFromBuffer(buffer.getBuffer(), canvas);
