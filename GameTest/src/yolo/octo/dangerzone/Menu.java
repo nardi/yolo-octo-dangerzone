@@ -195,6 +195,11 @@ public class Menu extends GameObject {
 						for (Section s : bd.getSections())
 							Log.i("bt", "Section from " + s.startTime + " to " + s.endTime + ", intensity: " + s.intensity);
 						
+						/* Stop elevator, start elevator bell */
+						elevator.stop();
+						MediaPlayer bell = MediaPlayer.create(context, R.raw.elevator_bell);
+						bell.start();
+						
 						//Level level = new Level(bd);
 						Log.e("Switching", "Switching to Level");
 						length = 1000 * md.getLength() / md.getRate();
