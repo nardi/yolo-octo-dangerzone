@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -49,6 +50,8 @@ public class GameFragment extends Fragment
 	
 	protected final List<GameObject> childObjects = new ArrayList<GameObject>();
 	private boolean iterating = false;
+	private SparseArray<GameObject> objectsToAdd = new SparseArray<GameObject>();
+	private int listSizeToBe = 0;
 	private List<GameObject> objectsToRemove = new ArrayList<GameObject>();
 	
 	private Paint statsPaint = new Paint();
@@ -84,24 +87,46 @@ public class GameFragment extends Fragment
 	}
 	
 	public void addObject(GameObject go) {
-		addObject(go, childObjects.size());
+		addObject(go, listSizeToBe);
 	}
 	
 	public void addObject(GameObject go, int index) {
 		go.setParentFragment(this);
 		go.attach();
-		childObjects.add(index, go);
+		if (iterating) {
+			objectsToAdd.put(index, go);
+			listSizeToBe++;
+		}
+		else {
+			childObjects.add(index, go);
+			listSizeToBe = childObjects.size();
+		}
 	}
 
 	public int removeObject(GameObject go) {
 		int index = childObjects.indexOf(go);
-		if (iterating)
+		if (iterating) {
+			listSizeToBe--;
 			objectsToRemove.add(go);
-		else
+		}
+		else {
 			childObjects.remove(go);
+			listSizeToBe = childObjects.size();
+		}
 		if (go.getParentFragment() == this)
 			go.setParentFragment(null);
 		return index;
+	}
+	
+	private void checkAndAdd() {
+		if (objectsToAdd.size() != 0) {
+			for (int i = 0; i < objectsToAdd.size(); i++) {
+				int index = objectsToAdd.keyAt(i);
+				GameObject go = objectsToAdd.valueAt(i);
+				childObjects.add(index, go);
+			}
+			objectsToAdd.clear();
+		}
 	}
 	
 	private void checkAndRemove() {
@@ -150,6 +175,7 @@ public class GameFragment extends Fragment
 			for (GameObject go : childObjects)
 				go.run();
 			iterating = false;
+			checkAndAdd();
 			checkAndRemove();
 			running = true;
 			if (thread.getState() != Thread.State.NEW) {
@@ -168,6 +194,7 @@ public class GameFragment extends Fragment
 		for (GameObject go : childObjects)
 			go.halt();
 		iterating = false;
+		checkAndAdd();
 		checkAndRemove();
 		running = false;
 	}
@@ -197,6 +224,7 @@ public class GameFragment extends Fragment
 		for (GameObject go : childObjects)
 			go.update(dt);
 		iterating = false;
+		checkAndAdd();
 		checkAndRemove();
 		postUpdate(dt);
 	}
@@ -213,6 +241,7 @@ public class GameFragment extends Fragment
 		for (GameObject go : childObjects)
 			go.draw(canvas);
 		iterating = false;
+		checkAndAdd();
 		checkAndRemove();
 		postDraw(canvas);
 	}
@@ -228,6 +257,7 @@ public class GameFragment extends Fragment
 		for (GameObject go : childObjects)
 			eventUsed |= go.touch(v, me);
 		iterating = false;
+		checkAndAdd();
 		checkAndRemove();
 		return eventUsed;
 	}
