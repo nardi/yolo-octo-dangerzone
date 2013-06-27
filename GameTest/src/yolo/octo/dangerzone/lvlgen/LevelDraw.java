@@ -34,6 +34,7 @@ public class LevelDraw {
 		old = new PointF(0 , 0);
 		this.score = score;
 	}
+	
 	/*
 	 * Following are the drawing functions for the level. Each function can 
 	 * either use the standard paint or the given paint. The drawFloor functions
