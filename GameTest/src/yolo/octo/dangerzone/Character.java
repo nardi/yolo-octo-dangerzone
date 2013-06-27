@@ -52,10 +52,10 @@ public class Character extends GameObject {
 	    Collectable.setCharacter(this);
 	}
 	
-	public Character(Context context, float x, float y, int temp) {
+	public Character(Context context, float x, float y, int floatOffset) {
 		this.x = x;
 		this.groundY = y;
-		this.y = y;
+		this.y = y + floatOffset;
 		
 	    Resources res = context.getResources();
 	    try {
