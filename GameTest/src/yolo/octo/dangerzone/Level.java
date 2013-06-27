@@ -67,7 +67,7 @@ public class Level extends GameObject {
 		buffer = new FloorBuffer(lvlGen.level, preloadPoints);
 		mp3 = playMp3(path);
 		
-		new Thread(mp3).start();
+		
 		
 		
 		/*
@@ -99,7 +99,9 @@ public class Level extends GameObject {
 				return true;
 			}
 		});
+		
 		addObject(jumpButton);
+		new Thread(mp3).start();
 	}
 	
 	@Override
