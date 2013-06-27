@@ -7,6 +7,7 @@ import java.nio.ShortBuffer;
 
 import nobleworks.libmpg.MP3Decoder;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -20,6 +21,7 @@ import android.graphics.RectF;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -49,6 +51,8 @@ public class Menu extends GameObject {
 	RectF logoRect,
 		  pnpRect;
 	
+	Context context;
+	
 	protected void onAttach() {	
 		
 		res = getParentFragment().getResources();
@@ -67,6 +71,8 @@ public class Menu extends GameObject {
 		} catch (Exception e){
 			Log.e("Menu", "Picca's falen!");
 		}
+		
+		context = getParentFragment().getActivity().getApplicationContext();
 		
 		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.RED, "Song");
 		pickASong.setOnTouchListener(new OnTouchListener() {
@@ -123,6 +129,8 @@ public class Menu extends GameObject {
 			public void run() {
 				try {
 					song = true;
+					MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.elevator);
+					mediaPlayer.start();
 					MP3Decoder md = new MP3Decoder(path);
 					int fftBufferSize = 1024;
 					int bufferSize = fftBufferSize * 100;
@@ -165,6 +173,7 @@ public class Menu extends GameObject {
 					//Level level = new Level(bd);
 					Log.e("Switching", "Switching to Level");
 					length = 1000 * md.getLength() / md.getRate();
+					mediaPlayer.stop();
 					swapFor(new Level(bd, length, path));
 				} catch (Exception e) {
 					Log.e("loadLevel", "Oops!", e);
@@ -197,6 +206,8 @@ public class Menu extends GameObject {
 		}
 		
 		if (song) {
+
+			
 			switch(print){
 				case 0:
 					pickASong.setText("Loading   ");
