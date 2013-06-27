@@ -1,7 +1,11 @@
 package yolo.octo.dangerzone;
 
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -61,9 +65,34 @@ public class Level extends GameObject {
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw(score);
 		Log.e("LvlGen", "Generating level");
-		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed, preloadTime);
-		lvlGen.generateLevel();
-		buffer = new FloorBuffer(lvlGen.level);
+		String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
+		LevelGenerator lvlGen;
+		
+		try{
+			Log.e("Import", "Trying to import level");
+			FileInputStream input = this.getParentFragment().getActivity().openFileInput(savedPath);
+			ObjectInputStream lvlImporter = new ObjectInputStream(input);
+			lvlGen = (LevelGenerator) lvlImporter.readObject();
+			lvlImporter.close();
+			Log.e("Import", "Succes!");
+			
+		}catch(Exception e){
+			Log.e("Import", "Could not import level, generating new one");
+			lvlGen = new LevelGenerator(beatDet, length, speed, preloadTime);
+			lvlGen.generateLevel();
+			try{
+				Log.e("OutPutStream", "Path: " + savedPath);
+				FileOutputStream output = Application.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
+				ObjectOutputStream lvlSaver = new ObjectOutputStream(output);
+				lvlSaver.writeObject(lvlGen);
+				lvlSaver.close();
+			}catch(Exception ex){
+				Log.e("OutPutStream", "Could not save level to a file because: ", ex);
+			}
+			
+		}
+		
+		buffer = new FloorBuffer(lvlGen.getLevel());
 		buffer.fillBuffer();
 		mp3 = playMp3(path);
 		
@@ -115,11 +144,15 @@ public class Level extends GameObject {
 		if(at != null && at.getPlayState() == at.PLAYSTATE_PLAYING){
 			long now = 1000L * at.getPlaybackHeadPosition() / at.getPlaybackRate();
 			diff += now - prevT;
-			Log.e("diff", "Diff: " + diff);
+			//Log.e("diff", "Diff: " + diff);
+			int framesSkipped = 0;
 			while(diff > 33){
-				Log.e("Update", " Updating buffer");
+				if(framesSkipped > 1){
+					Log.e("Update", " Skipped " + framesSkipped + " frames");
+				}
 				buffer.update(speed);
 				diff -= 33;
+				framesSkipped++;
 			}
 			prevT = now;
 		}
