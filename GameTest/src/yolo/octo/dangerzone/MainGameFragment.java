@@ -8,7 +8,7 @@ public class MainGameFragment extends GameFragment {
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        setTargetFps(60);
+        setTargetFps(30);
         //this.showStats = true;
         
 		addObject(new Menu());
