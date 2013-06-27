@@ -220,16 +220,11 @@ public class Menu extends GameObject {
 		canvas.drawRect(0, height / 2, width, height, top);
 		canvas.drawRect(0, 0, width, height / 2, bottom);
 		
-		//logoRect.set(0, 0, width, (float) (height / 3.5));
-		logo = getResizedBitmap(logo, height/2, height);
-		//logoRect.set(0, 0, width, (float) (logo.getHeight()/(height/3.5)));
 		pnpRect.set(0, height - (height / 5), width / 3, height);
-		
-		//canvas.drawBitmap(logo, null, logoRect, null);
 		canvas.drawBitmap(pnp, null, pnpRect, null);
 		
+		logo = getResizedBitmap(logo, height/2, height);
 		float left = (width/2) - (logo.getWidth()/2);
-		
 		canvas.drawBitmap(logo, left, 0, null);
 	}
 	
@@ -237,7 +232,7 @@ public class Menu extends GameObject {
 		int bitmapHeight = bm.getHeight();
 		int bitmapWidth = bm.getWidth();
 
-		// scale According to HEIGHT
+		/* scale bitmap looking at a new height */
 		int scaledHeight = (int)newHeight;
 		int scaledWidth = (scaledHeight * bitmapWidth) / bitmapHeight; 
 		bm = Bitmap.createScaledBitmap(bm, scaledWidth, scaledHeight, true);
