@@ -82,7 +82,7 @@ public class Level extends GameObject {
 			lvlGen.generateLevel();
 			try{
 				Log.e("OutPutStream", "Path: " + savedPath);
-				FileOutputStream output = Application.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
+				FileOutputStream output = App.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
 				ObjectOutputStream lvlSaver = new ObjectOutputStream(output);
 				lvlSaver.writeObject(lvlGen);
 				lvlSaver.close();
