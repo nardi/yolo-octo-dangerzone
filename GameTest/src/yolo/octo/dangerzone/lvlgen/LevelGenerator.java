@@ -132,7 +132,7 @@ public class LevelGenerator implements Serializable {
 				for (int k = sectionIndex1 + 1; k < sectionIndex2; k++) {
 					float factor = (k - sectionIndex1) / (float)(sectionIndex2 - sectionIndex1);
 					//level[k] = level[sectionIndex1] * (1 - factor) + level[sectionIndex2] * factor;
-					level[k] = linearInterpolation(level[sectionIndex1], level[sectionIndex2], factor);
+					level[k] += linearInterpolation(level[sectionIndex1], level[sectionIndex2], factor);
 					//level[k] += -0.10f * (float)Math.cos(2 * Math.PI * (k - firstSectionIndex) / sectionSteps);
 				}
 			}
@@ -141,7 +141,7 @@ public class LevelGenerator implements Serializable {
 			for (int k = lastSectionIndex + 1; k < level.length; k++) {
 				float factor = (k - lastSectionIndex) / (float)(level.length - 1 - lastSectionIndex);
 				//level[k] = level[lastSectionIndex] * (1 - factor);
-				level[k] = linearInterpolation(level[lastSectionIndex], 0, factor);
+				level[k] += linearInterpolation(level[lastSectionIndex], 0, factor);
 				//level[k] += (1 - factor) * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstSectionIndex) / sectionSteps);
 			}
 		}
