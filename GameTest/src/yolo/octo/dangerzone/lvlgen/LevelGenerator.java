@@ -124,7 +124,6 @@ public class LevelGenerator implements Serializable {
 			//level[k] = level[lastBeatIndex] * (1 - factor);
 			level[k] = badassInterpolation(level[lastBeatIndex], 0, factor);
 			//level[k] += (1 - factor) * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
-
 		}
 		
 		if (!sections.isEmpty()) {
@@ -145,7 +144,7 @@ public class LevelGenerator implements Serializable {
 				
 				float curSectionIntensity;				
 				if (section1.intensity > section2.intensity) {
-					curSectionIntensity = section2.intensity / 3;
+					curSectionIntensity = section2.intensity / 5;
 				} else {
 					curSectionIntensity = section2.intensity / 2;
 				}
