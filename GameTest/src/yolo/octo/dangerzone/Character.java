@@ -72,8 +72,8 @@ public class Character extends GameObject {
 	}
 	
 	private void updateY(long dt) {		   
-		y -= (dt/5) *speed;       
-		speed -= (dt/20) * gravity;   
+		y -= (dt/5f) *speed;       
+		speed -= (dt/20f) * gravity;   
 		if(y > groundY){
 		    y = groundY;
 		    speed = 5.0; 
