@@ -43,12 +43,11 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	
 	public void addObject(GameObject go, int index) {
 		go.setParent(this);
-		go.onAttach();
+		go.attach();
 		childObjects.add(index, go);
 	}
 
 	public int removeObject(GameObject go) {
-		go.onDetach();
 		int index = childObjects.indexOf(go);
 		if (iterating)
 			objectsToRemove.add(go);
@@ -134,5 +133,46 @@ public class GameObject implements Drawable, Updateable, Touchable {
 	}
 	
 	protected void onAttach() {}
-	protected void onDetach() {}
+	
+	public final void attach() {
+		onAttach();
+		iterating = true;
+		for (GameObject go : childObjects)
+			go.attach();
+		iterating = false;
+		checkAndRemove();
+	}
+	
+	protected void onRun() {}
+	
+	public final void run() {
+		onRun();
+		iterating = true;
+		for (GameObject go : childObjects)
+			go.run();
+		iterating = false;
+		checkAndRemove();
+	}
+	
+	protected void onHalt() {}
+	
+	public final void halt() {
+		onHalt();
+		iterating = true;
+		for (GameObject go : childObjects)
+			go.halt();
+		iterating = false;
+		checkAndRemove();
+	}
+	
+	protected void onResize(int width, int height) {}
+	
+	public final void resize(int width, int height) {
+		onResize(width, height);
+		iterating = true;
+		for (GameObject go : childObjects)
+			go.resize(width, height);
+		iterating = false;
+		checkAndRemove();
+	}
 }

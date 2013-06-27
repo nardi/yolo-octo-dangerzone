@@ -9,6 +9,8 @@
 
 package yolo.octo.dangerzone.lvlgen;
 
+import java.util.Random;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,16 +19,20 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.media.AudioTrack;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 
 public class FloorBuffer {
 	private int index;
 	private int bufferSize;
 	private int pointCounter = 0;
+	private int randomInt;
+	private int offset;
+	private float[] points;
 	private float[] buffer;
 	private PointF[] tempBuffer;
-	private float[] points;
-	private int offset;
+	private Random colGen = new Random();
+
 	
 	/* Initialiseer de waardes voor de buffer */
 	public FloorBuffer(float[] points, int offset) {
@@ -40,6 +46,7 @@ public class FloorBuffer {
 		fillBuffer();
 	}
 	
+	
 	/* Initialiseer de buffer met de eerste >bufferSize< aantal waardes.
 	 * Als er minder waardes dan dit zijn, wordt er een plat vlak gegenereerd.
 	 */
@@ -50,6 +57,12 @@ public class FloorBuffer {
 			if (pointCounter < points.length) {
 				buffer[i] = points[pointCounter];
 				pointCounter++;
+				
+				randomInt = colGen.nextInt(100);
+				if (randomInt <= 3) {
+					//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
+					// Geef i mee!!!
+				}
 			}
 			else {
 				buffer[i] = 0;
@@ -60,10 +73,18 @@ public class FloorBuffer {
 	
 	/* Vervangt het meest linker punt met het nieuwe, meest rechter punt. */
 	public void update() {
+
 		if (offset > 0 || pointCounter >= points.length) {
 			buffer[index] = 0;
 			if (offset > 0)
 				offset--;
+			
+			randomInt = colGen.nextInt(100);
+			if (randomInt <= 3) {
+				//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
+				// Geef 399 mee!!! (Want hij moe trechts beginnen
+			}
+
 		}
 		else {
 			buffer[index] = points[pointCounter];

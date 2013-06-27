@@ -89,12 +89,11 @@ public class GameFragment extends Fragment
 	
 	public void addObject(GameObject go, int index) {
 		go.setParentFragment(this);
-		go.onAttach();
+		go.attach();
 		childObjects.add(index, go);
 	}
 
 	public int removeObject(GameObject go) {
-		go.onDetach();
 		int index = childObjects.indexOf(go);
 		if (iterating)
 			objectsToRemove.add(go);
@@ -147,6 +146,11 @@ public class GameFragment extends Fragment
 	public synchronized void run() {
 		if (!running) {
 			onRun();
+			iterating = true;
+			for (GameObject go : childObjects)
+				go.run();
+			iterating = false;
+			checkAndRemove();
 			running = true;
 			if (thread.getState() != Thread.State.NEW) {
 				thread = new GameThread();
@@ -160,6 +164,11 @@ public class GameFragment extends Fragment
 	
 	public void postHalt() {
 		onHalt();
+		iterating = true;
+		for (GameObject go : childObjects)
+			go.halt();
+		iterating = false;
+		checkAndRemove();
 		running = false;
 	}
 	
@@ -322,6 +331,11 @@ public class GameFragment extends Fragment
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		onResize(width, height);
+		iterating = true;
+		for (GameObject go : childObjects)
+			go.resize(width, height);
+		iterating = false;
+		checkAndRemove();
 	}
 	
 	@Override
