@@ -1,14 +1,15 @@
 package yolo.octo.dangerzone.lvlgen;
 
+import java.io.Serializable;
 import java.util.List;
 
 import yolo.octo.dangerzone.beatdetection.Beat;
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.Section;
 
-public class LevelGenerator {
-	public float[] level;
-	private BeatDetector bd;
+public class LevelGenerator implements Serializable {
+	private float[] level;
+	private transient BeatDetector bd;
 	//Indices per second
 	private int speed;
 	private int preload;
@@ -144,5 +145,9 @@ public class LevelGenerator {
 				//level[k] += (1 - factor) * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstSectionIndex) / sectionSteps);
 			}
 		}
+	}
+	
+	public float[] getLevel(){
+		return this.level;
 	}
 }
