@@ -239,7 +239,7 @@ public class Menu extends GameObject {
 		/* scale bitmap looking at a new height */
 		int scaledHeight = (int)newHeight;
 		int scaledWidth = (scaledHeight * bitmapWidth) / bitmapHeight; 
-		
+	
 		try {
 			 if (scaledWidth > deviceWidth)
 			 scaledWidth = deviceWidth;
