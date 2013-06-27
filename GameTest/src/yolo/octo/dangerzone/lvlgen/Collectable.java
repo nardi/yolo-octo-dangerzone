@@ -32,6 +32,10 @@ public class Collectable extends GameObject {
 		// locIndex is waarde in buffer van links naar rechts: 0 tot 399, 0 is links en 399 is rechts.
 		if(view != null){
 			this.x = (float)((view.getWidth() / 399.0) * locIndex);
+			y = lvlDraw.getHeight();
+		}
+		else{
+			removeObject(this);
 		}
 		//this.x =
 		
@@ -81,7 +85,7 @@ public class Collectable extends GameObject {
 	
 	public void onDraw(Canvas canvas) {
 		//TODO: Set correct Y, based on actual level. 
-		y = lvlDraw.getHeight();
+		
 		canvas.drawCircle(x, y, radius, this.paint);
 	}
 	
@@ -101,7 +105,7 @@ public class Collectable extends GameObject {
 			 */
 			if (distance < (this.radius + cPosition[2]) * (this.radius + cPosition[2])) {
 				score.addScore(this.reward);
-				// TODO: Remove object
+				removeObject(this);
 			}
 		}		
 	}
