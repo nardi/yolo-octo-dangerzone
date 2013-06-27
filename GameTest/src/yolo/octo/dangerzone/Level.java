@@ -47,7 +47,7 @@ public class Level extends GameObject {
 	private int speed = 8, bpm = 120;
 	private long updateTime = 0;
 	private double minTime = 1000/30;
-	private int preloadTime = 0;
+	private int preloadTime = 1500;
 	private int diff = 0;
 	private long prevT = 0;
 	private boolean fadeOut;
@@ -65,7 +65,6 @@ public class Level extends GameObject {
 		lvlGen.generateLevel();
 		int preloadPoints = preloadTime / (1000 / (speed * 30));
 		buffer = new FloorBuffer(lvlGen.level, preloadPoints);
-		buffer.fillBuffer();
 		mp3 = playMp3(path);
 		
 		new Thread(mp3).start();
@@ -116,9 +115,7 @@ public class Level extends GameObject {
 		if(at != null && at.getPlayState() == at.PLAYSTATE_PLAYING){
 			long now = 1000L * at.getPlaybackHeadPosition() / at.getPlaybackRate();
 			diff += now - prevT;
-			Log.e("diff", "Diff: " + diff);
-			while(diff > 33){
-				Log.e("Update", " Updating buffer");
+			while(diff > 33) {
 				buffer.update(speed);
 				diff -= 33;
 			}
