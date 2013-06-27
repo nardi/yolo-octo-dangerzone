@@ -1,12 +1,16 @@
 package yolo.octo.dangerzone;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 import nobleworks.libmpg.MP3Decoder;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -14,11 +18,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -30,6 +36,7 @@ import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 import yolo.octo.dangerzone.beatdetection.Section;
 import yolo.octo.dangerzone.core.GameObject;
+import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 
 public class Menu extends GameObject {
 	
@@ -37,8 +44,9 @@ public class Menu extends GameObject {
 	public long length;
 	public int time, print;
 	private String path;
-	public boolean picking = false;
-	public boolean song = false;
+	public boolean picking = false,
+				   song = false,
+				   ready = false;
 	Button pickASong;
 	Paint top,
 		  bottom;
@@ -47,9 +55,14 @@ public class Menu extends GameObject {
 	Resources res;
 	RectF logoRect,
 		  pnpRect;
+	Level level;
+	
+	Context context;
 	
 	protected void onAttach() {	
+		
 		res = getParentFragment().getResources();
+		
 		top = new Paint();
 		bottom = new Paint();
 		
@@ -65,11 +78,17 @@ public class Menu extends GameObject {
 			Log.e("Menu", "Picca's falen!");
 		}
 		
-		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.RED, "Song");
+		context = getParentFragment().getActivity().getApplicationContext();
+
+		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.RED, "Pick a Song");
+
 		pickASong.setOnTouchListener(new OnTouchListener() {
 				public boolean onTouch(View v, MotionEvent me) {
-					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && song == false) {
+					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && !song) {
 						picking = true;
+					}
+					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && ready) {
+						swapFor(level);
 					}
 					if (me.getActionMasked() == MotionEvent.ACTION_UP) {
 					}
@@ -120,50 +139,78 @@ public class Menu extends GameObject {
 			public void run() {
 				try {
 					song = true;
-					MP3Decoder md = new MP3Decoder(path);
-					int fftBufferSize = 1024;
-					int bufferSize = fftBufferSize * 100;
-					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize * md.getNumChannels());
-					// Audio data is little endian, so for correct bytes -> short conversion:
-					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
-					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
-					float[] audioData = new float[fftBufferSize / 2];
+
+					MediaPlayer elevator = MediaPlayer.create(context, R.raw.elevator);
+					elevator.start();
 					
-					bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), fftBufferSize / 2);
-					
-					int read = -1;
-					while (read != 0) {
-						int samplesLeft = read = md.readSamples(shortBuffer);
+					try{
+						Log.e("Import", "Trying to import level");
+						String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
+						FileInputStream input = App.get().getApplicationContext().openFileInput(savedPath);
+						ObjectInputStream lvlImporter = new ObjectInputStream(input);
+						LevelGenerator lvlGen = (LevelGenerator) lvlImporter.readObject();
+						lvlImporter.close();
+						level = new Level(bd, length, path, lvlGen);
+						ready = true;
+						Log.e("Import", "Succes!");
 						
-						while (samplesLeft > 0) {
-							int i, j;
-							for (i = 0, j = 0;
-								 i < samplesLeft - 1 && i < fftBufferSize - 1;
-								 i += 2, j++) {
-								audioData[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) / Short.MAX_VALUE;
-							}
-							while (j < fftBufferSize / 2) {
-								audioData[j++] = 0;
+					}catch(Exception e){
+						Log.e("Import", "Could not import level, generating new one");
+					
+						MP3Decoder md = new MP3Decoder(path);
+						int fftBufferSize = 1024;
+						int bufferSize = fftBufferSize * 100;
+						ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize * md.getNumChannels());
+						// Audio data is little endian, so for correct bytes -> short conversion:
+						nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+						ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+						float[] audioData = new float[fftBufferSize / 2];
+						
+						bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), fftBufferSize / 2);
+						
+						int read = -1;
+						while (read != 0) {
+							int samplesLeft = read = md.readSamples(shortBuffer);
+							
+							while (samplesLeft > 0) {
+								int i, j;
+								for (i = 0, j = 0;
+									 i < samplesLeft - 1 && i < fftBufferSize - 1;
+									 i += 2, j++) {
+									audioData[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) / Short.MAX_VALUE;
+								}
+								while (j < fftBufferSize / 2) {
+									audioData[j++] = 0;
+								}
+								
+								bd.newSamples(audioData);
+								samplesLeft -= fftBufferSize;
 							}
 							
-							bd.newSamples(audioData);
-							samplesLeft -= fftBufferSize;
+							shortBuffer.position(0);
 						}
+						bd.finishSong();
 						
-						shortBuffer.position(0);
-					}
-					bd.finishSong();
-					
-					for (Beat b : bd.getBeats())
-						Log.i("bt", "Beat at " + b.startTime + ", intensity: " + b.intensity);
-					for (Section s : bd.getSections())
-						Log.i("bt", "Section from " + s.startTime + " to " + s.endTime + ", intensity: " + s.intensity);
-					
-					//Level level = new Level(bd);
-					Log.e("Switching", "Switching to Level");
-					length = 1000 * md.getLength() / md.getRate();
-					swapFor(new Level(bd, length, path));
-				} catch (Exception e) {
+						for (Beat b : bd.getBeats())
+							Log.i("bt", "Beat at " + b.startTime + ", intensity: " + b.intensity);
+						for (Section s : bd.getSections())
+							Log.i("bt", "Section from " + s.startTime + " to " + s.endTime + ", intensity: " + s.intensity);
+						
+						/* Stop elevator, start elevator bell */
+						elevator.stop();
+						MediaPlayer bell = MediaPlayer.create(context, R.raw.elevator_bell);
+						bell.start();
+						
+						//Level level = new Level(bd);
+						Log.e("Switching", "Switching to Level");
+						length = 1000 * md.getLength() / md.getRate();
+						level = new Level(bd, length, path);
+						ready = true;
+						
+
+					} 
+				}catch (Exception e) {
+
 					Log.e("loadLevel", "Oops!", e);
 				}
 			}
@@ -183,7 +230,7 @@ public class Menu extends GameObject {
 			
 		drawMenu(canvas, height, width);
 		
-		pickASong.setPosition(width / 2 , height / 2);
+		pickASong.setPosition(width / 2 , (height / 4) * 3);
 		/* Set by the button in the Main menu*/
 		if (picking) {
 			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -193,7 +240,12 @@ public class Menu extends GameObject {
 		    picking = false;
 		}
 		
-		if (song) {
+
+		if (ready) {
+			
+			pickASong.setText("Start Playing");
+		}
+		else if (song) {
 			switch(print){
 				case 0:
 					pickASong.setText("Loading   ");
@@ -212,6 +264,7 @@ public class Menu extends GameObject {
 					break;
 			}
 		}
+		
 	}
 	
 	/* Draws the menu*/
@@ -219,11 +272,34 @@ public class Menu extends GameObject {
 		canvas.drawRect(0, height / 2, width, height, top);
 		canvas.drawRect(0, 0, width, height / 2, bottom);
 		
-		logoRect.set(0, 0, width, (float) (height / 3.5));
-		pnpRect.set(0, height - (height / 5), width / 3, height);
+		pnp = getResizedBitmap(pnp, height/5, height, width);
+		canvas.drawBitmap(pnp, 0, (height/5 )*4, null);
+		//pnpRect.set(0, height - (height / 5), width / 3, height);
+		//canvas.drawBitmap(pnp, null, pnpRect, null);
 		
-		canvas.drawBitmap(logo, null, logoRect, null);
-		canvas.drawBitmap(pnp, null, pnpRect, null);
+		logo = getResizedBitmap(logo, height/2, height, width);
+		float left = (width/2) - (logo.getWidth()/2);
+		canvas.drawBitmap(logo, left, 0, null);
+	}
+	
+	public Bitmap getResizedBitmap(Bitmap bm, double newHeight, int deviceHeight, int deviceWidth) {
+		int bitmapHeight = bm.getHeight();
+		int bitmapWidth = bm.getWidth();
+
+		/* scale bitmap looking at a new height */
+		int scaledHeight = (int)newHeight;
+		int scaledWidth = (scaledHeight * bitmapWidth) / bitmapHeight; 
+	
+		try {
+			 if (scaledWidth > deviceWidth)
+			 scaledWidth = deviceWidth;
+			 
+			 bm = Bitmap.createScaledBitmap(bm, scaledWidth, scaledHeight, true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		 
+		return bm;
 	}
 
 	@Override
@@ -235,7 +311,6 @@ public class Menu extends GameObject {
 		}
 	}
 	
-
 	public void wanneerGebruikerOpButtonDruktOfzo() {
 		// verkrijg mp3 pad voor Level
 		this.swapFor(new Level(bd, length, path));

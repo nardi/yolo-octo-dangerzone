@@ -1,7 +1,11 @@
 package yolo.octo.dangerzone;
 
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -45,13 +49,14 @@ public class Level extends GameObject {
 	private Character character;
 	private Button jumpButton;
 	private boolean update = false;
-	private int speed = 4, bpm = 120;
+	private int speed = 8, bpm = 120;
 	private long updateTime = 0;
-	private double minTime = 1000/30;
-	private int preloadTime = 0;
-	private int diff = 0;
-	private long prevT = 0;
+	private double minTime = 1/30.0;
+	private int preloadTime = 1500;
+	private double diff = 0;
+	private double prevT = 0;
 	private boolean fadeOut;
+	private LevelGenerator lvlGen;
 	
 	//Coin[] coin = new Coin[bpm];
 	
@@ -62,14 +67,23 @@ public class Level extends GameObject {
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw(score);
 		Log.e("LvlGen", "Generating level");
-		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed, preloadTime);
+
+		lvlGen = new LevelGenerator(beatDet, length, speed);
 		lvlGen.generateLevel();
-		buffer = new FloorBuffer(lvlGen.level);
-		buffer.fillBuffer();
+		try{
+			String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
+			Log.e("OutPutStream", "Path: " + savedPath);
+			FileOutputStream output = App.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
+			ObjectOutputStream lvlSaver = new ObjectOutputStream(output);
+			lvlSaver.writeObject(lvlGen);
+			lvlSaver.close();
+		}catch(Exception ex){
+			Log.e("OutPutStream", "Could not save level to a file because: ", ex);
+		}
+		
+		int preloadPoints = preloadTime / (1000 / (speed * 30));
+		buffer = new FloorBuffer(lvlGen.getLevel(), preloadPoints);
 		mp3 = playMp3(path);
-		
-		new Thread(mp3).start();
-		
 		
 		/*
 		for (int i = 0; i < bpm; i++) {
@@ -77,6 +91,19 @@ public class Level extends GameObject {
 			coin[i].speed = speed + (speed/3);
 			addObject(coin[i]);
 		} */
+	}
+	
+	public Level(BeatDetector beatDet, long length, String path, LevelGenerator lvlGen) {
+		this.lvlGen = lvlGen;
+		score = new Score();
+		paint = new Paint();
+		paint.setColor(Color.rgb(143,205,158));
+		paint.setTextSize(12);
+		lvlDraw = new LevelDraw(score);
+		
+		int preloadPoints = preloadTime / (1000 / (speed * 30));
+		buffer = new FloorBuffer(lvlGen.getLevel(), preloadPoints);
+		mp3 = playMp3(path);
 	}
 	
 	protected void onAttach() {
@@ -102,7 +129,9 @@ public class Level extends GameObject {
 				return true;
 			}
 		});
+		
 		addObject(jumpButton);
+		new Thread(mp3).start();
 	}
 	
 	@Override
@@ -115,19 +144,23 @@ public class Level extends GameObject {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
-		if(at != null && at.getPlayState() == at.PLAYSTATE_PLAYING){
-			long now = 1000L * at.getPlaybackHeadPosition() / at.getPlaybackRate();
+		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
+			double now = at.getPlaybackHeadPosition() / (double)at.getPlaybackRate();
 			diff += now - prevT;
-			Log.e("diff", "Diff: " + diff);
-			while(diff > 33){
-				Log.e("Update", " Updating buffer");
+			//Log.e("diff", "Diff: " + diff);
+			int framesSkipped = 0;
+			while(diff > minTime){
+				if(framesSkipped > 1){
+					Log.e("Update", " Skipped " + framesSkipped + " frames");
+				}
 				buffer.update(speed);
-				diff -= 33;
+				diff -= minTime;
+				framesSkipped++;
 			}
 			prevT = now;
 		}
 		
-		if(at != null && at.getPlayState() == at.PLAYSTATE_STOPPED){
+		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_STOPPED){
 			AudioTrack temp = at;
 			at = null;
 			temp.release();
@@ -159,27 +192,28 @@ public class Level extends GameObject {
 				try {
 					MP3Decoder md = new MP3Decoder(path);
 					
-					int channels = AudioFormat.CHANNEL_OUT_DEFAULT;
+					int afChannels = AudioFormat.CHANNEL_OUT_DEFAULT;
 					switch (md.getNumChannels()) {
-						case 1: channels = AudioFormat.CHANNEL_OUT_MONO; break;
-						case 2: channels = AudioFormat.CHANNEL_OUT_STEREO; break;
+						case 1: afChannels = AudioFormat.CHANNEL_OUT_MONO; break;
+						case 2: afChannels = AudioFormat.CHANNEL_OUT_STEREO; break;
 					}
 					int bufferSize = AudioTrack.getMinBufferSize(md.getRate(),
-							channels, AudioFormat.ENCODING_PCM_16BIT);
+							afChannels, AudioFormat.ENCODING_PCM_16BIT);
 					short[] buffer = new short[bufferSize];
 					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(bufferSize * 2);
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
-					at = new AudioTrack(AudioManager.STREAM_MUSIC,
-							md.getRate(), channels,
+					AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+							md.getRate(), afChannels,
 							AudioFormat.ENCODING_PCM_16BIT, bufferSize,
 							AudioTrack.MODE_STREAM);
-					int preloadSamples = md.getRate() * channels * preloadTime / 1000;
-					//short[] preloadBuffer = new short[preloadSamples];
+					int preloadSamples = md.getRate() * md.getNumChannels() * preloadTime / 1000;
+					short[] preloadBuffer = new short[preloadSamples];
 					
-					at.play();
-					//at.write(preloadBuffer, 0, preloadSamples);
+					audioTrack.play();
+					at = audioTrack;
+					at.write(preloadBuffer, 0, preloadSamples);
 					int readSamples = -1;
 					while (readSamples != 0) {
 						readSamples = md.readSamples(shortBuffer);

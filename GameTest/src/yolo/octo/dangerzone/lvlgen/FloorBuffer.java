@@ -11,6 +11,10 @@ package yolo.octo.dangerzone.lvlgen;
 
 import java.util.Random;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import android.app.Application;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.media.AudioTrack;
@@ -21,43 +25,47 @@ import android.view.View;
 public class FloorBuffer {
 	private int index;
 	private int bufferSize;
-	private int pointCounter;
+
+	private int pointCounter = 0;
 	private int randomInt;
+	private int offset;
 	private float[] buffer;
 	private PointF[] tempBuffer;
 	private float[] points;
 	private Random colGen = new Random();
+
 	
 	/* Initialiseer de waardes voor de buffer */
-	public FloorBuffer(float[] points) {
+	public FloorBuffer(float[] points, int offset) {
 		this.points = points;
 		index = 0;
 		bufferSize = 400;
 		buffer = new float[bufferSize];
 		tempBuffer = new PointF[bufferSize];
-		pointCounter = bufferSize;
+		this.offset = offset + bufferSize / 4 - 1;
 		
 		fillBuffer();
 	}
 	
-	
 	/* Initialiseer de buffer met de eerste >bufferSize< aantal waardes.
 	 * Als er minder waardes dan dit zijn, wordt er een plat vlak gegenereerd.
 	 */
-	//XXX Deze was private, (?) maar heb ff public gemaakt voor testen
-	public void fillBuffer() {
-		for (int i = 0; i < bufferSize; i++) {
-			if (i < points.length) {
-				buffer[i] = points[i];
+	
+
+	private void fillBuffer() {
+		int toSkip = Math.min(bufferSize, offset);
+		offset -= toSkip;
+		for (int i = toSkip; i < bufferSize; i++) {
+			if (pointCounter < points.length) {
+				buffer[i] = points[pointCounter];
+				pointCounter++;
 				
 				randomInt = colGen.nextInt(100);
 				if (randomInt <= 3) {
 					//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
 					// Geef i mee!!!
 				}
-				
 			}
-			
 			else {
 				buffer[i] = 0;
 			}
@@ -67,20 +75,25 @@ public class FloorBuffer {
 	
 	/* Vervangt het meest linker punt met het nieuwe, meest rechter punt. */
 	public void update() {
-		if (pointCounter < points.length) {
-			buffer[index] = points[pointCounter];
+
+		if (offset > 0 || pointCounter >= points.length) {
+			buffer[index] = 0;
+			if (offset > 0)
+				offset--;
+			
 			randomInt = colGen.nextInt(100);
 			if (randomInt <= 3) {
 				//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
 				// Geef 399 mee!!! (Want hij moe trechts beginnen
 			}
+
 		}
 		else {
-			buffer[index] = 0;
+			buffer[index] = points[pointCounter];
+			pointCounter++;
 		}
 		
 		index = (index + 1) % bufferSize;
-		pointCounter++;
 	}
 	
 	public void update(int skip){
