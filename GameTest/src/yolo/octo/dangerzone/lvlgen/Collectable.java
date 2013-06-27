@@ -18,11 +18,14 @@ public class Collectable extends GameObject {
 	private static Score score;
 	private static Character character;
 	private View view;
+	private LevelDraw lvlDraw;
 	
 	
-	public Collectable(int type, int locIndex, View view) {
+	public Collectable(int type, int locIndex, LevelDraw lvlDraw) {
 		this.type = type;
 		this.radius = 30;
+		this.view = lvlDraw.getView();
+		this.lvlDraw = lvlDraw;
 		
 		
 		//TODO: Zet locIndex (index in buffer) om in X.
@@ -78,7 +81,7 @@ public class Collectable extends GameObject {
 	
 	public void onDraw(Canvas canvas) {
 		//TODO: Set correct Y, based on actual level. 
-		
+		y = lvlDraw.getHeight();
 		canvas.drawCircle(x, y, radius, this.paint);
 	}
 	
