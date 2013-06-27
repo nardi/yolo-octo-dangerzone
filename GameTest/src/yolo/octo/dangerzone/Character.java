@@ -78,7 +78,6 @@ public class Character extends GameObject {
 	}
 	
 	public void onDraw(Canvas canvas) {
-	//	canvas.drawCircle(x, y, radius, character);
 		canvas.drawBitmap(sprite, x-50, y, null);
 	}
 	
