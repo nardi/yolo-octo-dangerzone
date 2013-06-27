@@ -78,7 +78,7 @@ public class LevelGenerator implements Serializable {
 
 			level[beatIndex2] = beat2.intensity * (i % 2 == 0 ? 1 : -1);
 			
-			switch (i % 4) {
+			/* switch (i % 4) {
 				case 0:
 				case 2:
 					level[beatIndex2] += 0;
@@ -89,7 +89,7 @@ public class LevelGenerator implements Serializable {
 				case 3:
 					level[beatIndex2] += 0.5f * beat2.intensity;
 					break;
-			}
+			} */
 			
 			for (int k = beatIndex1 + 1; k < beatIndex2; k++) {
 				float factor = (k - beatIndex1) / (float)(beatIndex2 - beatIndex1);
