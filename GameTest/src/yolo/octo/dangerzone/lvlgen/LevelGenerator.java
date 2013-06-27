@@ -102,7 +102,7 @@ public class LevelGenerator {
 		 * Interpoleren tussen laatste beat en einde array.
 		 */
 		int lastBeatIndex = timeToIndex(beats.get(beats.size() - 1).startTime);		
-		for (int k = (int) (lastBeatIndex - 1); k < level.length; k++) {
+		for (int k = lastBeatIndex + 1; k < level.length; k++) {
 			float factor = (k - lastBeatIndex) / (float)(level.length - 1 - lastBeatIndex);
 			//level[k] = level[lastBeatIndex] * (1 - factor);
 			level[k] = badassInterpolation(level[lastBeatIndex], 0, factor);
@@ -137,7 +137,7 @@ public class LevelGenerator {
 			}
 			
 			int lastSectionIndex = timeToIndex(sections.get(sections.size() - 1).startTime);		
-			for (int k = (int) (lastSectionIndex - 1); k < level.length; k++) {
+			for (int k = lastSectionIndex + 1; k < level.length; k++) {
 				float factor = (k - lastSectionIndex) / (float)(level.length - 1 - lastSectionIndex);
 				//level[k] = level[lastSectionIndex] * (1 - factor);
 				level[k] = linearInterpolation(level[lastSectionIndex], 0, factor);

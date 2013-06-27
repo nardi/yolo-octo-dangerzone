@@ -1,6 +1,6 @@
 package yolo.octo.dangerzone;
 
-public class Application {
+public class App {
 	private static android.app.Application app = null;
 	public static android.app.Application get() {
 		return app;
