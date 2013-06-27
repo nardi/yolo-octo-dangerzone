@@ -50,11 +50,12 @@ public class Level extends GameObject {
 	private boolean update = false;
 	private int speed = 8, bpm = 120;
 	private long updateTime = 0;
-	private double minTime = 1000/30;
+	private double minTime = 1000/30.0;
 	private int preloadTime = 1500;
-	private int diff = 0;
-	private long prevT = 0;
+	private double diff = 0;
+	private double prevT = 0;
 	private boolean fadeOut;
+	private LevelGenerator lvlGen;
 	
 	//Coin[] coin = new Coin[bpm];
 	
@@ -65,39 +66,23 @@ public class Level extends GameObject {
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw(score);
 		Log.e("LvlGen", "Generating level");
-		String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
-		LevelGenerator lvlGen;
-		
+
+		lvlGen = new LevelGenerator(beatDet, length, speed);
+		lvlGen.generateLevel();
 		try{
-			Log.e("Import", "Trying to import level");
-			FileInputStream input = this.getParentFragment().getActivity().openFileInput(savedPath);
-			ObjectInputStream lvlImporter = new ObjectInputStream(input);
-			lvlGen = (LevelGenerator) lvlImporter.readObject();
-			lvlImporter.close();
-			Log.e("Import", "Succes!");
-			
-		}catch(Exception e){
-			Log.e("Import", "Could not import level, generating new one");
-			lvlGen = new LevelGenerator(beatDet, length, speed);
-			lvlGen.generateLevel();
-			try{
-				Log.e("OutPutStream", "Path: " + savedPath);
-				FileOutputStream output = App.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
-				ObjectOutputStream lvlSaver = new ObjectOutputStream(output);
-				lvlSaver.writeObject(lvlGen);
-				lvlSaver.close();
-			}catch(Exception ex){
-				Log.e("OutPutStream", "Could not save level to a file because: ", ex);
-			}
-			
+			String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
+			Log.e("OutPutStream", "Path: " + savedPath);
+			FileOutputStream output = App.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
+			ObjectOutputStream lvlSaver = new ObjectOutputStream(output);
+			lvlSaver.writeObject(lvlGen);
+			lvlSaver.close();
+		}catch(Exception ex){
+			Log.e("OutPutStream", "Could not save level to a file because: ", ex);
 		}
 		
 		int preloadPoints = preloadTime / (1000 / (speed * 30));
 		buffer = new FloorBuffer(lvlGen.getLevel(), preloadPoints);
 		mp3 = playMp3(path);
-		
-		
-		
 		
 		/*
 		for (int i = 0; i < bpm; i++) {
@@ -105,6 +90,19 @@ public class Level extends GameObject {
 			coin[i].speed = speed + (speed/3);
 			addObject(coin[i]);
 		} */
+	}
+	
+	public Level(BeatDetector beatDet, long length, String path, LevelGenerator lvlGen) {
+		this.lvlGen = lvlGen;
+		score = new Score();
+		paint = new Paint();
+		paint.setColor(Color.rgb(143,205,158));
+		paint.setTextSize(12);
+		lvlDraw = new LevelDraw(score);
+		
+		int preloadPoints = preloadTime / (1000 / (speed * 30));
+		buffer = new FloorBuffer(lvlGen.getLevel(), preloadPoints);
+		mp3 = playMp3(path);
 	}
 	
 	protected void onAttach() {
@@ -143,23 +141,23 @@ public class Level extends GameObject {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
-		if(at != null && at.getPlayState() == at.PLAYSTATE_PLAYING){
-			long now = 1000L * at.getPlaybackHeadPosition() / at.getPlaybackRate();
+		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
+			double now = 1000 * at.getPlaybackHeadPosition() / (double)at.getPlaybackRate();
 			diff += now - prevT;
 			//Log.e("diff", "Diff: " + diff);
 			int framesSkipped = 0;
-			while(diff > 33){
+			while(diff > minTime){
 				if(framesSkipped > 1){
 					Log.e("Update", " Skipped " + framesSkipped + " frames");
 				}
 				buffer.update(speed);
-				diff -= 33;
+				diff -= minTime;
 				framesSkipped++;
 			}
 			prevT = now;
 		}
 		
-		if(at != null && at.getPlayState() == at.PLAYSTATE_STOPPED){
+		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_STOPPED){
 			AudioTrack temp = at;
 			at = null;
 			temp.release();

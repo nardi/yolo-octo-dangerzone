@@ -84,10 +84,10 @@ public class LevelGenerator implements Serializable {
 					level[beatIndex2] += 0;
 					break;
 				case 1:
-					level[beatIndex2] += 0.3f * beat2.intensity;
+					level[beatIndex2] += 0.5f * beat2.intensity;
 					break;
 				case 3:
-					level[beatIndex2] += 0.3f * beat2.intensity;
+					level[beatIndex2] += 0.5f * beat2.intensity;
 					break;
 			}
 			
@@ -110,7 +110,7 @@ public class LevelGenerator implements Serializable {
 			//level[k] += (1 - factor) * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
 		}
 		
-		if (!sections.isEmpty()) {
+		/* if (!sections.isEmpty()) {
 			Section firstSection = sections.get(0);
 			int firstSectionIndex = timeToIndex(firstSection.startTime);
 			level[firstSectionIndex] += firstSection.intensity;
@@ -144,7 +144,7 @@ public class LevelGenerator implements Serializable {
 				level[k] += linearInterpolation(level[lastSectionIndex], 0, factor);
 				//level[k] += (1 - factor) * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstSectionIndex) / sectionSteps);
 			}
-		}
+		} */
 	}
 	
 	public float[] getLevel(){

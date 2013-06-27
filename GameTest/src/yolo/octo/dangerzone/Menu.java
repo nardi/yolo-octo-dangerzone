@@ -1,6 +1,9 @@
 package yolo.octo.dangerzone;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -33,6 +36,7 @@ import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 import yolo.octo.dangerzone.beatdetection.Section;
 import yolo.octo.dangerzone.core.GameObject;
+import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 
 public class Menu extends GameObject {
 	
@@ -135,62 +139,76 @@ public class Menu extends GameObject {
 			public void run() {
 				try {
 					song = true;
+
 					MediaPlayer elevator = MediaPlayer.create(context, R.raw.elevator);
 					elevator.start();
-					MP3Decoder md = new MP3Decoder(path);
-					int fftBufferSize = 1024;
-					int bufferSize = fftBufferSize * 100;
-					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize * md.getNumChannels());
-					// Audio data is little endian, so for correct bytes -> short conversion:
-					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
-					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
-					float[] audioData = new float[fftBufferSize / 2];
 					
-					bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), fftBufferSize / 2);
-					
-					int read = -1;
-					while (read != 0) {
-						int samplesLeft = read = md.readSamples(shortBuffer);
+					try{
+						Log.e("Import", "Trying to import level");
+						String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
+						FileInputStream input = App.get().getApplicationContext().openFileInput(savedPath);
+						ObjectInputStream lvlImporter = new ObjectInputStream(input);
+						LevelGenerator lvlGen = (LevelGenerator) lvlImporter.readObject();
+						lvlImporter.close();
+						level = new Level(bd, length, path, lvlGen);
+						ready = true;
+						Log.e("Import", "Succes!");
 						
-						while (samplesLeft > 0) {
-							int i, j;
-							for (i = 0, j = 0;
-								 i < samplesLeft - 1 && i < fftBufferSize - 1;
-								 i += 2, j++) {
-								audioData[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) / Short.MAX_VALUE;
-							}
-							while (j < fftBufferSize / 2) {
-								audioData[j++] = 0;
+					}catch(Exception e){
+						Log.e("Import", "Could not import level, generating new one");
+					
+						MP3Decoder md = new MP3Decoder(path);
+						int fftBufferSize = 1024;
+						int bufferSize = fftBufferSize * 100;
+						ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(2 * bufferSize * md.getNumChannels());
+						// Audio data is little endian, so for correct bytes -> short conversion:
+						nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+						ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
+						float[] audioData = new float[fftBufferSize / 2];
+						
+						bd = new FFTBeatDetector(md.getRate(), md.getNumChannels(), fftBufferSize / 2);
+						
+						int read = -1;
+						while (read != 0) {
+							int samplesLeft = read = md.readSamples(shortBuffer);
+							
+							while (samplesLeft > 0) {
+								int i, j;
+								for (i = 0, j = 0;
+									 i < samplesLeft - 1 && i < fftBufferSize - 1;
+									 i += 2, j++) {
+									audioData[j] = ((shortBuffer.get() + shortBuffer.get()) / 2f) / Short.MAX_VALUE;
+								}
+								while (j < fftBufferSize / 2) {
+									audioData[j++] = 0;
+								}
+								
+								bd.newSamples(audioData);
+								samplesLeft -= fftBufferSize;
 							}
 							
-							bd.newSamples(audioData);
-							samplesLeft -= fftBufferSize;
+							shortBuffer.position(0);
 						}
+						bd.finishSong();
 						
-						shortBuffer.position(0);
-					}
-					bd.finishSong();
-					
-					for (Beat b : bd.getBeats())
-						Log.i("bt", "Beat at " + b.startTime + ", intensity: " + b.intensity);
-					for (Section s : bd.getSections())
-						Log.i("bt", "Section from " + s.startTime + " to " + s.endTime + ", intensity: " + s.intensity);
-					
-					//Level level = new Level(bd);
-					Log.e("Switching", "Switching to Level");
-					
-					/* Stop elevator, start elevator bell */
-					elevator.stop();
-					MediaPlayer bell = MediaPlayer.create(context, R.raw.elevator_bell);
-					bell.start();
-					
-					length = 1000 * md.getLength() / md.getRate();
-					level = new Level(bd, length, path);
-					ready = true;
-					
+						for (Beat b : bd.getBeats())
+							Log.i("bt", "Beat at " + b.startTime + ", intensity: " + b.intensity);
+						for (Section s : bd.getSections())
+							Log.i("bt", "Section from " + s.startTime + " to " + s.endTime + ", intensity: " + s.intensity);
+						
+						//Level level = new Level(bd);
+						Log.e("Switching", "Switching to Level");
+						length = 1000 * md.getLength() / md.getRate();
+						level = new Level(bd, length, path);
+						ready = true;
+						
+						/* Stop elevator, start elevator bell */
+						elevator.stop();
+						MediaPlayer bell = MediaPlayer.create(context, R.raw.elevator_bell);
+						bell.start();
+					} 
+				}catch (Exception e) {
 
-					
-				} catch (Exception e) {
 					Log.e("loadLevel", "Oops!", e);
 				}
 			}
