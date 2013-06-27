@@ -1,3 +1,8 @@
+/* The LevelDraw class is in charge of drawing and refreshing what's on the 
+ * screen. It can retrieve the level from the FloorBuffer class, the character
+ * and its state, obstacles and the score, and draw these on the screen.
+ */
+
 package yolo.octo.dangerzone.lvlgen;
 
 import android.graphics.Canvas;
@@ -44,7 +49,6 @@ public class LevelDraw {
 	/* drawText() is used to write text to the screen, either with the standard paint
 	 * or a custom one.
 	 */
-	
 	public void drawText(String toWrite, PointF loc, Canvas canvas){
 		canvas.drawText(toWrite, loc.x, loc.y, paint);
 	}
@@ -53,71 +57,50 @@ public class LevelDraw {
 		canvas.drawText(toWrite, loc.x, loc.y, brush);
 	}
 	
+	
+	/* drawScore() displays the players' score on the screen
+	 */
 	public void drawScore(int score, Canvas canvas) {
 		canvas.drawText("Score: " + score, 10, 40, text);
 	}
 	
-	public void drawFloor(PointF newp, Canvas canvas){
-		if (init) {
-			init = false;
-			old.y = view.getHeight() * 2/3;
-			old.x = 150;
-			playerX = (int) ((view.getWidth()/4.0 * 399.0) / view.getWidth());
-		}
-		
-		paint.setStrokeWidth(10);
-		
-		if(old.x >= 0 && old.y > 0){
-			canvas.drawLine(old.x, old.y, newp.x, newp.y, paint);
-		}
-		old.x = newp.x;
-		old.y = newp.y;
-	}
 	
-	public void drawFloor(PointF newp, Paint brush, Canvas canvas){
-		if (init) {
-			init = false;
-			old.y = view.getHeight() * 2/3;
-			playerX = (int) ((view.getWidth()/4.0 * 399.0) / view.getWidth());
-		}
-		
-		if(old.x >= 0 && old.y > 0){
-			canvas.drawLine(old.x, old.y, newp.x, newp.y, brush);
-		}
-		old.x = newp.x;
-		old.y = newp.y;
-	}
-	
-	//public void fillFloor(PointF newp, Canvas canvas) {
-	//	canvas.drawLine(newp.x, newp.y, newp.x, view.getHeight(), paint);
-	//}
-	
+	/* The translate() function translates the values in the array to 
+	 * coordinates on the screen. 
+	 */
 	public PointF translate(PointF dev){
 		int height = Math.min(view.getWidth(), view.getHeight());
 		
+		/* The index is translated to a coordinate on the screen by multiplying the index
+		 * with the width of the screen divided by the highest index.
+		 * The deviation is translated by taking the line on height*(2/3) as base line
+		 * and adding the deviation times (2/7), times the height variable.
+		 */
 		if(view != null){
 			dev.x = (float)((view.getWidth() / 399.0) * dev.x);
-			
 			dev.y = (float)((view.getHeight() * (2f/3f)) - (dev.y * (2f/7f) * height));
 			return dev;
 		}
+		
 		Log.e("View", "View == null");
 		return dev;
 	}
 	
-	/*
-	 * Calls drawFloor with values from the ringbuffer.
+	/* drawFromBuffer() draws a path using values retrieved from the ring-buffer.
 	 */
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
+		
+		/* Initialises a few values ont he first draw
+		 */
 		if (init) {
 			init = false;
 			old.y = view.getHeight() * 2/3;
-			old.x = 150;
 			playerX = (int)(399/4f);
 		}
 		float translateY = 0;
 		
 		drawScore(score.getScore(), canvas);
+		
 		
 		for (int i = 0; i < buffer.length; i++) {
 			translate(buffer[i]);
@@ -127,16 +110,19 @@ public class LevelDraw {
 					translateY = newTY;
 			}
 		}
+		
+		/* Retrieves the Y-value of the player's location.
+		 */
 		playerY = buffer[playerX].y + translateY;
 		
+		/* Draw the paths between the points
+		 */
 		Path path = new Path();
 		path.moveTo(buffer[0].x, buffer[0].y);
 		
-		
 		for (int i = 1; i < buffer.length; i++) {
 			path.lineTo(buffer[i].x, buffer[i].y);
-			
-			
+				
 			if (i != playerX) {
 				//drawFloor(buf, canvas);
 				//fillFloor(buf, canvas);
@@ -154,6 +140,10 @@ public class LevelDraw {
 		old.y = -1;
 	}
 	
+	
+	/* Returns the Y-value for the player, used with jumping and drawing the 
+	 * character.
+	 */
 	public float getHeight() {
 		return playerY;
 	}
