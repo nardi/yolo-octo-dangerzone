@@ -137,12 +137,11 @@ public class Menu extends GameObject {
 	private Runnable loadLevel(final String path) {
 		return new Runnable() {
 			public void run() {
-				try {
-					song = true;
+				song = true;
 
-					MediaPlayer elevator = MediaPlayer.create(context, R.raw.elevator);
-					elevator.start();
-					
+				MediaPlayer elevator = MediaPlayer.create(context, R.raw.elevator);
+				elevator.start();
+				try {
 					try{
 						Log.e("Import", "Trying to import level");
 						String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
@@ -206,13 +205,16 @@ public class Menu extends GameObject {
 						length = 1000 * md.getLength() / md.getRate();
 						level = new Level(bd, length, path);
 						ready = true;
-						
-
 					} 
 				}catch (Exception e) {
 
 					Log.e("loadLevel", "Oops!", e);
 				}
+				/* Stop elevator, start elevator bell */
+				elevator.stop();
+				MediaPlayer bell = MediaPlayer.create(context, R.raw.elevator_bell);
+				bell.start();
+				while (bell.isPlaying());
 			}
 		};
 	}
@@ -309,10 +311,5 @@ public class Menu extends GameObject {
 			print = (print + 1) % 4;
 			time = time % 750;
 		}
-	}
-	
-	public void wanneerGebruikerOpButtonDruktOfzo() {
-		// verkrijg mp3 pad voor Level
-		this.swapFor(new Level(bd, length, path));
 	}
 }

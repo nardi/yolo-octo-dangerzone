@@ -21,6 +21,7 @@ import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import yolo.octo.dangerzone.lvlgen.Score;
+import yolo.octo.dangerzone.lvlgen.Coin;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -51,9 +52,9 @@ public class Level extends GameObject {
 	private int speed = 8, bpm = 120;
 	private long updateTime = 0;
 	private double minTime = 1/30.0;
-	private int preloadTime = 1500;
-	private double diff = 0;
-	private double prevT = 0;
+	private int preloadTime = 0;
+	private long diff = 0;
+	private long prevT = 0;
 	private boolean fadeOut;
 	private LevelGenerator lvlGen;
 	private LevelComplete end;
@@ -109,6 +110,8 @@ public class Level extends GameObject {
 		Context context = getParentFragment().getActivity();
 		
 		character = new Character(context, 0, 0);
+		Coin coin = new Coin(0,0);
+		addObject(coin);
 		addObject(character);
 		
 		jumpButton = new Button(context, 0, 0, 100, 100, Color.RED, "Jump");
@@ -142,7 +145,7 @@ public class Level extends GameObject {
 		}
 		
 		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
-			double now = at.getPlaybackHeadPosition() / (double)at.getPlaybackRate();
+			long now = 1000L * at.getPlaybackHeadPosition() / at.getSampleRate();
 			diff += now - prevT;
 			//Log.e("diff", "Diff: " + diff);
 			int framesSkipped = 0;
@@ -223,7 +226,7 @@ public class Level extends GameObject {
 					}
 					/* TODO Stopping here leaves no guarantee everything has been
 					 * played, but whatever */ 
-					at.stop();
+					//at.stop();
 					Log.d("playMp3", "Done decoding!");
 				} catch (Exception e) {
 					Log.e("playMp3", "Oops!", e);

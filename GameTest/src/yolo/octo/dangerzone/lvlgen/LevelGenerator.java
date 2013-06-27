@@ -2,10 +2,14 @@ package yolo.octo.dangerzone.lvlgen;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Random;
+
+import android.util.SparseArray;
 
 import yolo.octo.dangerzone.beatdetection.Beat;
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.Section;
+
 
 public class LevelGenerator implements Serializable {
 	private float[] level;
@@ -13,6 +17,7 @@ public class LevelGenerator implements Serializable {
 	//Indices per second
 	private int speed;
 	private int preload;
+	
 	
 	/* Constructor class - creates the level generator
 	 */
@@ -66,10 +71,19 @@ public class LevelGenerator implements Serializable {
 		 * Interpoleren tussen alle beats.
 		 */
 		for (int i = 0; i < beats.size() - 1; i++) {
+			
+			//TODO:
+			//RANDOM GENERATOR FOR OBJECTS
+			//SPARSEARRAYS, WHOO-HOO
+			
+			
 			Beat beat1 = beats.get(i);
 			int beatIndex1 = timeToIndex(beat1.startTime);
 			Beat beat2 = beats.get(i + 1);
 			int beatIndex2 = timeToIndex(beat2.startTime);
+			
+			
+			
 			
 			/* if (beat2.intensity > beat1.intensity)
 				level[beatIndex2] = level[beatIndex1] + beat2.intensity;
@@ -78,7 +92,7 @@ public class LevelGenerator implements Serializable {
 
 			level[beatIndex2] = beat2.intensity * (i % 2 == 0 ? 1 : -1);
 			
-			switch (i % 4) {
+			/* switch (i % 4) {
 				case 0:
 				case 2:
 					level[beatIndex2] += 0;
@@ -89,7 +103,7 @@ public class LevelGenerator implements Serializable {
 				case 3:
 					level[beatIndex2] += 0.5f * beat2.intensity;
 					break;
-			}
+			} */
 			
 			for (int k = beatIndex1 + 1; k < beatIndex2; k++) {
 				float factor = (k - beatIndex1) / (float)(beatIndex2 - beatIndex1);
@@ -108,6 +122,7 @@ public class LevelGenerator implements Serializable {
 			//level[k] = level[lastBeatIndex] * (1 - factor);
 			level[k] = badassInterpolation(level[lastBeatIndex], 0, factor);
 			//level[k] += (1 - factor) * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
+
 		}
 		
 		/* if (!sections.isEmpty()) {
@@ -149,5 +164,7 @@ public class LevelGenerator implements Serializable {
 	
 	public float[] getLevel(){
 		return this.level;
+
 	}
+	
 }
