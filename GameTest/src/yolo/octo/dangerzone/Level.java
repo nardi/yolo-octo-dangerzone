@@ -44,7 +44,7 @@ public class Level extends GameObject {
 	private Character character;
 	private Button jumpButton;
 	private boolean update = false;
-	private int speed = 4, bpm = 120;
+	private int speed = 8, bpm = 120;
 	private long updateTime = 0;
 	private double minTime = 1000/30;
 	private int preloadTime = 0;
@@ -61,9 +61,10 @@ public class Level extends GameObject {
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw(score);
 		Log.e("LvlGen", "Generating level");
-		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed, preloadTime);
+		LevelGenerator lvlGen = new LevelGenerator(beatDet, length, speed);
 		lvlGen.generateLevel();
-		buffer = new FloorBuffer(lvlGen.level);
+		int preloadPoints = preloadTime / (1000 / (speed * 30));
+		buffer = new FloorBuffer(lvlGen.level, preloadPoints);
 		buffer.fillBuffer();
 		mp3 = playMp3(path);
 		
