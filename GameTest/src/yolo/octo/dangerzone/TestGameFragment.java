@@ -13,7 +13,6 @@ import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 import yolo.octo.dangerzone.beatdetection.Section;
 import yolo.octo.dangerzone.core.GameFragment;
-import yolo.octo.dangerzone.lvlgen.Coin;
 
 import ddf.minim.analysis.FFT;
 import ddf.minim.analysis.WindowFunction;
@@ -43,7 +42,6 @@ public class TestGameFragment extends GameFragment {
 	private int jumpHeight = 0;
 	private boolean direction = false;
 	private boolean cantTouchThis = false;
-	Coin coin = new Coin(400, 300);
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,8 +51,6 @@ public class TestGameFragment extends GameFragment {
 		showStats = true;
 		alwaysRecieveEvents = true;
 
-		addObject(coin);
-		
         run();
     }
 	/*
@@ -272,10 +268,6 @@ public class TestGameFragment extends GameFragment {
 		if (jump) {
 			updateY(dt);
 		}
-		
-		// De collision check kan ook nog naar Coin.onUpdate verplaatst worden
-		if (checkCollisionCoin(touchX, touchY, coin))
-			coin.detach();
 	}
 
 	/*
@@ -298,7 +290,7 @@ public class TestGameFragment extends GameFragment {
 		}
 	}
 	
-	private boolean checkCollisionCoin(float x, float y, Coin coin) {
+	/*private boolean checkCollisionCoin(float x, float y, Coin coin) {
 		boolean collision;
 		float xDif = x - coin.x;
 		float yDif = y - coin.y;
@@ -309,7 +301,7 @@ public class TestGameFragment extends GameFragment {
 			collision = false;
 		}
 		return collision;
-	}
+	}*/
 
 	private void showPauseMenu() {
 		Fragment frag = new PauseDialogFragment();
