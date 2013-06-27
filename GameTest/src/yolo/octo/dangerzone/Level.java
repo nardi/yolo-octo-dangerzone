@@ -16,6 +16,7 @@ import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import yolo.octo.dangerzone.lvlgen.Score;
 import yolo.octo.dangerzone.lvlgen.Coin;
 import android.content.Context;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -50,6 +51,7 @@ public class Level extends GameObject {
 	private long prevT = 0;
 	private boolean fadeOut;
 	private LevelGenerator lvlGen;
+
 	private LevelComplete end;
 	//Coin[] coin = new Coin[bpm];
 	
@@ -153,6 +155,7 @@ public class Level extends GameObject {
 	
 	@Override
 	public void onDraw(Canvas canvas){
+		
 		canvas.drawColor(Color.rgb(124,139,198));
 		lvlDraw.view = getParentFragment().getView();
 		lvlDraw.drawFromBuffer(buffer.getBuffer(), canvas);
@@ -185,7 +188,7 @@ public class Level extends GameObject {
 				AudioTrack.MODE_STREAM);
 		int updatePeriod = md.getRate() / 30;
 		// Dingen synchroon laten lopen met de muziek is lastig, dit lijkt te werken
-		audioTrack.setPositionNotificationPeriod((int)(updatePeriod * 0.965));
+		audioTrack.setPositionNotificationPeriod((int)(updatePeriod * 0.97));
 		audioTrack.setPlaybackPositionUpdateListener(onAudioUpdate);
 		return new Runnable() {
 			public void run() {
