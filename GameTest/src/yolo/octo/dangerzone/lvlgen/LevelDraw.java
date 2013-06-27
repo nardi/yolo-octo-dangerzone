@@ -103,8 +103,8 @@ public class LevelDraw {
 		
 		for (int i = 0; i < buffer.length; i++) {
 			translate(buffer[i]);
-			if (buffer[i].y < view.getHeight() * (1/6f)) {
-				float newTY = view.getHeight() * (1/6f) - buffer[i].y;
+			if (buffer[i].y < view.getHeight() * (0.35f)) {
+				float newTY = view.getHeight() * (0.35f) - buffer[i].y;
 				if (newTY > translateY)
 					translateY = newTY;
 			}
