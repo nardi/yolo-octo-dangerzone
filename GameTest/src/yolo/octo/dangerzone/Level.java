@@ -136,7 +136,11 @@ public class Level extends GameObject {
 			int randomInt = colGen.nextInt(100);
 			if (randomInt <= 3) {
 				//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
-				addObject(new Collectable(randomInt, 399, lvlDraw.getView()));
+
+				Collectable collect = new Collectable(randomInt, 399, lvlDraw);
+				collect.setCharacter(character);
+				addObject(collect);
+				//addObject(new Collectable(randomInt, 399, lvlDraw.getView()));
 				// Geef 399 mee!!! (Want hij moe trechts beginnen
 			}
 		}
