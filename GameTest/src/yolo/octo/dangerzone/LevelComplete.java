@@ -25,6 +25,7 @@ public class LevelComplete extends GameObject {
 	private int textPart;
 	private Menu menu;
 	
+	/* Constructor*/
 	public LevelComplete (Score score) {
 		this.score = score;
 		textPart = 0;
@@ -49,15 +50,19 @@ public class LevelComplete extends GameObject {
 		/* Makes the butten keeping track of the text skipping*/
 		nextText.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent me) {
-				if (me.getActionMasked() == MotionEvent.ACTION_DOWN && time > 20 && textPart < 4) {
-					textPart++;
-					time = 0;
-					Log.i("Complete", "Current part " + textPart);
-				}
-				if (me.getActionMasked() == MotionEvent.ACTION_DOWN && time > 20 && textPart > 3) {
-					swapFor(menu);
+				if (me.getActionMasked() == MotionEvent.ACTION_DOWN) {
+					nextText.pressed = true;
 				}
 				if (me.getActionMasked() == MotionEvent.ACTION_UP) {
+				
+					if (time > 20 && textPart < 4) {
+						textPart++;
+						time = 0;
+					}
+					else if (time > 20 && textPart > 3) {
+						swapFor(menu);
+					}
+					nextText.pressed = false;
 				}
 	
 				return true;
@@ -73,19 +78,21 @@ public class LevelComplete extends GameObject {
 		time++;
 	}
 	
-	
+	/* Draws the end screen*/
 	public void onDraw (Canvas canvas) {
 		
 		int height = this.getParentFragment().getView().getHeight();
 		int width = this.getParentFragment().getView().getWidth();
 		nextText.setPosition(75, canvas.getHeight() - 75);
-		canvas.drawRect(0, 0, width, height / 2, top);
-		canvas.drawRect(0, height / 2, width, height, bottom);
+		canvas.drawRect(0, 0, width, (height / 3) * 2, top);
+		canvas.drawRect(0, (height / 3) * 2, width, height, bottom);
 		
+		/* Sets the proper x and y coordinates of the player and octo*/
 		player.x = width / 8;
-		player.y = (height / 2) - 100;
+		player.y = ((height / 3) * 2) - 100;
 		octo.x = width - (width /4);
 		octo.y = (height / 2) - 200;
+		
 		/* Keeps track of what part of the text we are at and draws it on the canvas*/
 		switch(textPart) {
 			case 0:

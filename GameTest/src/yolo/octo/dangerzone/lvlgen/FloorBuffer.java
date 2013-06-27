@@ -105,7 +105,7 @@ public class FloorBuffer {
 	}
 	
 	
-	/* gets the height on the player's position
+	/* Gets the height on the player's position
 	 */
 	public float getHeight(View v) {
 		int width = v.getWidth();
