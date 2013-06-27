@@ -49,7 +49,9 @@ public class Menu extends GameObject {
 		  pnpRect;
 	
 	protected void onAttach() {	
+		
 		res = getParentFragment().getResources();
+		
 		top = new Paint();
 		bottom = new Paint();
 		
