@@ -21,6 +21,7 @@ import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
 import yolo.octo.dangerzone.lvlgen.Score;
+import yolo.octo.dangerzone.lvlgen.Coin;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -109,6 +110,8 @@ public class Level extends GameObject {
 		Context context = getParentFragment().getActivity();
 		
 		character = new Character(context, 0, 0);
+		Coin coin = new Coin(0,0);
+		addObject(coin);
 		addObject(character);
 		
 		jumpButton = new Button(context, 0, 0, 100, 100, Color.RED, "Jump");

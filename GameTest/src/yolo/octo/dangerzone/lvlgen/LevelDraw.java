@@ -113,7 +113,6 @@ public class LevelDraw {
 			old.y = view.getHeight() * 2/3;
 			old.x = 150;
 			playerX = (int)(399/4f);
-			//Log.e("Navi", "" + playerX);
 		}
 		float translateY = 0;
 		
@@ -132,7 +131,6 @@ public class LevelDraw {
 		Path path = new Path();
 		path.moveTo(buffer[0].x, buffer[0].y);
 		
-		//playerY = (float)(view.getHeight() * 2.0/3.0);
 		
 		for (int i = 1; i < buffer.length; i++) {
 			path.lineTo(buffer[i].x, buffer[i].y);

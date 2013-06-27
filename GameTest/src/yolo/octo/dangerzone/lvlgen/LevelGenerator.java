@@ -2,10 +2,14 @@ package yolo.octo.dangerzone.lvlgen;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Random;
+
+import android.util.SparseArray;
 
 import yolo.octo.dangerzone.beatdetection.Beat;
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.Section;
+
 
 public class LevelGenerator implements Serializable {
 	private float[] level;
@@ -13,6 +17,7 @@ public class LevelGenerator implements Serializable {
 	//Indices per second
 	private int speed;
 	private int preload;
+	
 	
 	/* Constructor class - creates the level generator
 	 */
@@ -66,10 +71,19 @@ public class LevelGenerator implements Serializable {
 		 * Interpoleren tussen alle beats.
 		 */
 		for (int i = 0; i < beats.size() - 1; i++) {
+			
+			//TODO:
+			//RANDOM GENERATOR FOR OBJECTS
+			//SPARSEARRAYS, WHOO-HOO
+			
+			
 			Beat beat1 = beats.get(i);
 			int beatIndex1 = timeToIndex(beat1.startTime);
 			Beat beat2 = beats.get(i + 1);
 			int beatIndex2 = timeToIndex(beat2.startTime);
+			
+			
+			
 			
 			/* if (beat2.intensity > beat1.intensity)
 				level[beatIndex2] = level[beatIndex1] + beat2.intensity;
@@ -108,6 +122,7 @@ public class LevelGenerator implements Serializable {
 			//level[k] = level[lastBeatIndex] * (1 - factor);
 			level[k] = badassInterpolation(level[lastBeatIndex], 0, factor);
 			//level[k] += (1 - factor) * -0.10f * (float)Math.cos(2 * Math.PI * (k - firstBeatIndex) / beatSteps);
+
 		}
 		
 		/* if (!sections.isEmpty()) {
@@ -149,5 +164,7 @@ public class LevelGenerator implements Serializable {
 	
 	public float[] getLevel(){
 		return this.level;
+
 	}
+	
 }
