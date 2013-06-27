@@ -50,10 +50,10 @@ public class Level extends GameObject {
 	private boolean update = false;
 	private int speed = 8, bpm = 120;
 	private long updateTime = 0;
-	private double minTime = 1000/30;
+	private double minTime = 1000/30.0;
 	private int preloadTime = 1500;
-	private int diff = 0;
-	private long prevT = 0;
+	private double diff = 0;
+	private double prevT = 0;
 	private boolean fadeOut;
 	private LevelGenerator lvlGen;
 	
@@ -141,23 +141,23 @@ public class Level extends GameObject {
 			character.groundY = lvlDraw.getHeight() - 100;
 		}
 		
-		if(at != null && at.getPlayState() == at.PLAYSTATE_PLAYING){
-			long now = 1000L * at.getPlaybackHeadPosition() / at.getPlaybackRate();
+		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
+			double now = 1000 * at.getPlaybackHeadPosition() / (double)at.getPlaybackRate();
 			diff += now - prevT;
 			//Log.e("diff", "Diff: " + diff);
 			int framesSkipped = 0;
-			while(diff > 33){
+			while(diff > minTime){
 				if(framesSkipped > 1){
 					Log.e("Update", " Skipped " + framesSkipped + " frames");
 				}
 				buffer.update(speed);
-				diff -= 33;
+				diff -= minTime;
 				framesSkipped++;
 			}
 			prevT = now;
 		}
 		
-		if(at != null && at.getPlayState() == at.PLAYSTATE_STOPPED){
+		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_STOPPED){
 			AudioTrack temp = at;
 			at = null;
 			temp.release();
