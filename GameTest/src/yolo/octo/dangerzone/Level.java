@@ -222,7 +222,7 @@ public class Level extends GameObject {
 					}
 					/* TODO Stopping here leaves no guarantee everything has been
 					 * played, but whatever */ 
-					at.stop();
+					//at.stop();
 					Log.d("playMp3", "Done decoding!");
 				} catch (Exception e) {
 					Log.e("playMp3", "Oops!", e);
