@@ -72,7 +72,7 @@ public class Level extends GameObject {
 		try{
 			String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
 			Log.e("OutPutStream", "Path: " + savedPath);
-			FileOutputStream output = Application.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
+			FileOutputStream output = App.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
 			ObjectOutputStream lvlSaver = new ObjectOutputStream(output);
 			lvlSaver.writeObject(lvlGen);
 			lvlSaver.close();
@@ -84,9 +84,6 @@ public class Level extends GameObject {
 		buffer = new FloorBuffer(lvlGen.getLevel(), preloadPoints);
 		mp3 = playMp3(path);
 		
-		
-		
-		
 		/*
 		for (int i = 0; i < bpm; i++) {
 			coin[i] = new Coin(i*400, 200);
@@ -96,12 +93,16 @@ public class Level extends GameObject {
 	}
 	
 	public Level(BeatDetector beatDet, long length, String path, LevelGenerator lvlGen) {
+		this.lvlGen = lvlGen;
 		score = new Score();
 		paint = new Paint();
 		paint.setColor(Color.rgb(143,205,158));
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw(score);
-		this.lvlGen = lvlGen;
+		
+		int preloadPoints = preloadTime / (1000 / (speed * 30));
+		buffer = new FloorBuffer(lvlGen.getLevel(), preloadPoints);
+		mp3 = playMp3(path);
 	}
 	
 	protected void onAttach() {
@@ -188,27 +189,27 @@ public class Level extends GameObject {
 				try {
 					MP3Decoder md = new MP3Decoder(path);
 					
-					int channels = AudioFormat.CHANNEL_OUT_DEFAULT;
+					int afChannels = AudioFormat.CHANNEL_OUT_DEFAULT;
 					switch (md.getNumChannels()) {
-						case 1: channels = AudioFormat.CHANNEL_OUT_MONO; break;
-						case 2: channels = AudioFormat.CHANNEL_OUT_STEREO; break;
+						case 1: afChannels = AudioFormat.CHANNEL_OUT_MONO; break;
+						case 2: afChannels = AudioFormat.CHANNEL_OUT_STEREO; break;
 					}
 					int bufferSize = AudioTrack.getMinBufferSize(md.getRate(),
-							channels, AudioFormat.ENCODING_PCM_16BIT);
+							afChannels, AudioFormat.ENCODING_PCM_16BIT);
 					short[] buffer = new short[bufferSize];
 					ByteBuffer nativeBuffer = ByteBuffer.allocateDirect(bufferSize * 2);
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
 					at = new AudioTrack(AudioManager.STREAM_MUSIC,
-							md.getRate(), channels,
+							md.getRate(), afChannels,
 							AudioFormat.ENCODING_PCM_16BIT, bufferSize,
 							AudioTrack.MODE_STREAM);
-					int preloadSamples = md.getRate() * channels * preloadTime / 1000;
-					//short[] preloadBuffer = new short[preloadSamples];
+					int preloadSamples = md.getRate() * md.getNumChannels() * preloadTime / 1000;
+					short[] preloadBuffer = new short[preloadSamples];
 					
 					at.play();
-					//at.write(preloadBuffer, 0, preloadSamples);
+					at.write(preloadBuffer, 0, preloadSamples);
 					int readSamples = -1;
 					while (readSamples != 0) {
 						readSamples = md.readSamples(shortBuffer);

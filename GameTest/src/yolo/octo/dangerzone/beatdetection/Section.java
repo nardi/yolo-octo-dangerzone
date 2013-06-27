@@ -3,9 +3,14 @@ package yolo.octo.dangerzone.beatdetection;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+ * Sections are used to keep track of 
+ * music sections in an MP3 file. 
+ * Sections have a list of beats, a start time and an end time.
+ */
 public class Section {
 	public long startTime;
-	public long endTime; // of length, kan ook
+	public long endTime;
 	public final List<Beat> beats = new ArrayList<Beat>();
 	public float intensity;
 	public double avgTempo;

@@ -24,6 +24,7 @@ import android.graphics.RectF;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -56,6 +57,8 @@ public class Menu extends GameObject {
 		  pnpRect;
 	Level level;
 	
+	Context context;
+	
 	protected void onAttach() {	
 		
 		res = getParentFragment().getResources();
@@ -75,7 +78,10 @@ public class Menu extends GameObject {
 			Log.e("Menu", "Picca's falen!");
 		}
 		
+		context = getParentFragment().getActivity().getApplicationContext();
+
 		pickASong = new Button(getParentFragment().getActivity(), 0, 0, 300, 200, Color.RED, "Pick a Song");
+
 		pickASong.setOnTouchListener(new OnTouchListener() {
 				public boolean onTouch(View v, MotionEvent me) {
 					if (me.getActionMasked() == MotionEvent.ACTION_DOWN && !song) {
@@ -133,11 +139,14 @@ public class Menu extends GameObject {
 			public void run() {
 				try {
 					song = true;
+
+					MediaPlayer elevator = MediaPlayer.create(context, R.raw.elevator);
+					elevator.start();
 					
 					try{
 						Log.e("Import", "Trying to import level");
 						String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
-						FileInputStream input = Application.get().getApplicationContext().openFileInput(savedPath);
+						FileInputStream input = App.get().getApplicationContext().openFileInput(savedPath);
 						ObjectInputStream lvlImporter = new ObjectInputStream(input);
 						LevelGenerator lvlGen = (LevelGenerator) lvlImporter.readObject();
 						lvlImporter.close();
@@ -192,8 +201,14 @@ public class Menu extends GameObject {
 						length = 1000 * md.getLength() / md.getRate();
 						level = new Level(bd, length, path);
 						ready = true;
+						
+						/* Stop elevator, start elevator bell */
+						elevator.stop();
+						MediaPlayer bell = MediaPlayer.create(context, R.raw.elevator_bell);
+						bell.start();
 					} 
 				}catch (Exception e) {
+
 					Log.e("loadLevel", "Oops!", e);
 				}
 			}
@@ -223,7 +238,9 @@ public class Menu extends GameObject {
 		    picking = false;
 		}
 		
+
 		if (ready) {
+			
 			pickASong.setText("Start Playing");
 		}
 		else if (song) {
