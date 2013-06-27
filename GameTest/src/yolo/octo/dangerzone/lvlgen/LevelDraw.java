@@ -34,6 +34,7 @@ public class LevelDraw {
 		old = new PointF(0 , 0);
 		this.score = score;
 	}
+	
 	/*
 	 * Following are the drawing functions for the level. Each function can 
 	 * either use the standard paint or the given paint. The drawFloor functions
@@ -113,7 +114,6 @@ public class LevelDraw {
 			old.y = view.getHeight() * 2/3;
 			old.x = 150;
 			playerX = (int)(399/4f);
-			//Log.e("Navi", "" + playerX);
 		}
 		float translateY = 0;
 		
@@ -132,7 +132,6 @@ public class LevelDraw {
 		Path path = new Path();
 		path.moveTo(buffer[0].x, buffer[0].y);
 		
-		//playerY = (float)(view.getHeight() * 2.0/3.0);
 		
 		for (int i = 1; i < buffer.length; i++) {
 			path.lineTo(buffer[i].x, buffer[i].y);

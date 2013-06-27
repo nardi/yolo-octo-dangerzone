@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import yolo.octo.dangerzone.core.GameObject;
+import yolo.octo.dangerzone.lvlgen.Collectable;
+import yolo.octo.dangerzone.Character;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -19,7 +21,7 @@ import android.view.View;
 
 public class Character extends GameObject {
 	private double speed=5.0;
-	public float x, y, groundY, radius = 40;
+	public float x, y, groundY, radius = 50;
 	private Bitmap sprite;
 	public boolean jumping = false;
 	public boolean direction = false;
@@ -46,8 +48,23 @@ public class Character extends GameObject {
 	    } catch (Exception e) {
 	        Log.d("kak","Error is " + e);
 	    } 
+	    
+	    Collectable.setCharacter(this);
 	}
 	
+	public Character(Context context, float x, float y, int temp) {
+		this.x = x;
+		this.groundY = y;
+		this.y = y;
+		
+	    Resources res = context.getResources();
+	    try {
+			Bitmap spriteBig = BitmapFactory.decodeResource(res, R.drawable.octo);
+			this.sprite = getResizedBitmap(spriteBig, 100, 100);
+	    } catch (Exception e) {
+	        Log.d("kak","Error is " + e);
+	    } 	
+	}
 	protected void onUpdate(long dt){
 		if (jumping) {
 			updateY(dt);
