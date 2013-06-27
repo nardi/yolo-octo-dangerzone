@@ -9,19 +9,24 @@
 
 package yolo.octo.dangerzone.lvlgen;
 
+import java.util.Random;
+
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.media.AudioTrack;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 
 public class FloorBuffer {
 	private int index;
 	private int bufferSize;
 	private int pointCounter;
+	private int randomInt;
 	private float[] buffer;
 	private PointF[] tempBuffer;
 	private float[] points;
+	private Random colGen = new Random();
 	
 	/* Initialiseer de waardes voor de buffer */
 	public FloorBuffer(float[] points) {
@@ -44,6 +49,13 @@ public class FloorBuffer {
 		for (int i = 0; i < bufferSize; i++) {
 			if (i < points.length) {
 				buffer[i] = points[i];
+				
+				randomInt = colGen.nextInt(100);
+				if (randomInt <= 3) {
+					//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
+					// Geef i mee!!!
+				}
+				
 			}
 			
 			else {
@@ -57,6 +69,11 @@ public class FloorBuffer {
 	public void update() {
 		if (pointCounter < points.length) {
 			buffer[index] = points[pointCounter];
+			randomInt = colGen.nextInt(100);
+			if (randomInt <= 3) {
+				//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
+				// Geef 399 mee!!! (Want hij moe trechts beginnen
+			}
 		}
 		else {
 			buffer[index] = 0;

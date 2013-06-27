@@ -5,13 +5,16 @@ public class Score {
 	
 	public Score() {
 		score = 0;
+		Collectable.setScore(this);
 	}
 	
-	public void setScore(int score) {
-		this.score = score;
+	public void addScore(int score) {
+		this.score += score;
 	}
 	
 	public int getScore() {
 		return score;
 	}
+	
+	
 }
