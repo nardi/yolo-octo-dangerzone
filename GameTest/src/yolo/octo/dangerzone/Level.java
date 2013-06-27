@@ -50,7 +50,7 @@ public class Level extends GameObject {
 	private boolean update = false;
 	private int speed = 8, bpm = 120;
 	private long updateTime = 0;
-	private double minTime = 1000/30.0;
+	private double minTime = 1/30.0;
 	private int preloadTime = 1500;
 	private double diff = 0;
 	private double prevT = 0;
@@ -142,7 +142,7 @@ public class Level extends GameObject {
 		}
 		
 		if(at != null && at.getPlayState() == AudioTrack.PLAYSTATE_PLAYING){
-			double now = 1000 * at.getPlaybackHeadPosition() / (double)at.getPlaybackRate();
+			double now = at.getPlaybackHeadPosition() / (double)at.getPlaybackRate();
 			diff += now - prevT;
 			//Log.e("diff", "Diff: " + diff);
 			int framesSkipped = 0;
@@ -201,14 +201,15 @@ public class Level extends GameObject {
 					// Audio data is little endian, so for correct bytes -> short conversion:
 					nativeBuffer.order(ByteOrder.LITTLE_ENDIAN);
 					ShortBuffer shortBuffer = nativeBuffer.asShortBuffer();
-					at = new AudioTrack(AudioManager.STREAM_MUSIC,
+					AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
 							md.getRate(), afChannels,
 							AudioFormat.ENCODING_PCM_16BIT, bufferSize,
 							AudioTrack.MODE_STREAM);
 					int preloadSamples = md.getRate() * md.getNumChannels() * preloadTime / 1000;
 					short[] preloadBuffer = new short[preloadSamples];
 					
-					at.play();
+					audioTrack.play();
+					at = audioTrack;
 					at.write(preloadBuffer, 0, preloadSamples);
 					int readSamples = -1;
 					while (readSamples != 0) {
