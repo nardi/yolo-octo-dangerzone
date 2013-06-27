@@ -55,6 +55,7 @@ public class Level extends GameObject {
 	private int diff = 0;
 	private long prevT = 0;
 	private boolean fadeOut;
+	private LevelGenerator lvlGen;
 	
 	//Coin[] coin = new Coin[bpm];
 	
@@ -65,31 +66,18 @@ public class Level extends GameObject {
 		paint.setTextSize(12);
 		lvlDraw = new LevelDraw(score);
 		Log.e("LvlGen", "Generating level");
-		String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
-		LevelGenerator lvlGen;
-		
+
+		lvlGen = new LevelGenerator(beatDet, length, speed);
+		lvlGen.generateLevel();
 		try{
-			Log.e("Import", "Trying to import level");
-			FileInputStream input = this.getParentFragment().getActivity().openFileInput(savedPath);
-			ObjectInputStream lvlImporter = new ObjectInputStream(input);
-			lvlGen = (LevelGenerator) lvlImporter.readObject();
-			lvlImporter.close();
-			Log.e("Import", "Succes!");
-			
-		}catch(Exception e){
-			Log.e("Import", "Could not import level, generating new one");
-			lvlGen = new LevelGenerator(beatDet, length, speed);
-			lvlGen.generateLevel();
-			try{
-				Log.e("OutPutStream", "Path: " + savedPath);
-				FileOutputStream output = Application.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
-				ObjectOutputStream lvlSaver = new ObjectOutputStream(output);
-				lvlSaver.writeObject(lvlGen);
-				lvlSaver.close();
-			}catch(Exception ex){
-				Log.e("OutPutStream", "Could not save level to a file because: ", ex);
-			}
-			
+			String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
+			Log.e("OutPutStream", "Path: " + savedPath);
+			FileOutputStream output = Application.get().getApplicationContext().openFileOutput(savedPath, Context.MODE_PRIVATE);
+			ObjectOutputStream lvlSaver = new ObjectOutputStream(output);
+			lvlSaver.writeObject(lvlGen);
+			lvlSaver.close();
+		}catch(Exception ex){
+			Log.e("OutPutStream", "Could not save level to a file because: ", ex);
 		}
 		
 		int preloadPoints = preloadTime / (1000 / (speed * 30));
@@ -105,6 +93,15 @@ public class Level extends GameObject {
 			coin[i].speed = speed + (speed/3);
 			addObject(coin[i]);
 		} */
+	}
+	
+	public Level(BeatDetector beatDet, long length, String path, LevelGenerator lvlGen) {
+		score = new Score();
+		paint = new Paint();
+		paint.setColor(Color.rgb(143,205,158));
+		paint.setTextSize(12);
+		lvlDraw = new LevelDraw(score);
+		this.lvlGen = lvlGen;
 	}
 	
 	protected void onAttach() {
