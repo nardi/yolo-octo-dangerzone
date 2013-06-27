@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import yolo.octo.dangerzone.core.GameObject;
-//import yolo.octo.dangerzone.lvlgen.Collectable;
+import yolo.octo.dangerzone.lvlgen.Collectable;
 import yolo.octo.dangerzone.Character;
 
 import android.content.Context;
@@ -49,7 +49,7 @@ public class Character extends GameObject {
 	        Log.d("kak","Error is " + e);
 	    } 
 	    
-	    //Collectable.setCharacter(this);
+	    Collectable.setCharacter(this);
 	}
 	
 	public Character(Context context, float x, float y, int temp) {

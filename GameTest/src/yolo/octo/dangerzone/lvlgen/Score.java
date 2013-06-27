@@ -5,7 +5,7 @@ public class Score {
 	
 	public Score() {
 		score = 0;
-		//Collectable.setScore(this);
+		Collectable.setScore(this);
 	}
 	
 	public void addScore(int score) {
