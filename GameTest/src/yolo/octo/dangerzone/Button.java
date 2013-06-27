@@ -29,21 +29,23 @@ import android.view.View.OnTouchListener;
  * Used in the game and in the menu. 
  */
 public class Button extends GameObject {
-	float x, y, width, height;
-	Bitmap button1, button2;
-	boolean pressed = false;
-	RectF rect = new RectF();
-	OnTouchListener onTouchListener;
-	Paint paint = new Paint(); {
+	private float x, y, width, height;
+	public boolean pressed = false;
+	private Bitmap button1, button2;
+	private RectF rect = new RectF();
+	private OnTouchListener onTouchListener;
+	
+	private Paint paint = new Paint(); {
 		paint.setAlpha(220);
 	}
-	Paint textPaint = new Paint(); {
+	
+	private Paint textPaint = new Paint(); {
 		textPaint.set(paint);
 		textPaint.setTextAlign(Align.CENTER);
 		textPaint.setTextSize(30);
 		textPaint.setColor(Color.WHITE);
 	}
-	String text;
+	private String text;
 	
 	/* Constructor*/
 	public Button(Context context, float x, float y, float width, float height, int color, String text) {

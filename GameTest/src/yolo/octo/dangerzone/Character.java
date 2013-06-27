@@ -25,8 +25,6 @@ public class Character extends GameObject {
 	private Bitmap sprite;
 	public boolean jumping = false;
 	public boolean direction = false;
-	private long previous = 0, start = 0;
-	
 	public static final double gravity = 0.3;
 	
 	Paint character = new Paint(); {
@@ -36,6 +34,7 @@ public class Character extends GameObject {
 		character.setShadowLayer(2, 0, 0, Color.argb(0x42, 0, 0, 0));
 	}
 	
+	/* Constructor */
 	public Character(Context context, float x, float y) {
 		this.x = x;
 		this.groundY = y;
@@ -52,10 +51,12 @@ public class Character extends GameObject {
 	    Collectable.setCharacter(this);
 	}
 	
-	public Character(Context context, float x, float y, int temp) {
+	/* Constructor*/
+	public Character(Context context, float x, float y, int floatOffset) {
+
 		this.x = x;
 		this.groundY = y;
-		this.y = y;
+		this.y = y + floatOffset;
 		
 	    Resources res = context.getResources();
 	    try {
@@ -65,12 +66,17 @@ public class Character extends GameObject {
 	        Log.d("kak","Error is " + e);
 	    } 	
 	}
+	
+	/* The general update method */
 	protected void onUpdate(long dt){
 		if (jumping) {
 			updateY(dt);
 		}
 	}
 	
+	/* If the character is in 'jump' mode, updateY changes the vertical position
+	 * depending on the direction and speed.
+	 */
 	private void updateY(long dt) {		   
 		y -= (dt/5) *speed;       
 		speed -= (dt/17) * gravity;   
@@ -94,10 +100,14 @@ public class Character extends GameObject {
 		return resizedBitmap;
 	}
 	
+	/* General onDraw method, draws the character.
+	 */
 	public void onDraw(Canvas canvas) {
 		canvas.drawBitmap(sprite, x-50, y, null);
 	}
 	
+	/* getCharacterPos returns the x coordinatem y coordinate and radius of the character
+	 */
 	public float[] getCharacterPos() {
 		float[] pos = {x, y, radius};
 		return pos;
