@@ -25,6 +25,7 @@ public class LevelComplete extends GameObject {
 	private int textPart;
 	private Menu menu;
 	
+	/* Constructor*/
 	public LevelComplete (Score score) {
 		this.score = score;
 		textPart = 0;
@@ -77,7 +78,7 @@ public class LevelComplete extends GameObject {
 		time++;
 	}
 	
-	
+	/* Draws the end screen*/
 	public void onDraw (Canvas canvas) {
 		
 		int height = this.getParentFragment().getView().getHeight();
@@ -86,10 +87,12 @@ public class LevelComplete extends GameObject {
 		canvas.drawRect(0, 0, width, (height / 3) * 2, top);
 		canvas.drawRect(0, (height / 3) * 2, width, height, bottom);
 		
+		/* Sets the proper x and y coordinates of the player and octo*/
 		player.x = width / 8;
 		player.y = ((height / 3) * 2) - 100;
 		octo.x = width - (width /4);
 		octo.y = (height / 2) - 200;
+		
 		/* Keeps track of what part of the text we are at and draws it on the canvas*/
 		switch(textPart) {
 			case 0:
