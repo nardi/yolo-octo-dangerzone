@@ -41,7 +41,6 @@ public class Menu extends GameObject {
 	private BeatDetector bd;
 	public long length;
 	public int time, print;
-	private String path;
 	public boolean picking = false,
 				   song = false,
 				   ready = false;
@@ -128,7 +127,6 @@ public class Menu extends GameObject {
 				Log.e("Menu", "Something went wrong...");
 				return;
 			}
-			this.path = path;
 			new Thread(loadLevel(path)).start();
 		}
 	}
