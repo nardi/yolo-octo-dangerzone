@@ -13,6 +13,7 @@ public class Collectable extends GameObject {
 	private float radius;
 	private int reward;
 	private int color;
+	private int speed;
 	private float x, y;
 	private float[] cPosition;
 	private Paint paint;
@@ -23,11 +24,12 @@ public class Collectable extends GameObject {
 	private boolean rewarded;
 	
 	
-	public Collectable(int type, int locIndex, LevelDraw lvlDraw) {
+	public Collectable(int type, int locIndex, LevelDraw lvlDraw, int speed) {
 		this.type = type;
 		this.radius = 30;
 		this.view = lvlDraw.getView();
 		this.lvlDraw = lvlDraw;
+		this.speed = speed;
 		
 		
 		//TODO: Zet locIndex (index in buffer) om in X.
@@ -46,28 +48,33 @@ public class Collectable extends GameObject {
 				//create a coin on the floor, y is relative to the height of the floor.
 				this.reward = 50;
 				this.color = Color.YELLOW;
-				this.y -= 0;
+				this.y -= 1/40F * (float)view.getHeight();
+				Log.e("Collectable", "FloorCoin!" + y);
 				break;
 				
 			case 1 :
 				//create a coin in the air, y is again relative to the floor.
 				this.reward = 50;
 				this.color = Color.YELLOW;
-				this.y -= 50;
+				this.y -= 1/3F * (float)view.getHeight();
+				Log.e("Collectable", "AirCoin!" + y);
 				break;
 			
 			case 2 :
 				//create an obstacle on the ground;
 				this.reward = -30;
 				this.color = Color.BLACK;
-				this.y -= 0;
+				this.y -= 1/40F * (float)view.getHeight();
+				Log.e("Collectable", "FloorObs!" + y);
 				break;
 			
 			case 3 :
 				//create an obstacle in the air
+				
 				this.reward = -30;
 				this.color = Color.BLACK;
-				this.y -= 50;
+				this.y -= 1/3F * (float)view.getHeight();
+				Log.e("Collectable", "AirObs!" + y);
 				break; 
 		}		
 		
@@ -79,7 +86,7 @@ public class Collectable extends GameObject {
 	public void onUpdate(long dt) {
 		// TODO: Update x
 		if(view != null){
-			this.x -= 4 * (float)(view.getWidth() / 399.0);
+			this.x -= speed * (float)(view.getWidth() / 399.0);
 		}
 	
 		checkColission();
