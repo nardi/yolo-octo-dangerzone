@@ -26,6 +26,7 @@ public class LevelDraw {
 	private int y = 50;
 	private int playerX;
 	private float playerY;
+	private float collectableHeight;
 	
 	/* Constructor for a level drawer.
 	 */
@@ -113,6 +114,7 @@ public class LevelDraw {
 		/* Retrieves the Y-value of the player's location.
 		 */
 		playerY = buffer[playerX].y + translateY;
+		collectableHeight = buffer[399].y;
 		
 		/* Draw the paths between the points
 		 */
@@ -149,5 +151,9 @@ public class LevelDraw {
 	
 	public View getView(){
 		return this.view;
+	}
+	
+	public float getCollectableHeight(){
+		return collectableHeight;
 	}
 }

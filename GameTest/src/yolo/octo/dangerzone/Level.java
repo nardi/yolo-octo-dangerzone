@@ -133,17 +133,13 @@ public class Level extends GameObject {
 		@Override
 		public void onPeriodicNotification(AudioTrack arg0) {
 			buffer.update(speed);
-			int randomInt = colGen.nextInt(100);
+			int randomInt = colGen.nextInt(400);
 			if (randomInt <= 3) {
 				//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
-<<<<<<< HEAD
 				Collectable collect = new Collectable(randomInt, 399, lvlDraw);
 				collect.setCharacter(character);
 				addObject(collect);
-=======
-				//addObject(new Collectable(randomInt, 399, lvlDraw.getView()));
->>>>>>> 37cf99c083551e39d31fe5a709c7c3d8fc5bc874
-				// Geef 399 mee!!! (Want hij moe trechts beginnen
+
 			}
 		}
 		@Override
