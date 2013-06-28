@@ -43,7 +43,6 @@ public class LevelComplete extends GameObject {
 		player = new Character(context, 0 , 0);
 		octo = new Character(context, 0, 0, 20);
 		text.setColor(Color.rgb(232, 118, 0));
-		text.setTextSize(40);
 		nextText = new Button(context, 0, 0, 100, 100, Color.RED, "Next");
 		
 		/* Makes the butten keeping track of the text skipping*/
@@ -85,7 +84,7 @@ public class LevelComplete extends GameObject {
 		nextText.setPosition(75, canvas.getHeight() - 75);
 		canvas.drawRect(0, 0, width, (height / 3) * 2, top);
 		canvas.drawRect(0, (height / 3) * 2, width, height, bottom);
-		
+		text.setTextSize(40);
 		/* Sets the proper x and y coordinates of the player and octo*/
 		player.x = width / 8;
 		player.y = ((height / 3) * 2) - 100;
@@ -111,9 +110,14 @@ public class LevelComplete extends GameObject {
 				break;
 			case 4:
 				nextText.setText("Menu");
+				break;
 			default:
 				break;
 		}
+		/* Draw the score*/
+		text.setTextSize(30);
+		canvas.drawText("Well done Great Yolo..", width / 5, (height / 4) * 3, text);
+		canvas.drawText("Score: " + score.getScore(), width / 5, (height / 4) * 3 + 30, text);
 	}
 	
 	public void onHalt() {
