@@ -44,7 +44,7 @@ public class Level extends GameObject {
 	private Character character;
 	private Button jumpButton;
 	private boolean update = false;
-	private int preloadTime = 0;
+	private int preloadTime = 1000;
 	private int fadeOut;
 	private LevelGenerator lvlGen;
 	private Random colGen = new Random();
