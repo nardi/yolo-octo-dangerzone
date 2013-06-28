@@ -1,6 +1,5 @@
 package yolo.octo.dangerzone;
 
-
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
@@ -45,14 +44,15 @@ public class Level extends GameObject {
 	private Character character;
 	private Button jumpButton;
 	private boolean update = false;
-	private int preloadTime = 0;
-	private boolean fadeOut;
+	private int preloadTime = 1000;
+	private int fadeOut;
 	private LevelGenerator lvlGen;
 	private Random colGen = new Random();
 	private LevelComplete end;
 		
 	public Level(BeatDetector beatDet, long length, String path) {
 		this(new LevelGenerator(beatDet, length, speed), path);
+		
 		try{
 			String savedPath = path.substring(path.lastIndexOf("/") + 1) + ".lvl";
 			Log.e("OutPutStream", "Path: " + savedPath);
@@ -118,13 +118,16 @@ public class Level extends GameObject {
 			AudioTrack temp = at;
 			at = null;
 			temp.release();
-			fadeOut = true;
+			fadeOut = 1;
 		}
 		
-		if(fadeOut){
-			end = new LevelComplete(score);
+		if(fadeOut > 0){
 			buffer.update(speed);
-			swapFor(end);
+			if (fadeOut >= 200) {
+				end = new LevelComplete(score);
+				swapFor(end);
+			}
+			fadeOut++;
 		}
 		
 	}
@@ -139,7 +142,6 @@ public class Level extends GameObject {
 				Collectable collect = new Collectable(randomInt, 399, lvlDraw);
 				collect.setCharacter(character);
 				addObject(collect);
-
 			}
 		}
 		@Override

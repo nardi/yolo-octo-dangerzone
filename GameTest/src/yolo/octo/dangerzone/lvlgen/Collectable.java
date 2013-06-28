@@ -81,7 +81,7 @@ public class Collectable extends GameObject {
 		if(view != null){
 			this.x -= 4 * (float)(view.getWidth() / 399.0);
 		}
-		
+	
 		checkColission();
 	}
 	

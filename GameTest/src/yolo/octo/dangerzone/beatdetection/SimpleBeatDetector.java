@@ -15,7 +15,9 @@ import yolo.octo.dangerzone.core.CircularFloatBuffer;
  * 
  * Beats are found by comparing the energy of a sample with the average of the
  * previous energies measured. If the energy in a sample is higher than the average
- * of the history we have found a beat.
+ * of the history by a certain amount we have found a beat.
+ * 
+ * (Based on the algorithm found at http://archive.gamedev.net/archive/reference/programming/features/beatdetection/index.html)
  */
 public class SimpleBeatDetector implements BeatDetector {
 	private static final int LOWEST_BPM = 60;
@@ -150,13 +152,13 @@ public class SimpleBeatDetector implements BeatDetector {
 		return variance / energyHistory.length;
 	}
 	
-	/* Used to calculate the constant value*/
+	/* Used to calculate the constant value */
 	private float calcC (float v) {
 		return -0.0025714f * v + 1.5142857f;
 	}
 	
-	/* Walks through the list of beats and 
-	 * returns the average length of all beats.
+	/* Walks through the list of beats and returns
+	 * the average tempo (in beats per minute).
 	 */
 	public double estimateTempo() {
 		int numBeatTimes = 0;
@@ -168,18 +170,19 @@ public class SimpleBeatDetector implements BeatDetector {
 		for (int i = 0; i < beats.size() - 1; i++) {
 			long time = beats.get(i + 1).time() - beats.get(i).time();
 			if (60000 / time >= LOWEST_BPM) {
+				totalBeatTime += time;
 				beatTimes[numBeatTimes] = time;
 				numBeatTimes++;
 			}
 		}
 		avgBeatTime = ((double)totalBeatTime / numBeatTimes);
 		
-		/* Also calculates the median, just in case*/
+		/* Also calculates the median, just in case */
 		Arrays.sort(beatTimes);
 		medianBeatTime = beatTimes[beatTimes.length - numBeatTimes / 2 - 1];
 		if (beatTimes.length % 2 == 0) {
-	      double prev = beatTimes[beatTimes.length - numBeatTimes / 2];
-	      medianBeatTime = (float) ((prev + medianBeatTime) / 2);
+			double prev = beatTimes[beatTimes.length - numBeatTimes / 2];
+			medianBeatTime = (float) ((prev + medianBeatTime) / 2);
 	    }
 		
 		return 60000 / avgBeatTime;
