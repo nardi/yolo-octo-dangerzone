@@ -1,11 +1,7 @@
 package yolo.octo.dangerzone;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 import yolo.octo.dangerzone.core.GameObject;
-import yolo.octo.dangerzone.lvlgen.Collectable;
+import yolo.octo.dangerzone.lvlgen.Collectible;
 import yolo.octo.dangerzone.Character;
 
 import android.content.Context;
@@ -17,7 +13,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.Log;
-import android.view.View;
 
 public class Character extends GameObject {
 	private double speed=5.0;
@@ -48,7 +43,7 @@ public class Character extends GameObject {
 	        Log.d("kak","Error is " + e);
 	    } 
 	    
-	    Collectable.setCharacter(this);
+	    Collectible.setCharacter(this);
 	}
 	
 	/* Constructor*/
@@ -109,7 +104,7 @@ public class Character extends GameObject {
 	/* getCharacterPos returns the x coordinatem y coordinate and radius of the character
 	 */
 	public float[] getCharacterPos() {
-		float[] pos = {x, y, radius};
+		float[] pos = {x, y , radius};
 		return pos;
 	}
 }

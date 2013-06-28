@@ -9,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.util.Log;
 import android.view.View;
@@ -23,10 +22,9 @@ public class LevelDraw {
 	private Paint text;
 	private PointF old;
 	private boolean init = true;
-	private int y = 50;
 	private int playerX;
 	private float playerY;
-	private float collectableHeight;
+	private float collectibleHeight;
 	
 	/* Constructor for a level drawer.
 	 */
@@ -90,7 +88,7 @@ public class LevelDraw {
 	 */
 	public void drawFromBuffer(PointF[] buffer, Canvas canvas){
 		
-		/* Initialises a few values ont he first draw
+		/* Initializes a few values on the first draw
 		 */
 		if (init) {
 			init = false;
@@ -114,22 +112,21 @@ public class LevelDraw {
 		/* Retrieves the Y-value of the player's location.
 		 */
 		playerY = buffer[playerX].y + translateY;
-		collectableHeight = buffer[399].y;
+		collectibleHeight = buffer[399].y;
 		
 		/* Draw the paths between the points
 		 */
 		Path path = new Path();
 		path.moveTo(buffer[0].x, buffer[0].y);
 		
+		/* For each point, create a path line to it from the previous point.
+		 */
 		for (int i = 1; i < buffer.length; i++) {
 			path.lineTo(buffer[i].x, buffer[i].y);
-				
-			if (i != playerX) {
-				//drawFloor(buf, canvas);
-				//fillFloor(buf, canvas);
-			}
-
 		}
+		
+		/* Draw the floor and give it some color. 
+		 */
 		Paint paint2 = new Paint();
 		paint2.setColor(Color.rgb(183, 219, 149));
 		path.lineTo(view.getWidth(), view.getHeight());
@@ -149,11 +146,15 @@ public class LevelDraw {
 		return playerY;
 	}
 	
+	/* Returns the current view.
+	 */
 	public View getView(){
 		return this.view;
 	}
 	
-	public float getCollectableHeight(){
-		return collectableHeight;
+	/* Returns the collectible's height.
+	 */
+	public float getCollectibleHeight(){
+		return collectibleHeight;
 	}
 }

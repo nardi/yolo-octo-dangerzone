@@ -1,32 +1,15 @@
-/* De ringbuffer die bijhoudt welke punten er op dit moment op het scherm
- * staan
- * 
- * Dit is de meest basic vorm van de buffer.
- * 
- * NOTICES:
- * Maak EERST de punten aan, en daarna de buffer.
+/* The Floorbuffer-class is a ring-buffer that manages the points visible 
+ * on the screen.
  */
 
 package yolo.octo.dangerzone.lvlgen;
-
-import java.util.Random;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import android.app.Application;
-import android.graphics.Point;
 import android.graphics.PointF;
-import android.media.AudioTrack;
-import android.util.Log;
-import android.util.SparseArray;
 import android.view.View;
 
 public class FloorBuffer {
 	private int index;
 	private int bufferSize;
 	private int pointCounter = 0;
-	private int randomInt;
 	private int offset;
 	private float[] points;
 	private float[] buffer;
@@ -72,9 +55,6 @@ public class FloorBuffer {
 			buffer[index] = 0;
 			if (offset > 0)
 				offset--;
-			
-			
-
 		}
 		else {
 			buffer[index] = points[pointCounter];
@@ -84,6 +64,9 @@ public class FloorBuffer {
 		index = (index + 1) % bufferSize;
 	}
 	
+	/* This update() is calle din order to consecutively execute update(),
+	 * for example when we need to skip a few framses.
+	 */
 	public void update(int skip){
 		for(int i = 0; i < skip; i++){
 			update();

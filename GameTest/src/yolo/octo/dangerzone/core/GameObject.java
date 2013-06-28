@@ -1,3 +1,9 @@
+/* GameObjects are objects that can be added and removed on run.
+ * When added, when the game requires updating, all onUpdate methods of the 
+ * objects added get called. The same goes for onDraw when everything needs 
+ * to be drawn.
+ */
+
 package yolo.octo.dangerzone.core;
 
 import java.util.ArrayList;

@@ -1,22 +1,19 @@
+/* GameFragment used for testing various individual features.
+ */
+
 package yolo.octo.dangerzone;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.text.DecimalFormat;
-import java.util.List;
-
-
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.beatdetection.FFTBeatDetector;
 import yolo.octo.dangerzone.beatdetection.Section;
 import yolo.octo.dangerzone.core.GameFragment;
 
 import ddf.minim.analysis.FFT;
-import ddf.minim.analysis.WindowFunction;
-
 import nobleworks.libmpg.MP3Decoder;
 import android.content.Intent;
 import android.database.Cursor;
@@ -29,7 +26,6 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.app.Activity;
 import android.app.Fragment;

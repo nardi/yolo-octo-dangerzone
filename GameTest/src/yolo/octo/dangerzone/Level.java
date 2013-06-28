@@ -11,7 +11,7 @@ import nobleworks.libmpg.MP3Decoder;
 
 import yolo.octo.dangerzone.beatdetection.BeatDetector;
 import yolo.octo.dangerzone.core.GameObject;
-import yolo.octo.dangerzone.lvlgen.Collectable;
+import yolo.octo.dangerzone.lvlgen.Collectible;
 import yolo.octo.dangerzone.lvlgen.FloorBuffer;
 import yolo.octo.dangerzone.lvlgen.LevelDraw;
 import yolo.octo.dangerzone.lvlgen.LevelGenerator;
@@ -85,6 +85,8 @@ public class Level extends GameObject {
 		character = new Character(context, 0, 0);
 		addObject(character);
 		
+		Collectible.setCharacter(character);
+		
 		jumpButton = new Button(context, 0, 0, 100, 100, Color.RED, "Jump");
 		jumpButton.setOnTouchListener(new OnTouchListener() {
 			public boolean onTouch(View v, MotionEvent me) {
@@ -105,6 +107,10 @@ public class Level extends GameObject {
 		new Thread(playMp3(path)).start();
 	}
 	
+	/* Handles the things to update every 1/30th second approx.
+	 * It handles part of the jumping's administration and the playback of
+	 * music in order to sync it with the game.
+	 */
 	@Override
 	public void onUpdate(long dt) {
 		if (update && !character.jumping) {
@@ -138,9 +144,7 @@ public class Level extends GameObject {
 			buffer.update(speed);
 			int randomInt = colGen.nextInt(330);
 			if (randomInt <= 3) {
-				//TODO: Maak nieuwe collectable aan met types 0, 1, 2, of 3
-				Collectable collect = new Collectable(randomInt, 399, lvlDraw, speed);
-				collect.setCharacter(character);
+				Collectible collect = new Collectible(randomInt, 399, lvlDraw, speed);
 				addObject(collect);
 			}
 		}
@@ -149,6 +153,8 @@ public class Level extends GameObject {
 		}
 	};
 	
+	/* Handles the general elements of drawing on the screen.
+	 */
 	@Override
 	public void onDraw(Canvas canvas){
 		

@@ -1,9 +1,11 @@
+/* This is the initial menu, shown when the game is started. It 
+ * shows our logo's and allows you to pick a song to play.
+ */
+
 package yolo.octo.dangerzone;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -18,12 +20,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -273,9 +271,7 @@ public class Menu extends GameObject {
 		
 		pnp = getResizedBitmap(pnp, height/5, height, width);
 		canvas.drawBitmap(pnp, 0, (height/5 )*4, null);
-		//pnpRect.set(0, height - (height / 5), width / 3, height);
-		//canvas.drawBitmap(pnp, null, pnpRect, null);
-		
+
 		logo = getResizedBitmap(logo, height/2, height, width);
 		float left = (width/2) - (logo.getWidth()/2);
 		canvas.drawBitmap(logo, left, 0, null);

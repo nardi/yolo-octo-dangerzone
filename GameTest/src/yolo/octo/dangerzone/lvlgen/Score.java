@@ -11,7 +11,7 @@ public class Score {
 	 */
 	public Score() {
 		score = 0;
-		Collectable.setScore(this);
+		Collectible.setScore(this);
 	}
 	
 	/* Adds a certain amount to the current score. 
